@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Vector;
 //import java.util.Map;
 
-import org.opencv.android;
+import org.opencv.android.*;
+import org.opencv.utils.*;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -278,7 +279,7 @@ class CtView extends SampleCvViewBase implements OnTouchListener{
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
 
-        if (android.MatToBitmap(mRgba, bmp))
+        if (Utils.matToBitmap(mRgba, bmp))
             return bmp;
 
         bmp.recycle();
@@ -292,11 +293,11 @@ class CtView extends SampleCvViewBase implements OnTouchListener{
         synchronized (this) {
             // Explicitly deallocate Mats
             if (mRgba != null)
-                mRgba.dispose();
+                mRgba.release();
             if (mGray != null)
-                mGray.dispose();
+                mGray.release();
             if (mHSV != null)
-            	mHSV.dispose();
+            	mHSV.release();
 
             mRgba = null;
             mGray = null;

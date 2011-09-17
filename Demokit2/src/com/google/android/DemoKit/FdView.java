@@ -8,7 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 //import java.util.Map;
 
-import org.opencv.android;
+import org.opencv.android.*;
+import org.opencv.utils.*;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -164,7 +165,7 @@ class FdView extends SampleCvViewBase {
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
 
-        if (android.MatToBitmap(mRgba, bmp))
+        if (Utils.matToBitmap(mRgba, bmp))
             return bmp;
 
         bmp.recycle();
@@ -178,9 +179,9 @@ class FdView extends SampleCvViewBase {
         synchronized (this) {
             // Explicitly deallocate Mats
             if (mRgba != null)
-                mRgba.dispose();
+                mRgba.release();
             if (mGray != null)
-                mGray.dispose();
+                mGray.release();
 
             mRgba = null;
             mGray = null;
