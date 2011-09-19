@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/servoRelay" android:layout_width="match_parent"
+	android:orientation="horizontal" android:layout_height="wrap_content">
+	<TableLayout android:layout_width="0dip"
+		android:layout_height="wrap_content" android:id="@+id/servos"
+		android:layout_weight="2">
+		<include layout="@layout/servo" android:id="@+id/servo1"
+			android:layout_width="match_parent" android:layout_height="wrap_content"
+			android:layout_weight="0.7" />
+		<include layout="@layout/servo" android:id="@+id/servo2"
+			android:layout_width="match_parent" android:layout_height="wrap_content" />
+		<RelativeLayout>
+		<Button android:id="@+id/forward" android:text="fwd" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+		<Button android:layout_width="wrap_content" android:id="@+id/rotRight" android:text="rotR" android:layout_height="wrap_content" android:layout_toRightOf="@+id/forward" android:layout_alignTop="@+id/forward" android:layout_alignBottom="@+id/forward"></Button>
+		<Button android:text="tmUp" android:layout_width="50dip" android:layout_height="wrap_content" android:id="@+id/tempoUp" android:layout_toRightOf="@+id/rotRight" android:layout_alignTop="@+id/rotRight" android:layout_alignBottom="@+id/rotRight"></Button>
+		<Button android:layout_width="wrap_content" android:id="@+id/rotLeft" android:text="rotL" android:layout_height="wrap_content" android:layout_below="@+id/rotRight" android:layout_alignLeft="@+id/rotRight"></Button>
+		<Button android:layout_width="wrap_content" android:id="@+id/backward" android:text="bck" android:layout_height="wrap_content" android:layout_below="@+id/forward" android:layout_alignRight="@+id/forward"></Button>
+		<Button android:id="@+id/toggleSeq" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="ToggleSeq" android:layout_below="@+id/backward" android:layout_alignLeft="@+id/backward" android:layout_alignRight="@+id/backward"></Button>
+		<View android:id="@+id/view1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_toRightOf="@+id/toggleSeq" android:layout_alignTop="@+id/toggleSeq" android:layout_alignBottom="@+id/toggleSeq"></View>
+		<Button android:layout_width="wrap_content" android:layout_toRightOf="@+id/instrumentOn" android:text="Off" android:layout_height="wrap_content" android:layout_alignTop="@+id/instrumentOn" android:layout_alignBottom="@+id/instrumentOn" android:id="@+id/instrumentOff"></Button>
+		<Button android:text="rndAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/randomiseAll" android:layout_toRightOf="@+id/instrumentOff" android:layout_alignTop="@+id/instrumentOff" android:layout_alignBottom="@+id/instrumentOff"></Button>
+		<EditText android:layout_width="wrap_content" android:id="@+id/editText1" android:inputType="number" android:layout_height="wrap_content" android:layout_toRightOf="@+id/tempoUp" android:layout_alignTop="@+id/tempoUp" android:layout_alignBottom="@+id/tempoUp"></EditText>
+		<Button android:layout_width="50dip" android:id="@+id/tempoDown" android:text="tmDn" android:layout_height="wrap_content" android:layout_toRightOf="@+id/editText1" android:layout_alignTop="@+id/editText1" android:layout_alignBottom="@+id/editText1"></Button>
+		<EditText android:inputType="numberDecimal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/comptext" android:layout_toRightOf="@+id/tempoDown" android:layout_alignTop="@+id/tempoDown" android:layout_alignBottom="@+id/tempoDown">
+			<requestFocus></requestFocus>
+		</EditText>
+		<EditText android:inputType="numberDecimal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/acctext" android:layout_toRightOf="@+id/comptext" android:layout_alignTop="@+id/comptext" android:layout_alignBottom="@+id/comptext"></EditText>
+		<Button android:layout_width="wrap_content" android:id="@+id/stop" android:text="stop" android:layout_height="wrap_content" android:layout_toRightOf="@+id/rotLeft" android:layout_alignTop="@+id/rotLeft"></Button>
+		<Button android:text="On" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/instrumentOn" android:layout_toRightOf="@+id/stop" android:layout_alignTop="@+id/stop" android:layout_alignBottom="@+id/stop"></Button>
+		</RelativeLayout>
+	</TableLayout>
+</LinearLayout>
+
