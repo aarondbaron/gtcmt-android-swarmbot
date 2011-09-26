@@ -53,38 +53,25 @@ public class ClientActivity extends Activity  implements OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
         serverIp = (EditText) findViewById(R.id.server_ip);
         connectPhones = (Button) findViewById(R.id.connect_phones);
-        
         fromserver = (TextView) findViewById(R.id.fromserver);
         fromserver.setText("testing");
-        
         connectPhones.setOnClickListener(this);
-        
-        
         bt = new BeatTimer();
         bt.mActivity=this;
         bt.setRunning(true);
         bt.start();
-        
         array = new boolean[16];
         array[0]=true;
         aTest = new AudioTest();
         sequencerMode=true;
-        
-
-        
-        
         //atest.
     }
 
     
 
     public class ClientThread implements Runnable {
-
-        
-
 		public void run() {
             try {
                 InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
@@ -92,16 +79,9 @@ public class ClientActivity extends Activity  implements OnClickListener{
                 //Socket socket = new Socket(serverAddr, ServerActivity.SERVERPORT);
                 Socket socket = new Socket(serverAddr, 8080);
                 connected = true;
-                
-                
                 //BufferedReader in;
                 //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                
                 while (connected) {
-
-
-                	///////////////////////
-
                 	try {
                 		Log.d("client", "before creating bufread");
                 		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -114,12 +94,10 @@ public class ClientActivity extends Activity  implements OnClickListener{
                 			if(in.ready())
                 			{
                 				Log.d("in status", "ready");
-                			
                 			}
                 			else
                 			{
                 				Log.d("in status", "not ready");
-                				
                 			}
                 			Log.d("from ServerActivity", line);
 
