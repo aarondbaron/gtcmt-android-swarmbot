@@ -113,6 +113,8 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			mOutputContainer.setVisibility(View.GONE);
 			mOutputLabel.setBackgroundDrawable(mNormalTabImage);
 			
+			//mOutputController.
+			
 			return;
 			
 		}
