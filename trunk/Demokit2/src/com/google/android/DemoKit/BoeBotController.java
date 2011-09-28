@@ -140,6 +140,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		view1 = (RectView) mActivity.findViewById(R.id.view1);
 		view1.bbc=this;
 		
+		view1.setVisibility(View.GONE);
+		
 		et = (EditText) mActivity.findViewById(R.id.editText1);
 		acctext =  (EditText) mActivity.findViewById(R.id.acctext);
 		comptext = (EditText) mActivity.findViewById(R.id.comptext);
