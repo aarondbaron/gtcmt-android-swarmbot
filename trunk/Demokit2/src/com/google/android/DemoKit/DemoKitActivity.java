@@ -68,7 +68,7 @@ public class DemoKitActivity extends Activity implements Runnable {
 	BeatTimer beatTimer;
 	AudioTest aTest;
 	AndroidAudioDevice aDevice;
-	
+	ClientCode client;
 	
 	public SensorManager mSensorManager;
 
@@ -160,6 +160,8 @@ public class DemoKitActivity extends Activity implements Runnable {
 		}
 	};
 
+	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -195,6 +197,9 @@ public class DemoKitActivity extends Activity implements Runnable {
 		
 		mSensorManager = (SensorManager) getSystemService(android.content.Context.SENSOR_SERVICE);
 		
+		
+		//client = new ClientCode(this);
+		//client.attachToView();
 		//mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
 	}
 

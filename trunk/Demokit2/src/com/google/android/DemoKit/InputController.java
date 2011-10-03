@@ -11,20 +11,22 @@ public class InputController extends AccessoryController {
 	private TextView mTemperature;
 	private TextView mLightView;
 	private TextView mLightRawView;
-	private JoystickView mJoystickView;
+	//private JoystickView mJoystickView;
 	ArrayList<SwitchDisplayer> mSwitchDisplayers;
 	private final DecimalFormat mLightValueFormatter = new DecimalFormat("##.#");
 	private final DecimalFormat mTemperatureFormatter = new DecimalFormat(
 			"###" + (char)0x00B0);
 	
 	public double ir0,ir1;
+	
+	public TextView fromServer;
 
 	InputController(DemoKitActivity hostActivity) {
 		super(hostActivity);
 		mTemperature = (TextView) findViewById(R.id.tempValue);
 		mLightView = (TextView) findViewById(R.id.lightPercentValue);
 		mLightRawView = (TextView) findViewById(R.id.lightRawValue);
-		mJoystickView = (JoystickView) findViewById(R.id.joystickView);
+		//mJoystickView = (JoystickView) findViewById(R.id.joystickView);
 		
 		hostActivity.beatTimer.ic=this;
 	}
@@ -78,11 +80,11 @@ public class InputController extends AccessoryController {
 	}
 
 	public void joystickButtonSwitchStateChanged(boolean buttonState) {
-		mJoystickView.setPressed(buttonState);
+		//mJoystickView.setPressed(buttonState);
 	}
 
 	public void joystickMoved(int x, int y) {
-		mJoystickView.setPosition(x, y);
+		//mJoystickView.setPosition(x, y);
 	}
 
 	public void onTemperature(int temperature) {

@@ -177,6 +177,11 @@ public class BeatTimer extends Thread{
         running = run;
     }
 
+	public void resetIndex()
+	{
+		generalIndex=0;
+		globalTimer=System.currentTimeMillis();
+	}
 
 
 }

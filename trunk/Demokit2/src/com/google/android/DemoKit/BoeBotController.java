@@ -168,6 +168,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//sv = (SurfaceView) mActivity.findViewById(R.id.surfaceView1);
 
 		//view1.draw(canvas)
+		
+		mActivity.client = new ClientCode(mActivity);
 	}
 
 
