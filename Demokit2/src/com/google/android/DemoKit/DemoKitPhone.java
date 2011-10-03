@@ -38,6 +38,7 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 		
 		
 		//setContentView(new FdView(this));
+		//client = new ClientCode(this);
 	}
 
 	protected void showControls() {
