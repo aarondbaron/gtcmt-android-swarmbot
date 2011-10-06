@@ -75,6 +75,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
     
     int targetx,targety, myposx,myposy;
     float myangle;
+    int numNeighbors;
     
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -891,8 +892,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	//map based on number of neigbhors
 	
-	void fillSequencer()
+	void numberOfNeigbhors()
 	{
+		int numberNeigbhors=0;
 		//get coords of other
 		int otherx=100;
 		int othery= 100;
@@ -902,7 +904,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{
 			
-			
+			numNeighbors++;
 			
 		}
 		
