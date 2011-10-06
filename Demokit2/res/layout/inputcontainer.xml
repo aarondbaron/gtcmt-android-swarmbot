@@ -18,7 +18,10 @@
 	<EditText android:id="@+id/serverIP" android:layout_height="wrap_content" android:layout_width="match_parent">
 		<requestFocus></requestFocus>
 	</EditText>
-	<Button android:text="ConnectToServer" android:id="@+id/connectServer" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+	<Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="ConnectToServer" android:id="@+id/connectServer"></Button>
+	
+	<TextView android:layout_height="wrap_content"  android:id="@+id/textView1" android:layout_width="wrap_content" android:text="TextView" android:layout_weight="1"></TextView>
+	
 		
 </LinearLayout>
 
