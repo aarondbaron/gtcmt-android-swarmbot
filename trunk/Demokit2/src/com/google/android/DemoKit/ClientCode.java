@@ -25,7 +25,7 @@ public class ClientCode implements OnClickListener{
 	public String serverIpAddress;
 	public String line;
 	
-	
+	BoeBotController bbc;
 	BeatTimer bt;
 	
 	Button connectToServer;
@@ -34,8 +34,9 @@ public class ClientCode implements OnClickListener{
 	Handler handler = new Handler();
 	private DemoKitActivity mActivity;
 	
-	public ClientCode(DemoKitActivity mActivity)
+	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
+		bbc=BBC;
 		this.mActivity = mActivity;
 		//this.bt=bt;
 		
@@ -155,6 +156,7 @@ public class ClientCode implements OnClickListener{
 		{
 			 Log.d("ClientCode", "attempting to connect");
 			if (!connected) {
+			
 				serverIpAddress = serverIp.getText().toString();
 				if (!serverIpAddress.equals("")) {
 					Thread cThread = new Thread(new ClientThread());
