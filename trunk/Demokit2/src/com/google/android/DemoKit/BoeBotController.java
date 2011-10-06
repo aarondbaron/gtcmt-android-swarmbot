@@ -52,6 +52,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	boolean sequencerMode;
 	boolean useSensors;
+	boolean targetMode;
 	
 	int instrument;
 	
@@ -70,6 +71,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
     public float[] mR = new float[16];
     public float[] mI = new float[16];
     public float[] mOrientation = new float[3];
+    
+    
+    int targetx,targety, myposx,myposy;
+    float myangle;
     
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -881,12 +886,77 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 	}
 	
+	
+	///////////////musical mappings
+	
+	//map based on number of neigbhors
+	
+	void fillSequencer()
+	{
+		//get coords of other
+		int otherx=100;
+		int othery= 100;
+		
+		//determine if close by in a circle		
+		int rad =50;
+		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
+		{
+			
+			
+			
+		}
+		
+		
+		
+	}
+	
+	
+	////////////////////
+	
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
 		   return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	     }
 
 
 	///////////////////////////////////////////////////////
+	//targeting functions
+	
+	void setTarget(int x, int y)
+	{
+		targetx=x;
+		targety=y;
+	}
+	
+	void seekTarget()
+	{
+		
+		int dx = targetx-myposx;
+		int dy = targety-myposy;
+		
+		double angle = Math.atan2(dy, dx);
+		double mag = Math.sqrt(Math.pow(dx, 2)+ Math.pow(dy, 2));
+		
+		
+		//determine orientation
+		// or assume orientation was facing down.
+		
+		//rotate to position and move
+		
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////
 	class SVThread extends Thread
 	{
 		SurfaceView v;
@@ -923,7 +993,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
             return;
 		*/
 		
-		
+		/*
 		int type = event.sensor.getType();
 		if (type == Sensor.TYPE_ACCELEROMETER)
 		{
@@ -953,6 +1023,6 @@ public class BoeBotController implements OnClickListener, SensorEventListener
         
         comptext.setText("" + df.format(mOrientation[0]) + ","  + df.format(mOrientation[1]) + "," + df.format(mOrientation[2]));
         
-		
+		*/
 	}
 }
