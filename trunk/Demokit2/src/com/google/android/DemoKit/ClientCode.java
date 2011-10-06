@@ -72,6 +72,11 @@ public class ClientCode implements OnClickListener{
 				{
 					
 				}
+				if(line.contains("stop"))
+				{
+					bbc.stop();
+				}
+
 				handler.post(new Runnable() {
         			@Override
         			public void run() {
