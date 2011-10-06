@@ -174,7 +174,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		//view1.draw(canvas)
 		
-		mActivity.client = new ClientCode(mActivity);
+		mActivity.client = new ClientCode(mActivity,this);
 	}
 
 
