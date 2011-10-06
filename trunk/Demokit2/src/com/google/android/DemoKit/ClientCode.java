@@ -56,7 +56,7 @@ public class ClientCode implements OnClickListener{
 	
 	///////////
 	public class ClientThread implements Runnable {
-		
+		int myID=1;
 
 		public void run() {
             try {
@@ -72,11 +72,34 @@ public class ClientCode implements OnClickListener{
 				{
 					
 				}
-				if(line.contains("stop"))
+				
+				//[ID]position:
+				//[ID]stop
+				//[ID]forward
+				//[ID]backward
+				if(line.contains("stop"+myID))
 				{
 					bbc.stop();
 				}
+				if(line.contains("forward"+myID))
+				{
+					bbc.forward();
+				}
 
+				if(line.contains("backward"+myID))
+				{
+					bbc.backward();
+				}
+
+				if(line.contains("rotleft"+myID))
+				{
+					bbc.rotLeft();
+				}
+
+				if(line.contains("rotright"+myID))
+				{
+					bbc.rotRight();
+				}
 				handler.post(new Runnable() {
         			@Override
         			public void run() {
