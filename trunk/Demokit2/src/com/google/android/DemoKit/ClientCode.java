@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 
 public class ClientCode implements OnClickListener{
@@ -31,6 +32,8 @@ public class ClientCode implements OnClickListener{
 	Button connectToServer;
 	EditText serverIp;
 	
+	TextView fromServer;
+	
 	Handler handler = new Handler();
 	private DemoKitActivity mActivity;
 	
@@ -38,15 +41,6 @@ public class ClientCode implements OnClickListener{
 	{
 		bbc=BBC;
 		this.mActivity = mActivity;
-		//this.bt=bt;
-		
-		/*
-		connectToServer.setOnClickListener(this);		
-		connectToServer.findViewById(R.id.connectServer);
-		
-		serverIp.findViewById(R.id.serverIP);
-		*/
-		
 		attachToView();
 	}
 	
@@ -55,7 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		
+		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 	
 	
@@ -68,76 +62,24 @@ public class ClientCode implements OnClickListener{
             try {
                 InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
                 Log.d("ClientActivity", "C: Connecting...");
-                //Socket socket = new Socket(serverAddr, ServerActivity.SERVERPORT);
                 Socket socket = new Socket(serverAddr, 8080);
                 connected = true;
-                //BufferedReader in;
-                //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                while (connected) {
-                	try {
-                		Log.d("client", "before creating bufread");
-                		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                		line = null;
+        		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-                		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
-                		while ((line = in.readLine()) != null) {
-                			
-                			if(in.ready())
-                			{
-                				Log.d("in status", "ready");
-                			}
-                			else
-                			{
-                				Log.d("in status", "not ready");
-                			}
-                			Log.d("from ServerActivity", line);
-
-                			if(line.equals("rst"))
-                			{
-                				bt.resetIndex();
-                			}
-                			if(line.equals("rnd"))
-                			{
-                				bt.resetIndex();
-                				//fillRhythm(4,array);
-                			}
-                			//fromClient.setText(""+ line);
-                			handler.post(new Runnable() {
-                				@Override
-                				public void run() {
-                					// do whatever you want to the front end
-                					// this is where you can be creative
-                					//fromserver.setText("got" + line);
-                					/*
-                                	out.println("hello client. blhalbadsfdsafsdfadsf \n");
-
-                					 */
-                				}
-                			});
-                			
-                			if(bt.generalIndex%16==0)
-                			{
-                				out.println("hello server");
-                			}
-
-                		}
-
-                		break;
-                	} catch (Exception e) {
-                		handler.post(new Runnable() {
-                			@Override
-                			public void run() {
-                				//fromserver.setText("Oops. Connection interrupted. Please reconnect your phones.");
-                			}
-                		});
-                		e.printStackTrace();
-                	}
-                    
- 
-                }
-                socket.close();
-                Log.d("ClientActivity", "C: Closed.");
+                while ((line = in.readLine()) != null) {
+				if(line.contains("header"))
+				{
+					
+				}
+				handler.post(new Runnable() {
+        			@Override
+        			public void run() {
+        				fromServer.setText("position: "+line);
+        			}
+        		});
+    			Log.d("ClientActivity", line);
+			}
             } catch (Exception e) {
                 Log.e("ClientActivity", "C: Error", e);
                 connected = false;
