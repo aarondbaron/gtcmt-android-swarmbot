@@ -894,18 +894,26 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	void numberOfNeigbhors()
 	{
-		int numberNeigbhors=0;
+		numNeighbors=0;
 		//get coords of other
-		int otherx=100;
-		int othery= 100;
+		int otherx=targetx;
+		int othery= targety;
 		
 		//determine if close by in a circle		
 		int rad =50;
+		sequencerMode=true;
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{
 			
 			numNeighbors++;
+			fillRhythm(2, instrumentseq); 
+			fillRhythm(2, sfxrseq); 
 			
+		}
+		else
+		{
+			fillRhythm(5,instrumentseq);
+			fillRhythm(5, sfxrseq); 
 		}
 		
 		
