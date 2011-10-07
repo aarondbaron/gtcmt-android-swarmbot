@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E21ACCF8-4149-48CE-9BEF-7CBDBB1750C9}</ProjectGuid>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>yjswarm_Server</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>C:\Program Files\opencv\opencv\vs10\bin\Debug;$(ExecutablePath)</ExecutablePath>
+    <ReferencePath>C:\Program Files\opencv\opencv\vs10\bin\Debug;$(ReferencePath)</ReferencePath>
+    <IncludePath>C:\Program Files\opencv\opencv\vs10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\opencv\opencv\vs10\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>C:/Program Files/opencv/opencv/.;C:/Program Files/opencv/opencv/vs10;C:/Program Files/opencv/opencv/include;C:/Program Files/opencv/opencv/include/opencv;C:/Program Files/opencv/opencv/modules/core/include;C:/Program Files/opencv/opencv/modules/flann/include;C:/Program Files/opencv/opencv/modules/imgproc/include;C:/Program Files/opencv/opencv/modules/video/include;C:/Program Files/opencv/opencv/modules/highgui/include;C:/Program Files/opencv/opencv/modules/ml/include;C:/Program Files/opencv/opencv/modules/calib3d/include;C:/Program Files/opencv/opencv/modules/features2d/include;C:/Program Files/opencv/opencv/modules/objdetect/include;C:/Program Files/opencv/opencv/modules/legacy/include;C:/Program Files/opencv/opencv/modules/contrib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\Debug\opencv_core231d.lib;..\..\lib\Debug\opencv_flann231d.lib;..\..\lib\Debug\opencv_imgproc231d.lib;..\..\lib\Debug\opencv_highgui231d.lib;..\..\lib\Debug\opencv_ml231d.lib;..\..\lib\Debug\opencv_video231d.lib;..\..\lib\Debug\opencv_objdetect231d.lib;..\..\lib\Debug\opencv_features2d231d.lib;..\..\lib\Debug\opencv_calib3d231d.lib;..\..\lib\Debug\opencv_legacy231d.lib;..\..\lib\Debug\opencv_contrib231d.lib;..\..\3rdparty\lib\Debug\zlibd.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>C:/Program Files/opencv/opencv/.;C:/Program Files/opencv/opencv/vs10;C:/Program Files/opencv/opencv/include;C:/Program Files/opencv/opencv/include/opencv;C:/Program Files/opencv/opencv/modules/core/include;C:/Program Files/opencv/opencv/modules/flann/include;C:/Program Files/opencv/opencv/modules/imgproc/include;C:/Program Files/opencv/opencv/modules/video/include;C:/Program Files/opencv/opencv/modules/highgui/include;C:/Program Files/opencv/opencv/modules/ml/include;C:/Program Files/opencv/opencv/modules/calib3d/include;C:/Program Files/opencv/opencv/modules/features2d/include;C:/Program Files/opencv/opencv/modules/objdetect/include;C:/Program Files/opencv/opencv/modules/legacy/include;C:/Program Files/opencv/opencv/modules/contrib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\Release\opencv_core231.lib;..\..\lib\Release\opencv_flann231.lib;..\..\lib\Release\opencv_imgproc231.lib;..\..\lib\Release\opencv_highgui231.lib;..\..\lib\Release\opencv_ml231.lib;..\..\lib\Release\opencv_video231.lib;..\..\lib\Release\opencv_objdetect231.lib;..\..\lib\Release\opencv_features2d231.lib;..\..\lib\Release\opencv_calib3d231.lib;..\..\lib\Release\opencv_legacy231.lib;..\..\lib\Release\opencv_contrib231.lib;..\..\3rdparty\lib\Release\zlib.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.ico" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="yjswarm_Server.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

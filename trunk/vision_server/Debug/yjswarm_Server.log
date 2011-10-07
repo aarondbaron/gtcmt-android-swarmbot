@@ -1,0 +1,10 @@
+﻿  yjswarm_Server.cpp
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\types_c.h(296): warning C4793: 'cvRound' : function compiled as native :
+  	Inline native assembly not supported in managed code
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(381): warning C4793: 'cv::Mat::release' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(2092): warning C4793: 'cv::SparseMat::addref' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(115): warning C4793: 'cv::Mat::Mat' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+  yjswarm_Server.vcxproj -> C:\Program Files\opencv\opencv\vs10\samples\cpp\Debug\yjswarm_Server.exe
