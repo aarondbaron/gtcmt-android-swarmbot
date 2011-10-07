@@ -80,25 +80,34 @@ public class ClientCode implements OnClickListener{
 				if(line.contains("stop"+myID))
 				{
 					bbc.stop();
+					Log.d("LINE","stop");
 				}
 				if(line.contains("forward"+myID))
 				{
 					bbc.forward();
+
+					Log.d("LINE","forward");
 				}
 
 				if(line.contains("backward"+myID))
 				{
 					bbc.backward();
+
+					Log.d("LINE","backward");
 				}
 
 				if(line.contains("rotleft"+myID))
 				{
 					bbc.rotLeft();
+
+					Log.d("LINE","rotleft");
 				}
 
 				if(line.contains("rotright"+myID))
 				{
 					bbc.rotRight();
+
+					Log.d("LINE","rotright");
 				}
 				handler.post(new Runnable() {
         			@Override
