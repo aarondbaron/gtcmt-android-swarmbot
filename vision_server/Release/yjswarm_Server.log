@@ -1,0 +1,12 @@
+﻿  yjswarm_Server.cpp
+c:\program files\opencv\opencv\modules\flann\include\opencv2\flann\logger.h(66): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\Program Files\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+C:\Program Files\opencv\opencv\modules\flann\include\opencv2/flann/flann.hpp(233): warning C4996: 'cv::flann::Index_<T>': was declared deprecated
+          C:\Program Files\opencv\opencv\modules\flann\include\opencv2/flann/flann.hpp(278) : see reference to class template instantiation 'cv::flann::Index_<T>' being compiled
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(381): warning C4793: 'cv::Mat::release' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(2092): warning C4793: 'cv::SparseMat::addref' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+c:\program files\opencv\opencv\modules\core\include\opencv2\core\mat.hpp(115): warning C4793: 'cv::Mat::Mat' : function compiled as native :
+  	Found an intrinsic not supported in managed code
+  yjswarm_Server.vcxproj -> C:\Program Files\opencv\opencv\vs10\samples\cpp\Release\yjswarm_Server.exe
