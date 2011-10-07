@@ -110,27 +110,35 @@ public class ClientCode implements OnClickListener{
 					Log.d("LINE","rotright");
 				}
 				handler.post(new Runnable() {
-        			@Override
-        			public void run() {
-        				fromServer.setText("position: "+line);
-        			}
-        		});
-				
+					@Override
+					public void run() {
+						fromServer.setText("position: "+line);
+					}
+				});
+
 				//if it has myID
-				if(true)
+				if(line.contains("position"))
 				{
-					bbc.myposx=Integer.parseInt(    line.split(",")[1]       ) ;
-					bbc.myposy= Integer.parseInt(    line.split(",")[2]  )    ;
-					
+					String test [] = line.split(",");
+					Log.d("LINE", "test" + test.length);
+					Log.d("LINE", "test" + test[0]);
+
+					int ID = Integer.parseInt(test[3]);
+					if(ID==myID)
+					{
+						bbc.myposx=Integer.parseInt(    line.split(",")[1]       ) ;
+						bbc.myposy= Integer.parseInt(    line.split(",")[2]  )    ;
+					}		
+					else
+					{
+						bbc.targetx=Integer.parseInt(    line.split(",")[1]       ) ;
+						bbc.targety=Integer.parseInt(    line.split(",")[2]  )  ;
+					}
+
 				}
-				else
-				{
-					bbc.targetx=Integer.parseInt(    line.split(",")[1]       ) ;
-					bbc.targety=Integer.parseInt(    line.split(",")[2]  )  ;
-				}
-				
+
 				bbc.numberOfNeigbhors();
-				
+
     			Log.d("ClientActivity", line);
 			}
             } catch (Exception e) {
