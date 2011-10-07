@@ -106,6 +106,22 @@ public class ClientCode implements OnClickListener{
         				fromServer.setText("position: "+line);
         			}
         		});
+				
+				//if it has myID
+				if(true)
+				{
+					bbc.myposx=Integer.parseInt(    line.split(",")[1]       ) ;
+					bbc.myposy= Integer.parseInt(    line.split(",")[2]  )    ;
+					
+				}
+				else
+				{
+					bbc.targetx=Integer.parseInt(    line.split(",")[1]       ) ;
+					bbc.targety=Integer.parseInt(    line.split(",")[2]  )  ;
+				}
+				
+				bbc.numberOfNeigbhors();
+				
     			Log.d("ClientActivity", line);
 			}
             } catch (Exception e) {

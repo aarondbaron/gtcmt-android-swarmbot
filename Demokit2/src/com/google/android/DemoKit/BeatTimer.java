@@ -24,7 +24,7 @@ public class BeatTimer extends Thread{
 	
 	BeatTimer()
 	{
-		globalTimeInterval=125;
+		globalTimeInterval=125*2;
 		
 		globalTimer=System.currentTimeMillis();
 		appStartTimeMillis=globalTimer;
@@ -70,7 +70,8 @@ public class BeatTimer extends Thread{
 				if(bbc.sequencerMode)
 				{
 					boolean test=true;
-
+					
+					/*
 					if(bbc.fseq[bbc.currentIndex])
 					{
 
@@ -104,7 +105,7 @@ public class BeatTimer extends Thread{
 						//mActivity.aTest.soundType(3);
 						//mActivity.aTest.replay();
 					}
-					
+					*/
 					if(bbc.sfxrseq[bbc.currentIndex])
 					{
 						test=false;
@@ -113,6 +114,7 @@ public class BeatTimer extends Thread{
 						mActivity.aTest.replay();
 					}
 					
+					
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
 						test=false;
@@ -120,13 +122,15 @@ public class BeatTimer extends Thread{
 						//mActivity.aTest.soundType(3);
 						//mActivity.aTest.replay();
 					}
-
+						
+					/*
 					if(test)
 					{
 						bbc.stop();
 						//mActivity.aTest.replayRandom();
 
 					}
+					
 					
 					if(ic!=null)
 					{
@@ -137,7 +141,23 @@ public class BeatTimer extends Thread{
 						}
 						
 					}
+					*/
+					
+					
 				}
+				
+				////////////////////////////
+				//not sequencer mode...but free range... 
+				/*
+				if(bbc.instrumentseq[bbc.currentIndex])
+				{
+					
+					bbc.playInstrument();
+					//mActivity.aTest.soundType(3);
+					//mActivity.aTest.replay();
+				}
+				*/
+				
 			}
 
 		}
@@ -152,6 +172,11 @@ public class BeatTimer extends Thread{
 					  if(bbc.sequencerMode)
 					  {
 						 bbc.stopInstrument();
+					  }
+					  else
+					  {
+						  //bbc.stopInstrument();
+						  
 					  }
 				  }
 			  }
