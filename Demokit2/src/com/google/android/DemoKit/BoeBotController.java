@@ -73,8 +73,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
     public float[] mOrientation = new float[3];
     
     
-    int targetx,targety, myposx,myposy;
-    float myangle;
+    int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
+    float myangle, targetangle;
     int numNeighbors;
     
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {

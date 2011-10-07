@@ -56,7 +56,7 @@ public class ClientCode implements OnClickListener{
 	
 	///////////
 	public class ClientThread implements Runnable {
-		int myID=2;
+		int myID=1;
 
 		public void run() {
             try {
@@ -129,11 +129,30 @@ public class ClientCode implements OnClickListener{
 					int ID = Integer.parseInt(test[3]);
 					if(ID==myID)
 					{
+						int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+						int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+						
+						
+						
+						bbc.myvelx=bbc.myposx-newx;
+						bbc.myvely=bbc.myposy-newy;						
+						bbc.myangle = (float) Math.atan2(bbc.myvelx, bbc.myvely);
+						
 						bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 						bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
+						
+						
 					}		
 					else
 					{
+						int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+						int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+						
+						bbc.targetvelx=bbc.targetx-newx;
+						bbc.targetvely=bbc.targety-newy;						
+						bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
+						
+						
 						bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 						bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
 					}
