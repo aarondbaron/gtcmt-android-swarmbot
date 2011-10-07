@@ -900,7 +900,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		int othery= targety;
 		
 		//determine if close by in a circle		
-		int rad =50;
+		int rad =150;
 		sequencerMode=true;
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{

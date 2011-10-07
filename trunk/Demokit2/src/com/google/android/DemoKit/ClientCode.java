@@ -56,7 +56,7 @@ public class ClientCode implements OnClickListener{
 	
 	///////////
 	public class ClientThread implements Runnable {
-		int myID=1;
+		int myID=2;
 
 		public void run() {
             try {
@@ -122,17 +122,20 @@ public class ClientCode implements OnClickListener{
 					String test [] = line.split(",");
 					Log.d("LINE", "test" + test.length);
 					Log.d("LINE", "test" + test[0]);
+					Log.d("LINE", "test" + test[1]);
+					Log.d("LINE", "test" + test[2]);
+					Log.d("LINE", "test" + test[3]);
 
 					int ID = Integer.parseInt(test[3]);
 					if(ID==myID)
 					{
-						bbc.myposx=Integer.parseInt(    line.split(",")[1]       ) ;
-						bbc.myposy= Integer.parseInt(    line.split(",")[2]  )    ;
+						bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+						bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
 					}		
 					else
 					{
-						bbc.targetx=Integer.parseInt(    line.split(",")[1]       ) ;
-						bbc.targety=Integer.parseInt(    line.split(",")[2]  )  ;
+						bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+						bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
 					}
 
 				}
