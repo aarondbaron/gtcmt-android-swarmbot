@@ -198,16 +198,83 @@ public class ClientCode implements OnClickListener{
 
 	public class Behavior
 	{
+		private boolean LRMotorSweep;
+		private boolean incDec;
+		
+		byte step;
 		public Behavior()
 		{
-
+			step = (byte) 10;
 		}
 
 
 		void wander()
 		{
+			//descriptioin..
+			//behavior1
+			//initially it will move forward
+			//then one wheel will decrease to 128 
+			// that wheel will then increase back up to 255 
+			// the next wheel will decrease to 128
+			//then increase to 255.
+			//behavior 2
+			// when encountering the edge, it must turn appropriately and after angle is correct, or time, it will 
+			//go back ot behavior1
+			
 
 			//move forward for sometime by default..
+			
+			
+			//for some time shift wheel power down so bot starts to turn
+			//if(System.currentTimeMillis()-myTimer>timeInterval)
+			{
+				
+				if(LRMotorSweep)
+				{
+					//left wheel decrement
+					if(incDec)
+					{
+						//increment
+						byte prev = bbc.getLByte();
+						if(prev<=(byte)255+step)
+						{
+							bbc.writeL((byte)(prev+step));
+						}
+						else
+						{
+							LRMotorSweep=false;
+						}
+						
+					}
+					else
+					{
+						//decrement
+						byte prev = bbc.getLByte();
+						if(prev>=(byte)0+step)
+						{
+							bbc.writeL((byte)(prev-step));
+						}
+						else
+						{
+							LRMotorSweep=true;
+						}
+					}
+				   
+				}
+				else
+				{
+					// right wheel
+					if(incDec)
+					{
+						
+					}
+					else
+					{
+						
+					}
+				}
+				
+			}
 
 
 
