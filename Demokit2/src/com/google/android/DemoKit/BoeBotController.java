@@ -77,6 +77,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
     float myangle, targetangle;
     int numNeighbors;
     
+    byte rbyte, lbyte;
+    
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
 		bbs1 = servo1;
@@ -305,9 +307,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 0);
+				rbyte=(byte)0;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
+				lbyte=(byte)255;
 		
 	}
 
@@ -315,10 +319,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 255);
-
+		rbyte = (byte)255;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 0);
-
+		lbyte = (byte) 0;
 	}
 
 	public void rotLeft()
@@ -326,18 +330,21 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 0);
-
+		rbyte = (byte) 0;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 0);
+		lbyte=(byte) 0;
 	}
 
 	public void rotRight()
 	{
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 255);
-
+		rbyte=(byte)255;
+		
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
+		lbyte =(byte)255;
 	}
 
 	public void stop()
@@ -345,10 +352,37 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 128);
+		
+		rbyte=(byte)128;
+		lbyte=(byte)128;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 128);
 	}
+	
+	public void writeL(byte b)
+	{
+		lbyte =b;
+		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
+				mCommandTarget1, b);
+		
+	}
+	public void writeR(byte b)
+	{
+		rbyte=b;
+		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
+				mCommandTarget2, b);
+	}
+	
+	public byte getRByte()
+	{
+		return rbyte;
+	}
+	public byte getLByte()
+	{
+		return lbyte;
+	}
+	
 	
 	public void playInstrument()
 	{
