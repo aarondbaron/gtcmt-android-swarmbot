@@ -200,17 +200,30 @@ public class ClientCode implements OnClickListener{
 	{
 		private boolean LRMotorSweep;
 		private boolean incDec;
-		
+
 		byte step;
+
+		boolean m1, m2;
+		boolean m1IncDec, m2IncDec;
+
+		int lowm1, highm1, lowm2 , highm2 , delta;
+
+		//int pos1;// = 180;    // variable to store the servo position 
+		//int pos2; //= 180;
+
+		long timer;
+		long interval=1000000;  //1 second  -- will change in constructor
+
 		public Behavior()
 		{
 			step = (byte) 10;
+			interval=interval/8;
 		}
 
 
 		void wander()
 		{
-			//descriptioin..
+			//Description..
 			//behavior1
 			//initially it will move forward
 			//then one wheel will decrease to 128 
@@ -219,66 +232,94 @@ public class ClientCode implements OnClickListener{
 			//then increase to 255.
 			//behavior 2
 			// when encountering the edge, it must turn appropriately and after angle is correct, or time, it will 
-			//go back ot behavior1
-			
+			//go back to behavior1
+
 
 			//move forward for sometime by default..
-			
-			
+
+
+
+			////assuming m1 L m2 R
+
 			//for some time shift wheel power down so bot starts to turn
-			//if(System.currentTimeMillis()-myTimer>timeInterval)
+			if(System.currentTimeMillis()-timer>interval)
 			{
-				
-				if(LRMotorSweep)
+				timer+=interval;
+
+				if(m1)
 				{
-					//left wheel decrement
-					if(incDec)
+					//increment speed phase Left
+					if(m1IncDec)
 					{
-						//increment
-						byte prev = bbc.getLByte();
-						if(prev<=(byte)255+step)
+						if(bbc.getLByte()<highm1)
 						{
-							bbc.writeL((byte)(prev+step));
+							bbc.writeL( (byte) (bbc.getLByte()+ (byte)delta)  ); //pos1+=delta
 						}
 						else
 						{
-							LRMotorSweep=false;
+							//time to switch
+							m1=false;
+							m2=true;
+
+							m1IncDec=false;
 						}
-						
 					}
 					else
 					{
-						//decrement
-						byte prev = bbc.getLByte();
-						if(prev>=(byte)0+step)
+						//decrement speed phase Left
+						if(bbc.getLByte()>lowm1)
 						{
-							bbc.writeL((byte)(prev-step));
+							bbc.writeL((byte) (bbc.getLByte() - (byte)delta) ); // pos1-=delta
 						}
 						else
 						{
-							LRMotorSweep=true;
+							//time to switch
+							//m1=false;
+							//m2=true;
+							m1IncDec=true;
 						}
 					}
-				   
 				}
-				else
+
+
+				if(m2)
 				{
-					// right wheel
-					if(incDec)
+
+
+					if(m2IncDec)
 					{
-						
+						//increment speed phase RIGHT
+						if(bbc.getRByte()>highm2)
+						{
+							bbc.writeR((byte)( bbc.getRByte()-delta)  ) ; // pos2-=delta;
+						}
+						else
+						{
+							//time to switch
+							m1=true;
+							m2=false;
+
+							m2IncDec=false;
+						}
 					}
 					else
 					{
-						
+						//decrement speed phase Right
+						if(bbc.getRByte()<lowm2)
+						{
+							bbc.writeR((byte) (bbc.getRByte()+delta));//  pos2+=delta;
+						}
+						else
+						{
+							//time to switch
+							//m1=true;
+							//m2=false;          
+							m2IncDec=true;
+						}
 					}
-				}
-				
+				}			
 			}
-
-
-
-
+			
 			// if reach boundary
 			if(boundaryReached() )
 			{
@@ -294,7 +335,7 @@ public class ClientCode implements OnClickListener{
 					else
 					{
 
-						//rotate until somecondition
+						//rotate until some condition
 						bbc.rotRight();
 					}
 				}
@@ -304,6 +345,26 @@ public class ClientCode implements OnClickListener{
 
 		boolean boundaryReached()
 		{
+			int maxh,maxw;
+			maxh=1000;
+			maxw=1000;
+
+			if(bbc.myposx <0 )
+			{
+
+			}
+			if(bbc.myposy<0)
+			{
+
+			}
+			if(bbc.myposx>maxw)
+			{
+
+			}
+			if(bbc.myposx>maxh)
+			{
+
+			}
 
 
 			return true;
