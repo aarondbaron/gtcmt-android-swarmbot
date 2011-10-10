@@ -4,6 +4,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
@@ -33,17 +34,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private final byte mCommandTarget2;
 	private final byte mCommandTarget3;
 	private final byte mCommandTarget4;
-	private TextView mLabel;
+	private TextView mLabel, azimuthlabel;
 	private Slider mSlider;
 	private DemoKitActivity mActivity;
 
 	private Button forward, backward,rotLeft,rotRight, stop,randomiseAll, tempoUp,tempoDown, instrumentOn, instrumentOff, toggleSequencer,useSensorsButton;
 
 	private EditText et,acctext, comptext;
-	
+
 	private RectView view1;
 	private Paint paint;
-	
+
 	public boolean[] fseq,bseq,rseq,lseq, sfxrseq, instrumentseq;
 	//SurfaceView sv;
 	Thread svthread;
@@ -53,32 +54,43 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	boolean sequencerMode;
 	boolean useSensors;
 	boolean targetMode;
-	
+
 	int instrument;
-	
+
 	float accx,accy,accz;
 	public float[] accvals = new float[3];
 	//public SensorManager mSensorManager;
 	public Sensor mAccelerometer, mCompass,mMagfield;
 	NumberFormat df ;
-	
-	
+
+
 	public float[] data = new float[3];
 	public float[] mGData = new float[3];
-    public float[] mMData = new float[3];
-    public float[] magvals = new float[3];
-    
-    public float[] mR = new float[16];
-    public float[] mI = new float[16];
-    public float[] mOrientation = new float[3];
-    
-    
-    int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
-    float myangle, targetangle;
-    int numNeighbors;
-    
-    byte rbyte, lbyte;
-    
+	public float[] mMData = new float[3];
+	public float[] magvals = new float[3];
+
+	public float[] mR = new float[16];
+	public float[] mI = new float[16];
+	public float[] mOrientation = new float[3];
+
+
+	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
+	float myangle, targetangle;
+	int numNeighbors;
+
+	byte rbyte, lbyte;
+
+
+
+	//private SensorManager mSensorManager;
+	private Sensor mOrientationSensor;
+	//data for orientation values filtering (average using a ring buffer)
+	static private final int RING_BUFFER_SIZE=10;
+	private float[][][] mAnglesRingBuffer;
+	private int mNumAngles;
+	private int mRingBufferIndex;
+	private float[][] mAngles;
+
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
 		bbs1 = servo1;
@@ -93,38 +105,60 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		bseq = new boolean[16];
 		rseq = new boolean[16];
 		lseq = new boolean[16];
-		
+
 		sfxrseq = new boolean[16];
 		instrumentseq = new boolean[16];
-		
+
 		//svthread = new Thread();
 		//svthread.start();
 
 		mActivity.beatTimer.bbc=this;
 		sequencerMode=true;
-		
-		
+
+		/*
 		mAccelerometer = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mActivity.mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
-		
-		//mCompass = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-		
+		mActivity.mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);		
+		//mCompass = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);		
 		mMagfield = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		mActivity.mSensorManager.registerListener(this, mMagfield, SensorManager.SENSOR_DELAY_UI);
-		
-		
+		 */
+
+		//mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		//		mSensorManager = (SensorManager) mActivity.getSystemService(Context.SENSOR_SERVICE);
+		//	     mOrientationSensor=mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);//	     
+		//	     mSensorManager.registerListener(this, mOrientationSensor, SensorManager.SENSOR_DELAY_GAME);
+
+		//mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		//		mSensorManager = (SensorManager) mActivity.getSystemService(Context.SENSOR_SERVICE);
+		mOrientationSensor=mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);//	     
+		mActivity.mSensorManager.registerListener(this, mOrientationSensor, SensorManager.SENSOR_DELAY_GAME);
+
+		// initialize the ring buffer for orientation values
+		mNumAngles=0;
+		mRingBufferIndex=0;
+		mAnglesRingBuffer=new float[RING_BUFFER_SIZE][3][2];
+		mAngles=new float[3][2];
+		mAngles[0][0]=0;
+		mAngles[0][1]=0;
+		mAngles[1][0]=0;
+		mAngles[1][1]=0;
+		mAngles[2][0]=0;
+		mAngles[2][1]=0;
+
+
+
 		df = DecimalFormat.getInstance();
 		df.setMinimumFractionDigits(2);
 		df.setMaximumFractionDigits(2);
 		df.setRoundingMode(RoundingMode.DOWN);
-		
-		
-		
+
+
+
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
-		
-		
-		
+
+
+
 	}
 
 	public void attachToView() {
@@ -138,22 +172,23 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		randomiseAll = (Button) mActivity.findViewById(R.id.randomiseAll);
 		tempoUp = (Button) mActivity.findViewById(R.id.tempoUp);
 		tempoDown = (Button) mActivity.findViewById(R.id.tempoDown);
-		
+
 		instrumentOn = (Button) mActivity.findViewById(R.id.instrumentOn);
 		instrumentOff = (Button) mActivity.findViewById(R.id.instrumentOff);
-		
+
 		toggleSequencer = (Button) mActivity.findViewById(R.id.toggleSeq);
 		useSensorsButton = (Button) mActivity.findViewById(R.id.useSensorsButton);	
-		
+
 		view1 = (RectView) mActivity.findViewById(R.id.view1);
 		view1.bbc=this;
-		
+
 		view1.setVisibility(View.GONE);
-		
+
 		et = (EditText) mActivity.findViewById(R.id.editText1);
 		acctext =  (EditText) mActivity.findViewById(R.id.acctext);
 		comptext = (EditText) mActivity.findViewById(R.id.comptext);
-		
+		azimuthlabel = (TextView) mActivity.findViewById(R.id.az);
+
 
 
 		forward.setOnClickListener(this);
@@ -164,19 +199,19 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		randomiseAll.setOnClickListener(this);
 		tempoUp.setOnClickListener(this);
 		tempoDown.setOnClickListener(this);
-		
+
 		instrumentOn.setOnClickListener(this);
 		instrumentOff.setOnClickListener(this);
-		
+
 		toggleSequencer.setOnClickListener(this);
 		useSensorsButton.setOnClickListener(this);
-		
+
 		//et.setOnTouchListener(this);
 
 		//sv = (SurfaceView) mActivity.findViewById(R.id.surfaceView1);
 
 		//view1.draw(canvas)
-		
+
 		mActivity.client = new ClientCode(mActivity,this);
 	}
 
@@ -238,16 +273,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				//mActivity.aTest.replayRandom();
 				sequencerMode=false;
 			}
-			
+
 			if(arg0.getId()==randomiseAll.getId())
 			{
 				randomiseAll();
 				//ensureSamePosition();
 				//mActivity.aTest.replayRandom();
 				sequencerMode=true;
-				
+
 			}
-			
+
 			if(arg0.getId()==tempoUp.getId())
 			{
 				if(mActivity.beatTimer.globalTimeInterval>25)
@@ -256,7 +291,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 					et.setText("" + mActivity.beatTimer.globalTimeInterval);
 					sequencerMode=true;
 				}
-				
+
 				//playInstrument();
 			}
 			if(arg0.getId()==tempoDown.getId())
@@ -264,29 +299,29 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				mActivity.beatTimer.globalTimeInterval+=25;
 				et.setText("" + mActivity.beatTimer.globalTimeInterval);
 				sequencerMode=true;
-				
+
 				//stopInstrument();
 			}
-			
+
 			if(arg0.getId()==instrumentOn.getId())
 			{
 				playInstrument();
 				mActivity.aTest.replayRandom();
 				sequencerMode=false;
 			}
-			
+
 			if(arg0.getId()==instrumentOff.getId())
 			{
 				stopInstrument();
 				mActivity.aTest.replayRandom();
 				sequencerMode=false;
 			}
-			
+
 			if(arg0.getId() == toggleSequencer.getId())
 			{
 				sequencerMode=!sequencerMode;
 			}
-			
+
 			if(arg0.getId() == useSensorsButton.getId())
 			{
 				useSensors=!useSensors;
@@ -307,12 +342,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 0);
-				rbyte=(byte)0;
+		rbyte=(byte)0;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
-				lbyte=(byte)255;
-		
+		lbyte=(byte)255;
+
 	}
 
 	public void backward()
@@ -341,7 +376,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 255);
 		rbyte=(byte)255;
-		
+
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
 		lbyte =(byte)255;
@@ -352,20 +387,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 128);
-		
+
 		rbyte=(byte)128;
 		lbyte=(byte)128;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 128);
 	}
-	
+
 	public void writeL(byte b)
 	{
 		lbyte =b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, b);
-		
+
 	}
 	public void writeR(byte b)
 	{
@@ -373,7 +408,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, b);
 	}
-	
+
 	public byte getRByte()
 	{
 		return rbyte;
@@ -382,31 +417,31 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		return lbyte;
 	}
-	
-	
+
+
 	public void playInstrument()
 	{
 		byte instr1=0;
 		mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
 				instr1, (byte) 255);
-		
+
 		/*
 		mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
 				mCommandTarget4, 1);
-	*/
+		 */
 	}
-	
+
 	public void stopInstrument()
 	{
 		byte instr1=0;
 		mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
 				instr1, (byte) 0);
-		
+
 		/*
 		mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
 				mCommandTarget4, 0 );
-				*/
-	
+		 */
+
 	}
 
 	public void fixConflict()
@@ -416,7 +451,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			if(fseq[i] && bseq[i]||rseq[i]||lseq[i])
 			{
-			
+
 				if(Math.random()<.5)
 				{
 					fseq[i]=false;
@@ -429,7 +464,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				rseq[i]=false;
 				lseq[i]=false;
 			}
-			
+
 			if(bseq[i] && fseq[i]||rseq[i]||lseq[i])
 			{
 				if(Math.random()<.5)
@@ -440,15 +475,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				{
 					bseq[i]=true;
 				}
-				
+
 				fseq[i]=false;				
 				rseq[i]=false;
 				lseq[i]=false;
 			}
-			
+
 			if(rseq[i] && fseq[i]||bseq[i]||lseq[i])
 			{
-				
+
 				if(Math.random()<.5)
 				{
 					rseq[i]=false;
@@ -457,12 +492,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				{
 					rseq[i]=true;
 				}
-				
+
 				fseq[i]=false;
 				bseq[i]=false;				
 				lseq[i]=false;
 			}
-			
+
 			if(lseq[i] && fseq[i]||bseq[i]||rseq[i])
 			{
 				if(Math.random()<.5)
@@ -473,14 +508,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				{
 					lseq[i]=true;
 				}
-				
+
 				fseq[i]=false;
 				bseq[i]=false;
 				rseq[i]=false;
-			
+
 			}
-			
-			
+
+
 		}
 
 	}
@@ -515,9 +550,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		clearRhythm(lseq); 
 		clearRhythm(instrumentseq); 
 		clearRhythm(sfxrseq);
-		
+
 		mActivity.aTest.soundType(6);
-		
+
 		for(int i=0; i<fseq.length;i++)
 		{
 			if(Math.random()>.5)
@@ -546,12 +581,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				default: ;
 
 				}
-				
+
 			}
-			
+
 		}
-		
-		
+
+
 	}
 
 
@@ -594,18 +629,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 		//rebuildMusicShape();
 	}
-	
+
 	void clearAll()
 	{
-		
+
 		clearRhythm(fseq);
 		clearRhythm(rseq);
 		clearRhythm(lseq);
 		clearRhythm(bseq);
-		
+
 		clearRhythm(sfxrseq);
 		clearRhythm(instrumentseq);
-		
+
 	}
 
 
@@ -920,86 +955,86 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
-	
-	
+
+
 	///////////////musical mappings
-	
+
 	//map based on number of neigbhors
-	
+
 	void numberOfNeigbhors()
 	{
 		numNeighbors=0;
 		//get coords of other
 		int otherx=targetx;
 		int othery= targety;
-		
+
 		//determine if close by in a circle		
 		int rad =150;
 		sequencerMode=true;
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{
-			
+
 			numNeighbors++;
 			fillRhythm(2, instrumentseq); 
 			fillRhythm(2, sfxrseq); 
-			
+
 		}
 		else
 		{
 			fillRhythm(5,instrumentseq);
 			fillRhythm(5, sfxrseq); 
 		}
-		
-		
-		
+
+
+
 	}
-	
-	
+
+
 	////////////////////
-	
+
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
-		   return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-	     }
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	}
 
 
 	///////////////////////////////////////////////////////
 	//targeting functions
-	
+
 	void setTarget(int x, int y)
 	{
 		targetx=x;
 		targety=y;
 	}
-	
+
 	void seekTarget()
 	{
-		
+
 		int dx = targetx-myposx;
 		int dy = targety-myposy;
-		
+
 		double angle = Math.atan2(dy, dx);
 		double mag = Math.sqrt(Math.pow(dx, 2)+ Math.pow(dy, 2));
-		
-		
+
+
 		//determine orientation
 		// or assume orientation was facing down.
-		
+
 		//rotate to position and move
-		
-		
-		
-		
+
+
+
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	///////////////////////////////////////////////////////////////////////
 	class SVThread extends Thread
 	{
@@ -1026,7 +1061,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -1035,20 +1070,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		/*
 		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
             return;
-		*/
-		
+		 */
+
 		/*
 		int type = event.sensor.getType();
 		if (type == Sensor.TYPE_ACCELEROMETER)
 		{
-			
+
 			accx=event.values[0];
 			accy=event.values[1];
 			accz=event.values[2];
-			
+
 			accvals = event.values.clone();
 			data = mGData;
-			
+
 
 			acctext.setText("" + df.format(accx) + ","  + df.format(accy) + "," + df.format(accz));
 		} else
@@ -1060,13 +1095,112 @@ public class BoeBotController implements OnClickListener, SensorEventListener
           //  data[i] = event.values[i];
 		SensorManager.getRotationMatrix(mR, mI, accvals, magvals);
 		SensorManager.getOrientation(mR, mOrientation);
-		
+
         float incl = SensorManager.getInclination(mI);
-        
+
         //comptext.setText("" + df.format(magvals[0]) + ","  + df.format(magvals[1]) + "," + df.format(magvals[2]));
-        
+
         comptext.setText("" + df.format(mOrientation[0]) + ","  + df.format(mOrientation[1]) + "," + df.format(mOrientation[2]));
-        
-		*/
+
+		 */
+
+
+		
+		if(event.sensor==mOrientationSensor) {
+    		if(mNumAngles==RING_BUFFER_SIZE) {
+    			// subtract oldest vector
+	    		mAngles[0][0]-=mAnglesRingBuffer[mRingBufferIndex][0][0];
+	    		mAngles[0][1]-=mAnglesRingBuffer[mRingBufferIndex][0][1];
+	    		mAngles[1][0]-=mAnglesRingBuffer[mRingBufferIndex][1][0];
+	    		mAngles[1][1]-=mAnglesRingBuffer[mRingBufferIndex][1][1];
+	    		mAngles[2][0]-=mAnglesRingBuffer[mRingBufferIndex][2][0];
+	    		mAngles[2][1]-=mAnglesRingBuffer[mRingBufferIndex][2][1];
+    		} else {
+    			mNumAngles++;
+    		}
+
+    		// convert angles into x/y
+    		mAnglesRingBuffer[mRingBufferIndex][0][0]=(float) Math.cos(Math.toRadians(event.values[0]));
+    		mAnglesRingBuffer[mRingBufferIndex][0][1]=(float) Math.sin(Math.toRadians(event.values[0]));
+    		mAnglesRingBuffer[mRingBufferIndex][1][0]=(float) Math.cos(Math.toRadians(event.values[1]));
+    		mAnglesRingBuffer[mRingBufferIndex][1][1]=(float) Math.sin(Math.toRadians(event.values[1]));
+    		mAnglesRingBuffer[mRingBufferIndex][2][0]=(float) Math.cos(Math.toRadians(event.values[2]));
+    		mAnglesRingBuffer[mRingBufferIndex][2][1]=(float) Math.sin(Math.toRadians(event.values[2]));
+
+    		// accumulate new x/y vector
+    		mAngles[0][0]+=mAnglesRingBuffer[mRingBufferIndex][0][0];
+    		mAngles[0][1]+=mAnglesRingBuffer[mRingBufferIndex][0][1];
+    		mAngles[1][0]+=mAnglesRingBuffer[mRingBufferIndex][1][0];
+    		mAngles[1][1]+=mAnglesRingBuffer[mRingBufferIndex][1][1];
+    		mAngles[2][0]+=mAnglesRingBuffer[mRingBufferIndex][2][0];
+    		mAngles[2][1]+=mAnglesRingBuffer[mRingBufferIndex][2][1];
+
+    		mRingBufferIndex++;
+    		if(mRingBufferIndex==RING_BUFFER_SIZE) {
+    			mRingBufferIndex=0;
+    		}
+
+			// convert back x/y into angles
+			float azimuth=(float) Math.toDegrees(Math.atan2((double)mAngles[0][1], (double)mAngles[0][0]));
+			float pitch=(float) Math.toDegrees(Math.atan2((double)mAngles[1][1], (double)mAngles[1][0]));
+			float roll=(float) Math.toDegrees(Math.atan2((double)mAngles[2][1], (double)mAngles[2][0]));
+			//mCompassRenderer.setOrientation(azimuth, pitch, roll);
+			if(azimuth<0) azimuth=(360+azimuth)%360;
+			//mHeadingView.setText(getString(R.string.heading)+": "+(int)azimuth+"°");
+			azimuthlabel.setText("azimuth:" + azimuth);
+    	}
+
+		 
 	}
+
+	// a class for keeping track of other bots
+	public class Bot
+	{
+		int x, y;
+		int vx, vy;
+		float angle;
+
+		int ID;
+
+		Bot()
+		{
+
+		}
+
+		Bot(int x, int y)
+		{
+		}
+
+		int[] getPos()
+		{	
+			return new int[]{x,y};
+		}
+		void setPos(int x, int y)
+		{
+			this.x=x;
+			this.y=y;
+		}
+		int[] getVel()
+		{
+			return new int[]{vx,vy};
+		}
+		void setVel(int vx, int vy)
+		{
+			this.vx=vx;
+			this.vy=vy;
+
+			angle = (float) Math.atan2(vy, vx);
+
+		}
+
+
+
+
+
+
+
+
+	}
+
+
 }
