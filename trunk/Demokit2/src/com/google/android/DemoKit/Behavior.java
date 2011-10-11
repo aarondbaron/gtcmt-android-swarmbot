@@ -29,7 +29,7 @@ public class Behavior
 	{
 		
 	}
-	void follow(/*Bot bot*/)
+	void follow(Bot bot)
 	{
 		
 	}
