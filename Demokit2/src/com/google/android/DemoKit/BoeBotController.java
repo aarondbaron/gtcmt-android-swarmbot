@@ -3,6 +3,7 @@ package com.google.android.DemoKit;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Vector;
 
 
 import android.graphics.Canvas;
@@ -90,6 +91,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private int mNumAngles;
 	private int mRingBufferIndex;
 	private float[][] mAngles;
+	
+	public float  angleAzimuth;
+	
+	Vector otherBots;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -157,7 +162,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
 
-
+		otherBots = new Vector();
 
 	}
 
@@ -590,7 +595,63 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	}
 
 
+	boolean[] euclidArray(int m, int k)
+	{
+	  if(k<m||m==0)
+	    return new boolean[k];
 
+
+	  Vector d[] = new Vector[m];
+	  for(int i=0; i <m; i++)
+	  {
+	    d[i] = new Vector();
+	    d[i].add("1");
+	  }
+
+	  int dif=k-m;
+	  //Number of zeros
+
+	  for(int i=0; i< dif; i++)
+	  {
+	    //println(i%m);
+	    d[i%m].add("0");
+	  }
+
+	  Vector r = new Vector();
+
+	  for(int i=0; i< d.length;i++)
+	  {
+	    r.addAll(d[i]);
+	  }
+
+
+	  boolean b[]= new boolean[k];
+	  for(int i =0; i < r.size(); i++)
+	  {
+	    String s = (String) r.get(i);
+	    //print(s);
+	    if(s.equals("1"))
+	    {
+	      b[i]=true;
+	    }
+	  }
+	  //println();
+	  return b;
+	}
+	
+	void fillEuclid(int a, boolean b[])
+	{
+		//clearRhythm(b);
+		
+		boolean[] ea=euclidArray(a,b.length);
+		for(int i=0; i<b.length;i++)
+		{
+			
+			b[i]=ea[i];
+			
+		}
+		
+	}
 	void fillRhythm(int a, boolean b[])
 	{
 		clearRhythm(b);
@@ -1148,6 +1209,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			if(azimuth<0) azimuth=(360+azimuth)%360;
 			//mHeadingView.setText(getString(R.string.heading)+": "+(int)azimuth+"°");
 			azimuthlabel.setText("azimuth:" + azimuth);
+			angleAzimuth=azimuth;
     	}
 
 		 

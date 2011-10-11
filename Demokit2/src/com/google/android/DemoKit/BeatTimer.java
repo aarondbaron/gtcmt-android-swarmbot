@@ -71,6 +71,10 @@ public class BeatTimer extends Thread{
 				{
 					boolean test=true;
 					
+					int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
+					//bbc.fillRhythm(f, bbc.sfxrseq);
+					bbc.fillEuclid(f, bbc.sfxrseq);
+					
 					/*
 					if(bbc.fseq[bbc.currentIndex])
 					{
@@ -110,7 +114,7 @@ public class BeatTimer extends Thread{
 					{
 						test=false;
 						
-						//mActivity.aTest.soundType(6);
+						mActivity.aTest.soundType(6);
 						mActivity.aTest.replay();
 					}
 					
