@@ -138,7 +138,7 @@ public class ClientCode implements OnClickListener{
 
 
 						}		
-						else
+						else   /// not my ID
 						{
 							int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
@@ -150,6 +150,39 @@ public class ClientCode implements OnClickListener{
 
 							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
+							
+							///////////////////////// new way
+							
+							//this would be ideal if we have a comparator...but for now
+							//Bot b =bbc.otherBots.get(ID);
+							
+							for(int i =0 ; i < bbc.otherBots.size();i++)
+							{
+								Bot b = bbc.otherBots.get(i);
+								
+								if(b.ID==ID)
+								{
+									b.setVel(newx - b.x, newy-b.y);
+									b.setPos(newx,newy);
+									b.angle=(float) Math.atan2(b.vy, b.vx);
+									b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
+								}
+								else //this means that the ID wasn't found in otherBots..so we need ot create it..
+								{
+									Bot newBot = new Bot();
+									newBot.setPos(newx, newy);
+									newBot.angle = (float) Math.atan2(b.vy, b.vx);
+									newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
+									bbc.otherBots.add(newBot);
+									
+								}
+								
+								
+							}
+							
+							
+							
+							
 						}
 
 					}
