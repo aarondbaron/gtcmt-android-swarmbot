@@ -23,6 +23,8 @@ public class Behavior
 	private long boundaryTimer;
 	private boolean wanderPhase2;
 	private boolean wanderPhase1;
+	private boolean phase1move;
+	private boolean phase2move;
 
 	public Behavior(BoeBotController bbc)
 	{
@@ -35,7 +37,35 @@ public class Behavior
 	}
 	void move2Loc(int x,int y)
 	{
-
+		
+		//step one...find the vector 
+		int diffx=bbc.myposx-x;
+		int diffy=bbc.myposy-y;
+		
+		float ang = (float)Math.atan2(diffy,diffx);
+		
+		//get angle wrt orienation sensor --azimuth
+		float currentangle = bbc.angleAzimuth;
+		
+		// 
+		float angleneeded=0;
+		
+		//phase 1
+		//rotate to angle.
+		if(ModularDistance((int) currentangle,(int)angleneeded,360) < 10)
+		{
+			phase1move=false;
+			phase2move=true;
+		}
+		//phase 2
+		//forward
+		float rad=20;
+		if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
+		{
+			phase1move=true;
+			phase2move=false;
+		}
+		
 	}
 	void follow(Bot bot)
 	{
