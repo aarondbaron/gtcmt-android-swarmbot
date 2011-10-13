@@ -22,6 +22,8 @@ public class BeatTimer extends Thread{
 	
 	DemoKitActivity mActivity;
 	
+	boolean wander;
+	
 	BeatTimer()
 	{
 		globalTimeInterval=125*2;
@@ -45,10 +47,31 @@ public class BeatTimer extends Thread{
 	void update()
 	{
 		
+		if(wander)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				//Log.d("beatTimer", "wander");
+				bbc.myBehavior.wander();
+			}
+		}
+		
 		
 		//Log.d("in update", "timefromStart - globalTimer" + (timeFromStart() - globalTimer) );
 		if(System.currentTimeMillis() - globalTimer> globalTimeInterval)
 		{
+			/*
+			if(wander)
+			{
+				if(bbc.myBehavior!=null)
+				{
+					Log.d("beatTimer", "wander");
+					bbc.myBehavior.wander();
+				}
+			}
+			*/
+			
+			
 			globalTimer += globalTimeInterval;
 			incrementGeneralIndex();
 			//allowedToFire=true;

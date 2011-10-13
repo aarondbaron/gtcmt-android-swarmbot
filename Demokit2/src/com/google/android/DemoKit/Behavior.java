@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+import android.util.Log;
+
 public class Behavior
 {
 	private boolean LRMotorSweep;
@@ -7,8 +9,9 @@ public class Behavior
 
 	byte step;
 
-	boolean m1, m2;
+	boolean m1, m2,middleWait;
 	boolean m1IncDec, m2IncDec;
+	long middleTimer;
 
 	int lowm1, highm1, lowm2 , highm2 , delta;
 
@@ -16,7 +19,7 @@ public class Behavior
 	//int pos2; //= 180;
 
 	long timer;
-	long interval=1000000;  //1 second  -- will change in constructor
+	long interval=1000;  //1 second  -- will change in constructor
 	BoeBotController bbc;
 	private float tempAzimuth;
 	private boolean once;
@@ -25,6 +28,8 @@ public class Behavior
 	private boolean wanderPhase1;
 	private boolean phase1move;
 	private boolean phase2move;
+	
+	
 
 	public Behavior(BoeBotController bbc)
 	{
@@ -33,6 +38,18 @@ public class Behavior
 		this.bbc=bbc;
 		
 		
+		int off=100;
+		
+		lowm1=  128;
+		highm1= 255-off;
+		
+		lowm2 = 128;
+		highm2 =  0+off;
+		
+		delta=  1;
+		
+		m1=false;
+		m2=true;
 
 	}
 	void move2Loc(int x,int y)
@@ -94,6 +111,7 @@ public class Behavior
 
 		////assuming m1 L m2 R
 		
+		/*
 		if(boundaryReached() )
 		{
 			
@@ -105,24 +123,52 @@ public class Behavior
 			wanderPhase1=true;
 			wanderPhase2=false;
 		}
+		*/
+		wanderPhase1=true;
+		wanderPhase2=false;
 		
+		//middlewait check
+		if(middleWait)
+		{
+			//wait sometime
+			if(System.currentTimeMillis()-middleTimer>500)
+			{
+				middleWait=false;
+			}
+		}
+		
+		//checkifnearNeigbhor...
+		if(bbc.numNeighbors>0)
+		{
+			wanderPhase1=false;
+			wanderPhase2=false;
+			bbc.stop();
+		}
+		else
+		{
+			wanderPhase1=true;
+			wanderPhase2=false;
+		}
 
 		//for some time shift wheel power down so bot starts to turn
 		//WANDER PHASE 1
 		if(wanderPhase1)
 		{
-			if(System.currentTimeMillis()-timer>interval)
+			//Log.d("Behavior","wanderphase1");
+			if(System.currentTimeMillis()-timer>interval && !middleWait)
 			{
 				timer+=interval;
+				Log.d("Behavior","LByte:" + bbc.getLByte() + " RByte:" + bbc.getRByte());
 
 				if(m1)
 				{
+					Log.d("Behavior","motor1");
 					//increment speed phase Left
 					if(m1IncDec)
 					{
 						if(bbc.getLByte()<highm1)
 						{
-							bbc.writeL( (byte) (bbc.getLByte()+ (byte)delta)  ); //pos1+=delta
+							bbc.writeL(  (bbc.getLByte()+ delta)  ); //pos1+=delta
 						}
 						else
 						{
@@ -138,14 +184,17 @@ public class Behavior
 						//decrement speed phase Left
 						if(bbc.getLByte()>lowm1)
 						{
-							bbc.writeL((byte) (bbc.getLByte() - (byte)delta) ); // pos1-=delta
+							bbc.writeL( (bbc.getLByte() - delta) ); // pos1-=delta
 						}
 						else
 						{
 							//time to switch
 							//m1=false;
 							//m2=true;
-							m1IncDec=true;
+							m1IncDec=true;							
+							//time to wait?
+							middleTimer=System.currentTimeMillis();
+							middleWait=true;
 						}
 					}
 				}
@@ -153,14 +202,14 @@ public class Behavior
 
 				if(m2)
 				{
-
+					Log.d("Behavior","motor2");
 
 					if(m2IncDec)
 					{
 						//increment speed phase RIGHT
 						if(bbc.getRByte()>highm2)
 						{
-							bbc.writeR((byte)( bbc.getRByte()-delta)  ) ; // pos2-=delta;
+							bbc.writeR( ( bbc.getRByte()-delta)  ) ; // pos2-=delta;
 						}
 						else
 						{
@@ -176,7 +225,7 @@ public class Behavior
 						//decrement speed phase Right
 						if(bbc.getRByte()<lowm2)
 						{
-							bbc.writeR((byte) (bbc.getRByte()+delta));//  pos2+=delta;
+							bbc.writeR(  (bbc.getRByte()+delta));//  pos2+=delta;
 						}
 						else
 						{
@@ -184,6 +233,9 @@ public class Behavior
 							//m1=true;
 							//m2=false;          
 							m2IncDec=true;
+							//time to wait
+							middleTimer=System.currentTimeMillis();
+							middleWait=true;
 						}
 					}
 				}			
