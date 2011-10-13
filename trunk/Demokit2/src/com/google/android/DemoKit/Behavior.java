@@ -18,23 +18,31 @@ public class Behavior
 	long timer;
 	long interval=1000000;  //1 second  -- will change in constructor
 	BoeBotController bbc;
+	private float tempAzimuth;
+	private boolean once;
+	private long boundaryTimer;
+	private boolean wanderPhase2;
+	private boolean wanderPhase1;
+
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
 		interval=interval/8;
-		 this.bbc=bbc;
+		this.bbc=bbc;
 		
+		
+
 	}
 	void move2Loc(int x,int y)
 	{
-		
+
 	}
 	void follow(Bot bot)
 	{
-		
+
 	}
-	
-	
+
+
 
 	void wander()
 	{
@@ -55,106 +63,137 @@ public class Behavior
 
 
 		////assuming m1 L m2 R
-
-		//for some time shift wheel power down so bot starts to turn
-		if(System.currentTimeMillis()-timer>interval)
-		{
-			timer+=interval;
-
-			if(m1)
-			{
-				//increment speed phase Left
-				if(m1IncDec)
-				{
-					if(bbc.getLByte()<highm1)
-					{
-						bbc.writeL( (byte) (bbc.getLByte()+ (byte)delta)  ); //pos1+=delta
-					}
-					else
-					{
-						//time to switch
-						m1=false;
-						m2=true;
-
-						m1IncDec=false;
-					}
-				}
-				else
-				{
-					//decrement speed phase Left
-					if(bbc.getLByte()>lowm1)
-					{
-						bbc.writeL((byte) (bbc.getLByte() - (byte)delta) ); // pos1-=delta
-					}
-					else
-					{
-						//time to switch
-						//m1=false;
-						//m2=true;
-						m1IncDec=true;
-					}
-				}
-			}
-
-
-			if(m2)
-			{
-
-
-				if(m2IncDec)
-				{
-					//increment speed phase RIGHT
-					if(bbc.getRByte()>highm2)
-					{
-						bbc.writeR((byte)( bbc.getRByte()-delta)  ) ; // pos2-=delta;
-					}
-					else
-					{
-						//time to switch
-						m1=true;
-						m2=false;
-
-						m2IncDec=false;
-					}
-				}
-				else
-				{
-					//decrement speed phase Right
-					if(bbc.getRByte()<lowm2)
-					{
-						bbc.writeR((byte) (bbc.getRByte()+delta));//  pos2+=delta;
-					}
-					else
-					{
-						//time to switch
-						//m1=true;
-						//m2=false;          
-						m2IncDec=true;
-					}
-				}
-			}			
-		}
 		
-		// if reach boundary
 		if(boundaryReached() )
 		{
-			int xbound=10;
-			if(bbc.myposx < 0 + xbound)
+			
+			wanderPhase1=false;
+			wanderPhase2=true;
+		}
+		else
+		{
+			wanderPhase1=true;
+			wanderPhase2=false;
+		}
+		
+
+		//for some time shift wheel power down so bot starts to turn
+		//WANDER PHASE 1
+		if(wanderPhase1)
+		{
+			if(System.currentTimeMillis()-timer>interval)
 			{
-				//get what current angle is
-				if(bbc.myangle>90 || bbc.myangle <270)
+				timer+=interval;
+
+				if(m1)
 				{
-					//this should probably be rotate until something
-					bbc.rotLeft();
+					//increment speed phase Left
+					if(m1IncDec)
+					{
+						if(bbc.getLByte()<highm1)
+						{
+							bbc.writeL( (byte) (bbc.getLByte()+ (byte)delta)  ); //pos1+=delta
+						}
+						else
+						{
+							//time to switch
+							m1=false;
+							m2=true;
+
+							m1IncDec=false;
+						}
+					}
+					else
+					{
+						//decrement speed phase Left
+						if(bbc.getLByte()>lowm1)
+						{
+							bbc.writeL((byte) (bbc.getLByte() - (byte)delta) ); // pos1-=delta
+						}
+						else
+						{
+							//time to switch
+							//m1=false;
+							//m2=true;
+							m1IncDec=true;
+						}
+					}
 				}
-				else
+
+
+				if(m2)
 				{
 
-					//rotate until some condition
-					bbc.rotRight();
-				}
+
+					if(m2IncDec)
+					{
+						//increment speed phase RIGHT
+						if(bbc.getRByte()>highm2)
+						{
+							bbc.writeR((byte)( bbc.getRByte()-delta)  ) ; // pos2-=delta;
+						}
+						else
+						{
+							//time to switch
+							m1=true;
+							m2=false;
+
+							m2IncDec=false;
+						}
+					}
+					else
+					{
+						//decrement speed phase Right
+						if(bbc.getRByte()<lowm2)
+						{
+							bbc.writeR((byte) (bbc.getRByte()+delta));//  pos2+=delta;
+						}
+						else
+						{
+							//time to switch
+							//m1=true;
+							//m2=false;          
+							m2IncDec=true;
+						}
+					}
+				}			
 			}
 		}
+
+	
+		
+		//WANDER PHASE 2
+		// if reach boundary
+		if(System.currentTimeMillis()-boundaryTimer>2000 && wanderPhase2)
+		{
+
+			
+
+
+				//record only once
+				if(!once)
+				{
+					tempAzimuth=bbc.angleAzimuth;
+					once=true;
+
+					bbc.rotLeft();//or Right???
+				}
+
+				if(ModularDistance((int) tempAzimuth,(int)bbc.angleAzimuth,360) < 90)
+				{
+					//bbc.stop();
+					bbc.forward();
+					boundaryTimer=System.currentTimeMillis();
+					//need to wait some time before checking boundary again..
+					//then release from boundary phase.
+					wanderPhase2=false;
+					wanderPhase1=true;
+					once=false;
+				}
+			}
+
+
+		
 
 	}
 
@@ -163,26 +202,43 @@ public class Behavior
 		int maxh,maxw;
 		maxh=1000;
 		maxw=1000;
+		int buff=50;
 
-		if(bbc.myposx <0 )
+		boolean bound =false;
+		if(bbc.myposx <0 + buff )
 		{
-
+			bound=true;
 		}
-		if(bbc.myposy<0)
+		if(bbc.myposy<0 + buff)
 		{
-
+			bound=true;
 		}
-		if(bbc.myposx>maxw)
+		if(bbc.myposx>maxw- buff)
 		{
-
+			bound=true;
 		}
-		if(bbc.myposx>maxh)
+		if(bbc.myposx>maxh - buff)
 		{
-
+			bound=true;
 		}
 
 
-		return true;
+		return bound;
+	}
+
+
+
+	// Calculates x in modulo m
+	public int Mod(int x, int m)
+	{
+		if (m < 0) m = -m;
+		int r = x % m;
+		return r < 0 ? r + m : r;
+	}
+	// Calculates the distance from a to b in modulo m
+	public  int ModularDistance(int a, int b, int m)
+	{
+		return Math.min(Mod(a - b, m), Mod(b - a, m));
 	}
 
 }
