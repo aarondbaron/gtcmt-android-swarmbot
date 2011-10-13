@@ -79,7 +79,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	float myangle, targetangle;
 	int numNeighbors;
 
-	byte rbyte, lbyte;
+	int rbyte, lbyte;
 
 
 
@@ -95,6 +95,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public float  angleAzimuth;
 	
 	Vector<Bot> otherBots;
+	
+	Behavior myBehavior;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -277,15 +279,30 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				clearAll();
 				//mActivity.aTest.replayRandom();
 				sequencerMode=false;
+				
+				mActivity.beatTimer.wander=false;
 			}
 
 			if(arg0.getId()==randomiseAll.getId())
 			{
+				//block this only temporary
+				/*
 				randomiseAll();
 				//ensureSamePosition();
 				//mActivity.aTest.replayRandom();
 				sequencerMode=true;
-
+				*/
+				
+				myBehavior  = new Behavior(this);
+				myBehavior.m1=false;
+				myBehavior.m2=true;
+				//backward();
+				forward();
+				
+				mActivity.beatTimer.wander=true;
+				
+				
+				
 			}
 
 			if(arg0.getId()==tempoUp.getId())
@@ -400,25 +417,25 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				mCommandTarget2, (byte) 128);
 	}
 
-	public void writeL(byte b)
+	public void writeL(int b)
 	{
 		lbyte =b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
-				mCommandTarget1, b);
+				mCommandTarget1, (byte)b);
 
 	}
-	public void writeR(byte b)
+	public void writeR(int b)
 	{
 		rbyte=b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
-				mCommandTarget2, b);
+				mCommandTarget2, (byte)b);
 	}
 
-	public byte getRByte()
+	public int getRByte()
 	{
 		return rbyte;
 	}
-	public byte getLByte()
+	public int getLByte()
 	{
 		return lbyte;
 	}
