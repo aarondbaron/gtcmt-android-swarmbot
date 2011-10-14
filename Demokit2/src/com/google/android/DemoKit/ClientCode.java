@@ -49,6 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
+		serverIp.setText("143.215.100.128");
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
