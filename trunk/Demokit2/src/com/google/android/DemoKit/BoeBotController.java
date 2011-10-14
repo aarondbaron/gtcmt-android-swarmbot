@@ -97,6 +97,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	Vector<Bot> otherBots;
 	
 	Behavior myBehavior;
+	Behavior moveBehavior;
+	
+	float calibrationAngle;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -165,6 +168,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		paint.setColor(Color.RED);
 
 		otherBots = new Vector();
+		
+		moveBehavior = new Behavior(this);
 
 	}
 
@@ -1042,12 +1047,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	void numberOfNeigbhors()
 	{
 		numNeighbors=0;
+		int rad =150;
+		/*
 		//get coords of other
 		int otherx=targetx;
 		int othery= targety;
 
 		//determine if close by in a circle		
-		int rad =150;
+		
 		sequencerMode=true;
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{
@@ -1062,7 +1069,19 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			fillRhythm(5,instrumentseq);
 			fillRhythm(5, sfxrseq); 
 		}
-
+		*/
+		
+		for(int i =0 ; i < otherBots.size();i++)
+		{
+			Bot b = otherBots.get(i);
+			
+			if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < rad )	
+			{
+				numNeighbors++;
+			
+			}
+			
+		}
 
 
 	}
