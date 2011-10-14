@@ -67,11 +67,11 @@ public class Behavior
 	{
 		
 		//step one...find the vector 
-		int diffx=bbc.myposx-x;
-		int diffy=bbc.myposy-y;
+		int diffx=x-bbc.myposx;
+		int diffy=y-bbc.myposy;
 		
 		//this is the angle we want to rotate to.
-		float ang = (float) Math.atan2(diffy,diffx) + (float)Math.PI;
+		float ang = ((float) Math.atan2(diffy,diffx) + (float)Math.PI)*180.f/(float)Math.PI;
 		
 		//get angle wrt orienation sensor --azimuth
 		float currentangle = bbc.angleAzimuth;
@@ -82,18 +82,21 @@ public class Behavior
 		
 		
 		
-		if(ModularDistance((int) currentangle,(int) ang + (int)bbc.calibrationAngle,360) < 10)
+		if(ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle)%360,360) < 30)
 		{
 			phase1move=false;
 			phase2move=true;
+			
 			//bbc.forward();
 			bbc.stop();
-			Log.d("Behavior","currentAngle" + currentangle);
+			Log.d("move","reach target:"+bbc.calibrationAngle);
 		}
 		else
 		{
-			bbc.rotLeft();
-			Log.d("Behavior","currentAngle" + currentangle);
+			bbc.writeL(130);
+			bbc.writeR(130);
+//			bbc.rotLeft();
+			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
 		}
 		//phase 2
 		//forward

@@ -56,7 +56,7 @@ public class ClientCode implements OnClickListener{
 
 	///////////
 	public class ClientThread implements Runnable {
-		int myID=2;
+		int myID=1;
 
 		public void run() {
 			try {
@@ -122,16 +122,19 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						
 						int ID = (int) Float.parseFloat(test[3]);
+						Log.e("move","move to position!");
 						
 						if(ID==myID)
 						{							
 							int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
-						
+							Log.e("move","move to x:"+x+"y:"+y);
 							bbc.targetx=x;
 							bbc.targety=y;
 							bbc.moveToLoc(true);
 							//bbc.moveBehavior.move2Loc(x, y);
+
+							Log.e("move","move to done x:"+x+"y:"+y);
 						}
 					
 					}
