@@ -128,7 +128,10 @@ public class ClientCode implements OnClickListener{
 							int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
 						
-							bbc.moveBehavior.move2Loc(x, y);
+							bbc.targetx=x;
+							bbc.targety=y;
+							bbc.moveToLoc(true);
+							//bbc.moveBehavior.move2Loc(x, y);
 						}
 					
 					}

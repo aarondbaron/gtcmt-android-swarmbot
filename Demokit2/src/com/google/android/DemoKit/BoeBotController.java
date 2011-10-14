@@ -421,6 +421,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 128);
 	}
+	
+	public void moveToLoc(boolean b)
+	{
+		
+		mActivity.beatTimer.move2Loc=b;
+	}
 
 	public void writeL(int b)
 	{

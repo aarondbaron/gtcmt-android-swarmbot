@@ -23,6 +23,7 @@ public class BeatTimer extends Thread{
 	DemoKitActivity mActivity;
 	
 	boolean wander;
+	boolean move2Loc;
 	
 	BeatTimer()
 	{
@@ -54,6 +55,15 @@ public class BeatTimer extends Thread{
 				//Log.d("beatTimer", "wander");
 				bbc.myBehavior.wander();
 			}
+		}
+		
+		if(move2Loc)
+		{
+			if(bbc.moveBehavior!=null)
+			{
+				bbc.moveBehavior.move();
+			}
+			
 		}
 		
 		
