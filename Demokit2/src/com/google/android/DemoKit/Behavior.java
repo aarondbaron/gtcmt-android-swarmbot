@@ -29,6 +29,8 @@ public class Behavior
 	private boolean phase1move;
 	private boolean phase2move;
 	
+	//private float trueAz;
+	
 	
 
 	public Behavior(BoeBotController bbc)
@@ -52,6 +54,10 @@ public class Behavior
 		m2=true;
 
 	}
+	
+
+	
+	//this assumes we start out with robot facing in positive x direction and 0 y.
 	void move2Loc(int x,int y)
 	{
 		
@@ -59,29 +65,38 @@ public class Behavior
 		int diffx=bbc.myposx-x;
 		int diffy=bbc.myposy-y;
 		
-		float ang = (float)Math.atan2(diffy,diffx);
+		//this is the angle we want to rotate to.
+		float ang = (float) Math.atan2(diffy,diffx) + (float)Math.PI;
 		
 		//get angle wrt orienation sensor --azimuth
 		float currentangle = bbc.angleAzimuth;
-		
-		// 
-		float angleneeded=0;
+		//bbc.calibrationAngle;
 		
 		//phase 1
 		//rotate to angle.
-		if(ModularDistance((int) currentangle,(int)angleneeded,360) < 10)
+		
+		if(ModularDistance((int) currentangle,(int) ang + (int)bbc.calibrationAngle,360) < 10)
 		{
 			phase1move=false;
 			phase2move=true;
+			//bbc.forward();
+			bbc.stop();
+		}
+		else
+		{
+			bbc.rotLeft();
 		}
 		//phase 2
 		//forward
+		/*
 		float rad=20;
 		if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
 		{
-			phase1move=true;
+			phase1move=false;
 			phase2move=false;
+			bbc.stop();
 		}
+		*/
 		
 	}
 	void follow(Bot bot)
