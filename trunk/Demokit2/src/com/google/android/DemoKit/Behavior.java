@@ -56,6 +56,11 @@ public class Behavior
 	}
 	
 
+	void move()
+	{
+		move2Loc(bbc.targetx,bbc.targety);
+		
+	}
 	
 	//this assumes we start out with robot facing in positive x direction and 0 y.
 	void move2Loc(int x,int y)
@@ -75,16 +80,20 @@ public class Behavior
 		//phase 1
 		//rotate to angle.
 		
+		
+		
 		if(ModularDistance((int) currentangle,(int) ang + (int)bbc.calibrationAngle,360) < 10)
 		{
 			phase1move=false;
 			phase2move=true;
 			//bbc.forward();
 			bbc.stop();
+			Log.d("Behavior","currentAngle" + currentangle);
 		}
 		else
 		{
 			bbc.rotLeft();
+			Log.d("Behavior","currentAngle" + currentangle);
 		}
 		//phase 2
 		//forward
