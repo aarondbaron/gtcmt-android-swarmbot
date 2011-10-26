@@ -55,7 +55,7 @@ public class BeatTimer extends Thread{
 			if(bbc.myBehavior!=null)
 			{
 				//Log.d("beatTimer", "wander");
-				bbc.myBehavior.wander();
+				bbc.myBehavior.fullWander();
 			}
 		}
 		
@@ -76,8 +76,18 @@ public class BeatTimer extends Thread{
 			});
 			
 		}
-		
-		
+		if(bbc!=null)
+		{
+			if(bbc.moveBehavior!=null)
+			{
+				if(bbc.moveBehavior.boundaryReached())
+				{
+					bbc.stopAll();
+					move2Loc=false;
+					wander=false;
+				}
+			}
+		}
 		//Log.d("in update", "timefromStart - globalTimer" + (timeFromStart() - globalTimer) );
 		if(System.currentTimeMillis() - globalTimer> globalTimeInterval)
 		{
