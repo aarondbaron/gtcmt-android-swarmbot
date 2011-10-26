@@ -28,6 +28,7 @@ public class Behavior
 	private boolean wanderPhase1;
 	public boolean phase1move=true;
 	public boolean phase2move;
+	public boolean orientComplete;
 		
 	public Behavior(BoeBotController bbc)
 	{
@@ -56,6 +57,43 @@ public class Behavior
 		//phase1move=true;
 	}
 	
+	void orient2Loc(int x,int y)
+	{
+		int diffx=x-bbc.myposx;
+		int diffy=y-bbc.myposy;
+		
+		//this is the angle we want to rotate to.
+		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
+
+		if(ang<0)
+			ang+=360;
+		bbc.targetangle=ang;
+		float currentangle = bbc.angleAzimuth;
+		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
+		int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
+
+		if(bbc.modDistance < 10)
+		{
+			orientComplete=true;
+			bbc.stop();
+			Log.d("move","reach target:"+bbc.calibrationAngle);
+		}
+		else
+		{
+			if(result==-1)
+			{
+				bbc.writeL(130);//Right
+				bbc.writeR(130);
+			}
+			else
+			{
+				bbc.writeL(127);//Left
+				bbc.writeR(127);
+			}
+			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+		}		
+
+	}
 	//this assumes we start out with robot facing in positive x direction and 0 y.
 	void move2Loc(int x,int y)
 	{
@@ -65,6 +103,8 @@ public class Behavior
 		
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
+		
+		
 		if(phase1move)
 		{
 			if(ang<0)
@@ -101,22 +141,60 @@ public class Behavior
 		float rad=50;
 		if(phase2move)
 		{
-			bbc.writeL(127);
-			bbc.writeR(130);
 			if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
 			{
 				phase1move=true;
 				phase2move=false;
 				bbc.stop();
 			}
-		}		
+			else
+			{
+//				bbc.writeL(127);
+//				bbc.writeR(129);
+				bbc.forward();
+			}
+		}	
 	}
 	void follow(Bot bot)
 	{
 
 	}
 
-
+	
+	void fullWander()
+	{
+		
+		if(!this.boundaryReached()&&bbc.numNeighbors==0)
+		{
+			wander();
+			bbc.clearRhythm(bbc.sfxrseq);
+			bbc.clearRhythm(bbc.instrumentseq);
+		}
+		else//Not ok to wander
+		{
+			int w=this.whichBoundaryReached();
+			switch(w)
+			{
+				case -1:	
+					if(bbc.numNeighbors==0)
+						wander();
+					else{
+						bbc.stop();
+						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
+						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
+					}
+					break;
+				case 0:	
+					orientComplete=false;
+				break;
+				case 1:		break;
+				case 2: 	break;
+				case 3: 	break;
+			}
+		}
+		
+		
+	}
 
 	void wander()
 	{
@@ -270,47 +348,44 @@ public class Behavior
 		}
 
 	
-		
-		//WANDER PHASE 2
-		// if reach boundary
-		if(System.currentTimeMillis()-boundaryTimer>2000 && wanderPhase2)
-		{
-
-			
-
-
-				//record only once
-				if(!once)
-				{
-					tempAzimuth=bbc.angleAzimuth;
-					once=true;
-
-					bbc.rotLeft();//or Right???
-				}
-
-				if(ModularDistance((int) tempAzimuth,(int)bbc.angleAzimuth,360) < 90)
-				{
-					//bbc.stop();
-					bbc.forward();
-					boundaryTimer=System.currentTimeMillis();
-					//need to wait some time before checking boundary again..
-					//then release from boundary phase.
-					wanderPhase2=false;
-					wanderPhase1=true;
-					once=false;
-				}
-			}
-
-
-		
+//		
+//		//WANDER PHASE 2
+//		// if reach boundary
+//		if(System.currentTimeMillis()-boundaryTimer>2000 && wanderPhase2)
+//		{
+//
+//			
+//
+//
+//				//record only once
+//				if(!once)
+//				{
+//					tempAzimuth=bbc.angleAzimuth;
+//					once=true;
+//
+//					bbc.rotLeft();//or Right???
+//				}
+//
+//				if(ModularDistance((int) tempAzimuth,(int)bbc.angleAzimuth,360) < 90)
+//				{
+//					//bbc.stop();
+//					bbc.forward();
+//					boundaryTimer=System.currentTimeMillis();
+//					//need to wait some time before checking boundary again..
+//					//then release from boundary phase.
+//					wanderPhase2=false;
+//					wanderPhase1=true;
+//					once=false;
+//				}
+//			}
 
 	}
 
-	boolean boundaryReached()
+	public boolean boundaryReached()
 	{
 		int maxh,maxw;
-		maxh=1000;
-		maxw=1000;
+		maxh=480;
+		maxw=640;
 		int buff=50;
 
 		boolean bound =false;
@@ -334,6 +409,42 @@ public class Behavior
 
 		return bound;
 	}
+	
+	
+	public int whichBoundaryReached()
+	{
+		int maxh,maxw;
+		maxh=480;
+		maxw=640;
+		int buff=50;
+
+		boolean bound =false;
+		if(bbc.myposx <0 + buff )
+		{
+			bound=true;
+			return 0;
+		}
+		if(bbc.myposy<0 + buff)
+		{
+			bound=true;
+			return 1;
+		}
+		if(bbc.myposx>maxw- buff)
+		{
+			bound=true;
+			return 2;
+		}
+		if(bbc.myposx>maxh - buff)
+		{
+			bound=true;
+			return 3;
+		}
+
+
+		return -1;
+	}
+	
+	
 
 	// Calculates x in modulo m
 	public int Mod(int x, int m)

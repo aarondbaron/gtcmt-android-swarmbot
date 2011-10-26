@@ -49,7 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		serverIp.setText("143.215.103.49");
+		serverIp.setText("143.215.100.235");
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
@@ -81,6 +81,8 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("stop"+myID))
 					{
 						bbc.stop();
+						bbc.moveToLoc(false);
+						bbc.setWander(false);
 						Log.d("LINE","stop");
 					}
 					if(line.contains("forward"+myID))
@@ -132,7 +134,10 @@ public class ClientCode implements OnClickListener{
 							Log.e("move","move to x:"+x+"y:"+y);
 							bbc.targetx=x;
 							bbc.targety=y;
+							bbc.moveBehavior.phase1move=true;
+							bbc.moveBehavior.phase2move=false;
 							bbc.moveToLoc(true);
+							
 							//bbc.moveBehavior.move2Loc(x, y);
 
 							Log.e("move","move to done x:"+x+"y:"+y);

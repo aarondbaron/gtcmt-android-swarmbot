@@ -280,12 +280,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 			if(arg0.getId()==stop.getId())
 			{
-				stop();
-				clearAll();
-				//mActivity.aTest.replayRandom();
-				sequencerMode=false;
-				mActivity.beatTimer.wander=false;
-				mActivity.beatTimer.move2Loc=false;
+				stopAll();
 			}
 
 			if(arg0.getId()==randomiseAll.getId())
@@ -427,7 +422,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		
 		mActivity.beatTimer.move2Loc=b;
 	}
-
+	public void setWander(boolean b)
+	{
+		
+		mActivity.beatTimer.wander=b;
+	}
 	public void writeL(int b)
 	{
 		lbyte =b;
@@ -552,7 +551,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 
 	}
-
+	public void stopAll()
+	{
+		stop();
+		clearAll();
+		//mActivity.aTest.replayRandom();
+		sequencerMode=false;
+		mActivity.beatTimer.wander=false;
+		mActivity.beatTimer.move2Loc=false;
+	}
 
 	public void randomiseSequence(boolean[] b)
 	{
