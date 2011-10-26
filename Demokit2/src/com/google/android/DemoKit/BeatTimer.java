@@ -1,6 +1,8 @@
 package com.google.android.DemoKit;
 
+import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 
 public class BeatTimer extends Thread{
 	
@@ -13,13 +15,13 @@ public class BeatTimer extends Thread{
 	boolean generalTimingFlag;
 	
 	long appStartTimeMillis;
-
+	Handler handler=new Handler();
 	private boolean running;
 	
 	BoeBotController bbc;
 	InputController ic;
 	OutputController oc;
-	
+
 	DemoKitActivity mActivity;
 	
 	boolean wander;
@@ -63,6 +65,15 @@ public class BeatTimer extends Thread{
 			{
 				bbc.moveBehavior.move();
 			}
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					bbc.move2locLabel.setText("angle: "+bbc.modDistance+
+							"\ncalibrate ang="+bbc.calibrationAngle+
+							"\ntargetx="+bbc.targetx+
+							"\ntargetx="+bbc.targety);
+				}
+			});
 			
 		}
 		
