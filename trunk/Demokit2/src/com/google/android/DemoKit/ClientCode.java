@@ -49,7 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		serverIp.setText("143.215.100.128");
+		serverIp.setText("143.215.103.49");
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
@@ -57,7 +57,7 @@ public class ClientCode implements OnClickListener{
 
 	///////////
 	public class ClientThread implements Runnable {
-		int myID=1;
+		int myID=2;
 
 		public void run() {
 			try {
@@ -184,8 +184,8 @@ public class ClientCode implements OnClickListener{
 							bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
 
 
-							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
+//							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+//							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
 							
 							///////////////////////// new way
 							

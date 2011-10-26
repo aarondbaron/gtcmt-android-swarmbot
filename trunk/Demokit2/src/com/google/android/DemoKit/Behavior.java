@@ -26,20 +26,14 @@ public class Behavior
 	private long boundaryTimer;
 	private boolean wanderPhase2;
 	private boolean wanderPhase1;
-	private boolean phase1move;
-	private boolean phase2move;
-	
-	//private float trueAz;
-	
-	
-
+	public boolean phase1move=true;
+	public boolean phase2move;
+		
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
 		interval=interval/8;
-		this.bbc=bbc;
-		
-		
+		this.bbc=bbc;		
 		int off=100;
 		
 		lowm1=  128;
@@ -59,57 +53,63 @@ public class Behavior
 	void move()
 	{
 		move2Loc(bbc.targetx,bbc.targety);
-		
+		//phase1move=true;
 	}
 	
 	//this assumes we start out with robot facing in positive x direction and 0 y.
 	void move2Loc(int x,int y)
 	{
-		
 		//step one...find the vector 
 		int diffx=x-bbc.myposx;
 		int diffy=y-bbc.myposy;
 		
 		//this is the angle we want to rotate to.
-		float ang = ((float) Math.atan2(diffy,diffx) + (float)Math.PI)*180.f/(float)Math.PI;
-		
-		//get angle wrt orienation sensor --azimuth
-		float currentangle = bbc.angleAzimuth;
-		//bbc.calibrationAngle;
-		
-		//phase 1
-		//rotate to angle.
-		
-		
-		
-		if(ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle)%360,360) < 30)
+		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
+		if(phase1move)
 		{
-			phase1move=false;
-			phase2move=true;
-			
-			//bbc.forward();
-			bbc.stop();
-			Log.d("move","reach target:"+bbc.calibrationAngle);
-		}
-		else
-		{
-			bbc.writeL(130);
-			bbc.writeR(130);
-//			bbc.rotLeft();
-			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+			if(ang<0)
+				ang+=360;
+			bbc.targetangle=ang;
+			float currentangle = bbc.angleAzimuth;
+			bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
+			int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
+	
+			if(bbc.modDistance < 10)
+			{
+				phase1move=false;
+				phase2move=true;
+				bbc.stop();
+				Log.d("move","reach target:"+bbc.calibrationAngle);
+			}
+			else
+			{
+				if(result==-1)
+				{
+					bbc.writeL(130);//Right
+					bbc.writeR(130);
+				}
+				else
+				{
+					bbc.writeL(127);//Left
+					bbc.writeR(127);
+				}
+				Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+			}		
 		}
 		//phase 2
-		//forward
-		/*
-		float rad=20;
-		if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
-		{
-			phase1move=false;
-			phase2move=false;
-			bbc.stop();
-		}
-		*/
 		
+		float rad=50;
+		if(phase2move)
+		{
+			bbc.writeL(127);
+			bbc.writeR(130);
+			if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
+			{
+				phase1move=true;
+				phase2move=false;
+				bbc.stop();
+			}
+		}		
 	}
 	void follow(Bot bot)
 	{
@@ -335,19 +335,25 @@ public class Behavior
 		return bound;
 	}
 
-
-
 	// Calculates x in modulo m
 	public int Mod(int x, int m)
 	{
 		if (m < 0) m = -m;
 		int r = x % m;
-		return r < 0 ? r + m : r;
+		return r<0?r+m:r;
 	}
 	// Calculates the distance from a to b in modulo m
 	public  int ModularDistance(int a, int b, int m)
 	{
 		return Math.min(Mod(a - b, m), Mod(b - a, m));
+	}
+	// Calculates the distance from a to b in modulo m
+	public  int ModularDistance2(int a, int b, int m)
+	{
+		if(Mod(a-b,m)<Mod(b-a,m))
+			return 1;//Left
+		else
+			return -1;//Right
 	}
 
 }

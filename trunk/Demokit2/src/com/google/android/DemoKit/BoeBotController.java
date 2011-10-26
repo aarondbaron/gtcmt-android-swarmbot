@@ -35,7 +35,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private final byte mCommandTarget2;
 	private final byte mCommandTarget3;
 	private final byte mCommandTarget4;
-	private TextView mLabel, azimuthlabel;
+	public TextView mLabel, azimuthlabel,move2locLabel;
 	private Slider mSlider;
 	private DemoKitActivity mActivity;
 
@@ -80,7 +80,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	int numNeighbors;
 
 	int rbyte, lbyte;
-
+	public int modDistance;
 
 
 	//private SensorManager mSensorManager;
@@ -200,7 +200,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		acctext =  (EditText) mActivity.findViewById(R.id.acctext);
 		comptext = (EditText) mActivity.findViewById(R.id.comptext);
 		azimuthlabel = (TextView) mActivity.findViewById(R.id.az);
-
+		move2locLabel=(TextView)mActivity.findViewById(R.id.Mov2Loc);
 
 
 		forward.setOnClickListener(this);
@@ -284,8 +284,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				clearAll();
 				//mActivity.aTest.replayRandom();
 				sequencerMode=false;
-				
 				mActivity.beatTimer.wander=false;
+				mActivity.beatTimer.move2Loc=false;
 			}
 
 			if(arg0.getId()==randomiseAll.getId())
