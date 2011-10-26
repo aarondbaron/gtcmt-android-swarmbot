@@ -28,6 +28,7 @@
 		<TextView android:id="@+id/az" android:layout_width="wrap_content" android:layout_toRightOf="@+id/acctext" android:layout_height="wrap_content" android:text="TextView" android:layout_alignTop="@+id/acctext" android:layout_alignBottom="@+id/acctext"></TextView>
 		<Button android:layout_width="wrap_content" android:id="@+id/stop" android:text="stop" android:layout_height="wrap_content" android:layout_toRightOf="@+id/rotLeft" android:layout_alignTop="@+id/rotLeft"></Button>
 		<Button android:text="On" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/instrumentOn" android:layout_toRightOf="@+id/stop" android:layout_alignTop="@+id/stop" android:layout_alignBottom="@+id/stop"></Button>
+		<TextView android:layout_width="wrap_content" android:text="TextView" android:id="@+id/Mov2Loc" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_marginRight="14dp"></TextView>
 		</RelativeLayout>
 	</TableLayout>
 </LinearLayout>
