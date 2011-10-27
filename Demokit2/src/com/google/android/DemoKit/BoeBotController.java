@@ -422,11 +422,6 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		
 		mActivity.beatTimer.move2Loc=b;
 	}
-	public void setWander(boolean b)
-	{
-		
-		mActivity.beatTimer.wander=b;
-	}
 	public void writeL(int b)
 	{
 		lbyte =b;
@@ -559,6 +554,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		sequencerMode=false;
 		mActivity.beatTimer.wander=false;
 		mActivity.beatTimer.move2Loc=false;
+	}
+	
+	public void setWander(boolean b)
+	{
+		if(b)
+		{
+			mActivity.beatTimer.wander=b;
+		}
+		else
+		{
+			mActivity.beatTimer.wander=b;
+		}
 	}
 
 	public void randomiseSequence(boolean[] b)
