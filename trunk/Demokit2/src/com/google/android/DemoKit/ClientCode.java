@@ -119,7 +119,12 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","calibration done");
 					}
-					
+					if(line.contains("wander"+myID))
+					{
+						bbc.moveBehavior.initWander();
+						bbc.moveBehavior.initWanderComplete=true;
+						bbc.setWander(true);					
+					}
 					if(line.contains("move"))
 					{
 						String test [] = line.split(",");

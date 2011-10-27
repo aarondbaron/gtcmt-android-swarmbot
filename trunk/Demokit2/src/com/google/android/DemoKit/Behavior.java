@@ -29,7 +29,7 @@ public class Behavior
 	public boolean phase1move=true;
 	public boolean phase2move;
 	public boolean orientComplete;
-		
+	public boolean initWanderComplete=false;
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
@@ -57,7 +57,7 @@ public class Behavior
 		//phase1move=true;
 	}
 	
-	void orient2Loc(int x,int y)
+	boolean orient2Loc(int x,int y)
 	{
 		int diffx=x-bbc.myposx;
 		int diffy=y-bbc.myposy;
@@ -74,9 +74,10 @@ public class Behavior
 
 		if(bbc.modDistance < 10)
 		{
-			orientComplete=true;
 			bbc.stop();
 			Log.d("move","reach target:"+bbc.calibrationAngle);
+			return true;
+			
 		}
 		else
 		{
@@ -91,6 +92,7 @@ public class Behavior
 				bbc.writeR(127);
 			}
 			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+			return false;
 		}		
 
 	}
@@ -163,40 +165,87 @@ public class Behavior
 	
 	void fullWander()
 	{
+		int boundary=this.whichBoundaryReached();
+		int neighbor=bbc.numNeighbors;
 		
-		if(!this.boundaryReached()&&bbc.numNeighbors==0)
+		if(boundary>-1)
 		{
-			wander();
-			bbc.clearRhythm(bbc.sfxrseq);
-			bbc.clearRhythm(bbc.instrumentseq);
-		}
-		else//Not ok to wander
-		{
-			int w=this.whichBoundaryReached();
-			switch(w)
+			if(neighbor==0)
 			{
-				case -1:	
-					if(bbc.numNeighbors==0)
-						wander();
-					else{
-						bbc.stop();
-						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
-						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
+				this.orientComplete=this.orient2Loc(320,240);
+				if(this.orientComplete)
+				{
+					if(!initWanderComplete)
+					{
+						initWander();
+						initWanderComplete=true;
 					}
-					break;
-				case 0:	
-					orientComplete=false;
-				break;
-				case 1:		break;
-				case 2: 	break;
-				case 3: 	break;
+					this.wander();
+				}
+			}
+			else
+			{
+				
 			}
 		}
+		else//not in the boundary
+		{
+			this.wander();
+			initWanderComplete=false;
+		}
+		
+//		
+//		if(!this.boundaryReached()&&bbc.numNeighbors==0)
+//		{
+//			wander();
+//			bbc.clearRhythm(bbc.sfxrseq);
+//			bbc.clearRhythm(bbc.instrumentseq);
+//		}
+//		else//Not ok to wander, have neighbors, or at boundary
+//		{
+//			int w=this.whichBoundaryReached();
+//			switch(w)
+//			{
+//				case -1:	
+//					if(bbc.numNeighbors==0)
+//						wander();
+//					else{
+//						bbc.stop();
+//						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
+//						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
+//					}
+//					break;
+//				case 0:	
+//					//orientComplete=false;
+//					this.orient2Loc(320, 240);
+//					break;
+//				case 1:		
+//					this.orient2Loc(320, 240);
+//					break;
+//				case 2:
+//					this.orient2Loc(320, 240);
+//					break;
+//				case 3:
+//					this.orient2Loc(320, 240);
+//					break;
+//			}
+//		}
 		
 		
 	}
 
-	void wander()
+	public void initWander()
+	{
+		middleWait=false;
+		timer=System.currentTimeMillis();
+		m1=true;
+		m2=false;
+		m1IncDec=true;
+		m2IncDec=true;
+//		middleTimer=
+	}
+	
+	public void wander()
 	{
 		//Description..
 		//behavior1
