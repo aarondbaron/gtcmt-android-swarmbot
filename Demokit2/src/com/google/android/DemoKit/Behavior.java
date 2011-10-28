@@ -57,6 +57,18 @@ public class Behavior
 		//phase1move=true;
 	}
 	
+	void orient()
+	{
+		
+		orientComplete=orient2Loc(bbc.targetx,bbc.targety);
+		
+		if(orientComplete)
+		{
+			bbc.orientToLoc(false);
+		}
+	
+	}
+	
 	boolean orient2Loc(int x,int y)
 	{
 		int diffx=x-bbc.myposx;
