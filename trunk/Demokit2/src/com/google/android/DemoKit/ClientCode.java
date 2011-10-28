@@ -49,7 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		serverIp.setText("143.215.100.235");
+		serverIp.setText("143.215.96.143");
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
@@ -119,11 +119,33 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","calibration done");
 					}
+					
+					if(line.contains("calibrateAll"))
+					{
+						bbc.calibrationAngle=bbc.angleAzimuth;
+
+						Log.d("LINE","calibration All done");
+					}
+					
+					if(line.contains("orientAll"))
+					{
+						String test [] = line.split(",");
+						
+						int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+						int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+						
+						bbc.targetx=x;
+						bbc.targety=y;
+						
+						bbc.orientToLoc(true);
+						//bbc.moveBehavior.orient2Loc(x, y);
+					}
+					
 					if(line.contains("wander"+myID))
 					{
 						bbc.moveBehavior.initWander();
 						bbc.moveBehavior.initWanderComplete=true;
-						bbc.setWander(true);
+						bbc.setWander(true);					
 					}
 					if(line.contains("move"))
 					{

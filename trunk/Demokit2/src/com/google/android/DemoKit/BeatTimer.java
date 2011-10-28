@@ -26,6 +26,7 @@ public class BeatTimer extends Thread{
 	
 	boolean wander;
 	boolean move2Loc;
+	boolean orient2Loc;
 	
 	BeatTimer()
 	{
@@ -49,7 +50,15 @@ public class BeatTimer extends Thread{
 
 	void update()
 	{
-		
+		if(orient2Loc)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				
+				bbc.myBehavior.orient();
+			}
+			
+		}
 		if(wander)
 		{
 			if(bbc.myBehavior!=null)
