@@ -123,7 +123,7 @@ public class ClientCode implements OnClickListener{
 					{
 						bbc.moveBehavior.initWander();
 						bbc.moveBehavior.initWanderComplete=true;
-						bbc.setWander(true);					
+						bbc.setWander(true);
 					}
 					if(line.contains("move"))
 					{
