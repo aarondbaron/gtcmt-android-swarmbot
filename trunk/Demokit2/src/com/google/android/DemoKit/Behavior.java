@@ -58,25 +58,22 @@ public class Behavior
 	}
 	
 	void orient()
-	{
-		
+	{		
 		orientComplete=orient2Loc(bbc.targetx,bbc.targety);
 		
+		//MAybe here
 		if(orientComplete)
 		{
 			bbc.orientToLoc(false);
-		}
-	
+		}	
 	}
 	
 	boolean orient2Loc(int x,int y)
 	{
 		int diffx=x-bbc.myposx;
 		int diffy=y-bbc.myposy;
-		
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
-
 		if(ang<0)
 			ang+=360;
 		bbc.targetangle=ang;
@@ -89,7 +86,6 @@ public class Behavior
 			bbc.stop();
 			Log.d("move","reach target:"+bbc.calibrationAngle);
 			return true;
-			
 		}
 		else
 		{
@@ -117,8 +113,7 @@ public class Behavior
 		
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
-		
-		
+				
 		if(phase1move)
 		{
 			if(ang<0)
@@ -254,7 +249,6 @@ public class Behavior
 		m2=false;
 		m1IncDec=true;
 		m2IncDec=true;
-//		middleTimer=
 	}
 	
 	public void wander()

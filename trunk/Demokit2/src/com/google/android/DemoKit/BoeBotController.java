@@ -425,7 +425,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	public void orientToLoc(boolean b)
 	{
-		
+		//set value
 		mActivity.beatTimer.orient2Loc=b;
 	}
 	public void writeL(int b)
