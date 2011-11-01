@@ -49,7 +49,7 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		serverIp.setText("143.215.96.143");
+		serverIp.setText("143.215.110.128");
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
@@ -131,14 +131,16 @@ public class ClientCode implements OnClickListener{
 					{
 						String test [] = line.split(",");
 						
-						int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-						int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+						int x=(int) Float.parseFloat(test[1]);
+						int y=(int) Float.parseFloat(test[2]);
 						
 						bbc.targetx=x;
 						bbc.targety=y;
 						
 						bbc.orientToLoc(true);
+						Log.d("ClientCode","orientx:"+x+"orienty:"+y);
 						//bbc.moveBehavior.orient2Loc(x, y);
+						
 					}
 					
 					if(line.contains("wander"+myID))

@@ -53,11 +53,19 @@ public class BeatTimer extends Thread{
 		if(orient2Loc)
 		{
 			if(bbc.myBehavior!=null)
-			{
-				
+			{			
 				bbc.myBehavior.orient();
 			}
-			
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					bbc.move2locLabel.setText("targetX: "+bbc.targetx+
+							"\ntargetY="+bbc.targety+
+							"\ntargetAngle:"+bbc.targetangle+
+							"\norientCmpleted:"+bbc.moveBehavior.orientComplete							
+							);
+				}
+			});
 		}
 		if(wander)
 		{
