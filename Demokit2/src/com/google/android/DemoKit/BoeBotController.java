@@ -227,6 +227,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//view1.draw(canvas)
 
 		mActivity.client = new ClientCode(mActivity,this);
+		
+		myBehavior= new Behavior(this);
 	}
 
 
@@ -295,7 +297,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				sequencerMode=true;
 				*/
 				
-				/*
+				
+				
+				
 				myBehavior  = new Behavior(this);
 				myBehavior.m1=false;
 				myBehavior.m2=true;
@@ -304,15 +308,26 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				this.myposx=200;
 				this.myposy=200;				
 				mActivity.beatTimer.wander=true;
-				*/
 				
+				
+				
+				//orient test
+				/*
 				this.myposx=640/2;
 				this.myposy=480/2;
 				myBehavior = new Behavior(this);
 				this.targetx=0;
 				this.targety=0;
 				this.orientToLoc(true);
+				*/
 				
+				//wander test
+				/*
+				this.myposx=640/2;
+				this.myposy=480/2;
+				myBehavior.initWander();
+				this.setWander(true);
+				*/
 				
 				
 				
