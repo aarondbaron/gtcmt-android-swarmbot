@@ -5,10 +5,12 @@ public class Bot
 {
 	int x, y;
 	int vx, vy;
-	float angle;
+	private float angle;
 	float azimuthAngle;
 
 	int ID;
+	
+	boolean positionLost;
 
 	Bot()
 	{
@@ -37,8 +39,16 @@ public class Bot
 		this.vx=vx;
 		this.vy=vy;
 
-		angle = (float) Math.atan2(vy, vx);
+		setAngle((float) Math.atan2(vy, vx));
 
+	}
+
+	public void setAngle(float angle) {
+		this.angle = angle;
+	}
+
+	public float getAngle() {
+		return angle;
 	}
 
 }

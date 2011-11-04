@@ -112,71 +112,83 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","rotright");
 					}
-					
+
 					if(line.contains("calibrate"+myID))
 					{
 						bbc.calibrationAngle=bbc.angleAzimuth;
 
 						Log.d("LINE","calibration done");
 					}
-					
+
 					if(line.contains("calibrateAll"))
 					{
 						bbc.calibrationAngle=bbc.angleAzimuth;
 
 						Log.d("LINE","calibration All done");
 					}
-					
+
 					if(line.contains("orientAll"))
 					{
 						String test [] = line.split(",");
-						
+
 						int x=(int) Float.parseFloat(test[1]);
 						int y=(int) Float.parseFloat(test[2]);
-						
+
 						bbc.targetx=x;
 						bbc.targety=y;
-						
+
 						bbc.orientToLoc(true);
 						Log.d("ClientCode","orientx:"+x+"orienty:"+y);
 						//bbc.moveBehavior.orient2Loc(x, y);
-						
+
 					}
-					
+
 					if(line.contains("wander"+myID))
 					{
-						bbc.moveBehavior.initWander();
-						bbc.moveBehavior.initWanderComplete=true;
+						bbc.myBehavior.initWander();
+						bbc.myBehavior.initWanderComplete=true;
 						bbc.setWander(true);					
 					}
 					if(line.contains("move"))
 					{
 						String test [] = line.split(",");
-						
+
 						int ID = (int) Float.parseFloat(test[3]);
 						Log.e("move","move to position!");
-						
-						if(ID==myID)
-						{							
-							int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
-							Log.e("move","move to x:"+x+"y:"+y);
-							bbc.targetx=x;
-							bbc.targety=y;
-							bbc.moveBehavior.phase1move=true;
-							bbc.moveBehavior.phase2move=false;
-							bbc.moveToLoc(true);
-							
-							//bbc.moveBehavior.move2Loc(x, y);
 
-							Log.e("move","move to done x:"+x+"y:"+y);
+
+
+						if(ID==myID)
+						{			
+
+							if(!bbc.positionLost)
+							{
+								int x=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+								int y=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+								Log.e("move","move to x:"+x+"y:"+y);
+								bbc.targetx=x;
+								bbc.targety=y;
+								bbc.myBehavior.phase1move=true;
+								bbc.myBehavior.phase2move=false;
+								bbc.moveToLoc(true);
+
+
+
+								//bbc.moveBehavior.move2Loc(x, y);
+
+								Log.e("move","move to done x:"+x+"y:"+y);
+							}
+							else
+							{
+
+							}
 						}
-					
+
 					}
-					
-					
-					
-					
+
+
+
+
 					handler.post(new Runnable() {
 						@Override
 						public void run() {
@@ -190,69 +202,98 @@ public class ClientCode implements OnClickListener{
 
 						String test [] = line.split(",");
 						int ID = (int) Float.parseFloat(test[3]);
+
+						
+
 						if(ID==myID)
 						{
-							int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+							boolean posLost=false;
+							if(test[1]=="x" || test[2]=="x")
+							{
+								posLost=true;							
+							}
+							bbc.positionLost=posLost;
+							
+							if(!bbc.positionLost)
+							{
+								int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+								int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
 
 
-							/*
-							bbc.myvelx=bbc.myposx-newx;
-							bbc.myvely=bbc.myposy-newy;						
-							bbc.myangle = (float) Math.atan2(bbc.myvelx, bbc.myvely);
-							*/
-							
-							
-							bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
+								/*
+								bbc.myvelx=bbc.myposx-newx;
+								bbc.myvely=bbc.myposy-newy;						
+								bbc.myangle = (float) Math.atan2(bbc.myvelx, bbc.myvely);
+								 */
+
+
+								bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+								bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
+							}
+							else
+							{
+								//do nothing..keep previous position?  or perhaps stop until something happens
+								bbc.stop();
+
+							}
 
 
 						}		
 						else   /// not my ID
 						{
+							boolean posLost=false;
+							if(test[1]=="x" || test[2]=="x")
+							{
+								posLost=true;							
+							}
+							
+							
 							int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
 
-							bbc.targetvelx=bbc.targetx-newx;
-							bbc.targetvely=bbc.targety-newy;						
-							bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
+							//bbc.targetvelx=bbc.targetx-newx;
+							//bbc.targetvely=bbc.targety-newy;						
+							//bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
 
 
-//							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-//							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
-							
+							//							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+							//							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
+
 							///////////////////////// new way
-							
+
 							//this would be ideal if we have a comparator...but for now
 							//Bot b =bbc.otherBots.get(ID);
-							
+
 							for(int i =0 ; i < bbc.otherBots.size();i++)
 							{
 								Bot b = bbc.otherBots.get(i);
-								
+
 								if(b.ID==ID)
 								{
 									//b.setVel(newx - b.x, newy-b.y);
 									b.setPos(newx,newy);
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
+									b.positionLost=posLost;
 								}
 								else //this means that the ID wasn't found in otherBots..so we need ot create it..
 								{
 									Bot newBot = new Bot();
 									newBot.setPos(newx, newy);
+									//newBot.setAngle(angle)
 									//newBot.angle = (float) Math.atan2(b.vy, b.vx);
 									//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
+									b.positionLost=posLost;
 									bbc.otherBots.add(newBot);
-									
+
 								}
-								
-								
+
+
 							}
-							
-							
-							
-							
+
+
+
+
 						}
 
 					}

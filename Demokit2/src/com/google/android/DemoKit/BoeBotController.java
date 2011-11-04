@@ -97,9 +97,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	Vector<Bot> otherBots;
 	
 	Behavior myBehavior;
-	Behavior moveBehavior;
+	//Behavior moveBehavior;
 	
 	float calibrationAngle;
+	
+	boolean positionLost;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -169,7 +171,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		otherBots = new Vector();
 		
-		moveBehavior = new Behavior(this);
+		//moveBehavior = new Behavior(this);
 
 	}
 
@@ -293,13 +295,27 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				sequencerMode=true;
 				*/
 				
+				/*
 				myBehavior  = new Behavior(this);
 				myBehavior.m1=false;
 				myBehavior.m2=true;
 				//backward();
-				forward();
-				
+				forward();				
+				this.myposx=200;
+				this.myposy=200;				
 				mActivity.beatTimer.wander=true;
+				*/
+				
+				this.myposx=640/2;
+				this.myposy=480/2;
+				myBehavior = new Behavior(this);
+				this.targetx=0;
+				this.targety=0;
+				this.orientToLoc(true);
+				
+				
+				
+				
 				
 				
 				
