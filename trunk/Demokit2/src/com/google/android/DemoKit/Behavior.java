@@ -243,12 +243,14 @@ public class Behavior
 
 	public void initWander()
 	{
+		bbc.forward();
 		middleWait=false;
-		timer=System.currentTimeMillis();
-		m1=true;
-		m2=false;
-		m1IncDec=true;
-		m2IncDec=true;
+		//timer=System.currentTimeMillis();
+		m1=false;
+		m2=true;
+		m1IncDec=false;
+		m2IncDec=false;
+		
 	}
 	
 	public void wander()
