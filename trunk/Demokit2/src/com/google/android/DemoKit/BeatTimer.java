@@ -62,7 +62,7 @@ public class BeatTimer extends Thread{
 					bbc.move2locLabel.setText("targetX: "+bbc.targetx+
 							"\ntargetY="+bbc.targety+
 							"\ntargetAngle:"+bbc.targetangle+
-							"\norientCmpleted:"+bbc.moveBehavior.orientComplete							
+							"\norientCmpleted:"+bbc.myBehavior.orientComplete							
 							);
 				}
 			});
@@ -78,9 +78,9 @@ public class BeatTimer extends Thread{
 		
 		if(move2Loc)
 		{
-			if(bbc.moveBehavior!=null)
+			if(bbc.myBehavior!=null)
 			{
-				bbc.moveBehavior.move();
+				bbc.myBehavior.move();
 			}
 			handler.post(new Runnable() {
 				@Override
@@ -95,9 +95,9 @@ public class BeatTimer extends Thread{
 		}
 		if(bbc!=null)
 		{
-			if(bbc.moveBehavior!=null)
+			if(bbc.myBehavior!=null)
 			{
-				if(bbc.moveBehavior.boundaryReached())
+				if(bbc.myBehavior.boundaryReached()&& this.mActivity.client.connected)
 				{
 					bbc.stopAll();
 					move2Loc=false;
