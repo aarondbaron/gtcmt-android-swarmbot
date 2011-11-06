@@ -28,6 +28,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 	public BoeBotController bbc;
 	public FaceController fc;
+	public BeatTimer bt;
 
 	RobotFaceViewThread thread;
 
@@ -181,12 +182,13 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		// TODO Auto-generated method stub
 
 		thread.robotEyes= new Eyes();
+		thread.robotTeeth = new Teeth(getWidth()/2,getHeight()-getHeight()/4);
 		thread.setRunning(true);
 		thread.start();
-		
+
 		Log.d("SURFACECREATED","W:" + getWidth() + "  H:" + getHeight());
-		
-		
+
+
 
 	}
 
@@ -208,6 +210,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		List<Point> points = new ArrayList<Point>();
 
 		public Eyes robotEyes;
+		public Teeth robotTeeth;
 		public RobotFaceViewThread(SurfaceHolder holder, Context context) 
 		{
 
@@ -234,6 +237,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 						render(c);
 						//_panel.onDraw(c);
 						robotEyes.run(c);
+						robotTeeth.run(c);
 					}
 				} finally {
 					// do this in a finally so that if an exception is thrown
@@ -372,28 +376,31 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		boolean openState;
 		long openTimer,closeTimer;
 		int brate=16;
-		
+
 		int sz=100;
 		int tsz=50;
 
+		boolean showlog=false;
 		public Eyes()
 		{
-			
+
 			int w1 = getWidth();
 			int h1 = getHeight();
 			e1 = new Eye(w1/4,h1/2);
 			e2 = new Eye(w1-w1/4,h1/2);
 			Log.d("WHAT ARE W H","W:" + w1 + "  H:" + h1);
 
+
+
 			openTimer=System.currentTimeMillis();
 			closeTimer=System.currentTimeMillis();
 		}
-		
+
 		void resetEyePositions(int x, int y)
 		{
 			e1 = new Eye(x/4,y/2);
 			e2 = new Eye(x-x/4,y/2);
-			
+
 		}
 
 		void update()
@@ -401,13 +408,15 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			if(closeOpen && !(closeState || openState))
 			{
 				tsz+=brate;
-				Log.d("eye","closing");
+				if(showlog)
+					Log.d("eye","closing");
 			}
 
 			if(!closeOpen && !(closeState || openState))
 			{
 				tsz-=brate;
-				Log.d("eye","opening");
+				if(showlog)
+					Log.d("eye","opening");
 
 			}
 
@@ -419,8 +428,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 				closeState=true;
 				closeTimer=System.currentTimeMillis();
-
-				Log.d("eye","closed");
+				if(showlog)
+					Log.d("eye","closed");
 			}
 			if(tsz<0)
 			{
@@ -428,8 +437,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				closeOpen=false;
 				openState=true;
 				openTimer=System.currentTimeMillis();
-
-				Log.d("eye","open");
+				if(showlog)
+					Log.d("eye","open");
 			}
 
 
@@ -439,8 +448,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				{
 					openState=false; 
 					closeOpen=true;
-
-					Log.d("eye","openstate finished");
+					if(showlog)
+						Log.d("eye","openstate finished");
 				}
 			}
 
@@ -450,8 +459,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				{
 					closeState=false; 
 					closeOpen=false;
-
-					Log.d("eye","closeState finished");
+					if(showlog)
+						Log.d("eye","closeState finished");
 				}
 			}
 		}
@@ -474,7 +483,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			int x,y;
 
-			
+
 
 
 
@@ -491,7 +500,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			void update()
 			{
-				
+
 			}
 
 			void render(Canvas c)
@@ -564,15 +573,151 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		}
 
 
+	}
+	////end ends
+
+
+	//start teeth
+	class Teeth 
+	{
+		int numTeeth=16;
+
+		Tooth[] t;
+		int toothSize=12;
+		int startx, starty;
+
+		int state=0;
+		public Teeth(int xx,int yy)
+		{
+			startx=xx;
+			starty=yy;
+
+			t=new Tooth[numTeeth];
+			for(int i=0; i <t.length;i++)
+			{
+
+				t[i]= new Tooth(startx+(i-numTeeth/2)*toothSize, starty, toothSize,i);
+			}
+		}
+
+		void update()
+		{
+			for(int i=0; i <t.length;i++)
+			{
+				if(state==0)
+				{
+					t[i].ytarget=starty;
+				}
+				
+				if(state==1)
+				{
+					int off=0;
+					if(i>t.length/2)
+					{
+						off=(int) map(i,0,t.length/2,20,0);
+					}
+					else
+					{
+						off=(int) map(i,t.length/2,t.length,0,20);
+					}
+					t[i].ytarget=starty+off;
+				}
+				if(state==2)
+				{
+					int off=0;
+					if(i>t.length/2)
+					{
+						off=(int) map(i,0,t.length/2,0,20);
+					}
+					else
+					{
+						off=(int) map(i,t.length/2,t.length,20,0);
+					}
+					t[i].ytarget=starty+off;
+				}
+			}
+		}
+
+		void render()
+		{
+		}
+
+		void run(Canvas c)
+		{
+			update();
+			render();
+
+			for(int i=0; i <t.length;i++)
+			{
+				t[i].run(c);
+			}
+		}
+
+		public class Tooth
+		{
+			int x,y,sz;
+
+			int ytarget;
+			int ID;
+			public Tooth(int x, int y, int sz, int ID)
+			{
+				this.x=x;
+				this.y=y;
+				this.sz=sz/2;
+				ytarget=y;
+				this.ID=ID;
+			} 
 
 
 
+			void update()
+			{
+				if(ytarget<y)
+				{
+					y-=1;
+				}
+				else
+					if(ytarget>y)
+					{
+						y+=1;
+					}
+			}
+
+			void render(Canvas c)
+			{
+				//rectMode(CENTER);
+				//fill(255);
+				//rect(this.x,this.y,sz,sz);
+				
+				
+				c.drawRect(x-sz, y-sz, x+sz, y+sz, paint1);
+				
+				if(bbc!=null)
+				{
+					if(bbc.currentIndex==ID)
+					{
+						c.drawRect(x-sz, y-sz, x+sz, y+sz, blackpaint);
+					}
+					
+				}
+				
+			}
+
+			void run(Canvas c)
+			{
+				update();
+				render(c);
+			}
+		}
 	}
 
+
+
+	//// end teeth
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
-		if(true)
+		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
 			Point point = new Point();
 			point.x = event.getX();
@@ -583,9 +728,28 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			invalidate();
 			Log.d("robotfaceView", "point: " + point);
 			return true;
+			
+		}
+
+		if(event.getAction() == MotionEvent.ACTION_UP)
+		{
+			
+			thread.robotTeeth.state++;
+			if(thread.robotTeeth.state>3)
+			{
+				thread.robotTeeth.state=0;
+			}
+			Log.d("robotfaceView", "motionUP: " +thread.robotTeeth.state );
+			return true;
+
 		}
 
 		return false;
+	}
+
+
+	public float map(float value, float istart, float istop, float ostart, float ostop) {
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
 
 }
