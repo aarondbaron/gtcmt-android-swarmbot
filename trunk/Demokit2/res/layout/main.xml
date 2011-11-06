@@ -21,6 +21,11 @@
 			style="@style/DemoKitTextBase" android:gravity="center"
 			android:layout_weight="1" android:layout_gravity="center"
 			android:clickable="true"></TextView>
+		<TextView android:text="Face" android:id="@+id/robotFaceLabel"
+			android:layout_width="wrap_content" android:layout_height="match_parent"
+			style="@style/DemoKitTextBase" android:gravity="center"
+			android:layout_weight="1" android:layout_gravity="center"
+			android:clickable="true"></TextView>
 	</LinearLayout>
 	<FrameLayout android:layout_width="match_parent"
 		android:layout_height="wrap_content" android:orientation="vertical"
@@ -30,6 +35,8 @@
 		<include layout="@layout/outputcontainer" android:id="@+id/outputContainer"
 			android:layout_width="match_parent" android:layout_height="wrap_content" />
 		<include layout="@layout/cameracontainer" android:id="@+id/cameraContainer"
+			android:layout_width="match_parent" android:layout_height="wrap_content" />
+		<include layout="@layout/robotfacecontainer" android:id="@+id/rFaceContainer"
 			android:layout_width="match_parent" android:layout_height="wrap_content" />
 	</FrameLayout>
 </LinearLayout>

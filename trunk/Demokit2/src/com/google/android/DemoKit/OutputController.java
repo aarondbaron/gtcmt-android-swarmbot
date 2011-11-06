@@ -59,5 +59,12 @@ public class OutputController extends AccessoryController {
 		c.attachToView();
 		
 	}
+	
+	//potentially?
+	private void setupRobotFaceController()
+	{
+		FaceController f = new FaceController(mHostActivity);
+	
+	}
 
 }
