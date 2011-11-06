@@ -30,5 +30,12 @@ public class FaceController {
 		
 		mActivity=m;
 	}
+	
+	
+	public FaceController(DemoKitActivity mAct)
+	{
+		mActivity=mAct;
+	}
+	
 
 }

@@ -15,13 +15,17 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 	TextView mInputLabel;
 	TextView mOutputLabel;
 	TextView mCamLabel;
+	TextView mFaceLabel;
+	
 	LinearLayout mInputContainer;
 	LinearLayout mOutputContainer;
 	LinearLayout mCameraContainer;
+	LinearLayout mRobotFaceContainer;
 	
 	Drawable mFocusedTabImage;
 	Drawable mNormalTabImage;
 	OutputController mOutputController;
+	FaceController mfc;
 
 	@Override
 	protected void hideControls() {
@@ -49,14 +53,18 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 		mInputLabel = (TextView) findViewById(R.id.inputLabel);
 		mOutputLabel = (TextView) findViewById(R.id.outputLabel);
 		mCamLabel = (TextView) findViewById(R.id.cameraLabel);
+		mFaceLabel = (TextView) findViewById(R.id.robotFaceLabel);
+		//
 		
 		mInputContainer = (LinearLayout) findViewById(R.id.inputContainer);
 		mOutputContainer = (LinearLayout) findViewById(R.id.outputContainer);
 		mCameraContainer = (LinearLayout) findViewById(R.id.cameraContainer);
+		mRobotFaceContainer = (LinearLayout) findViewById(R.id.rFaceContainer);
 		
 		mInputLabel.setOnClickListener(this);
 		mOutputLabel.setOnClickListener(this);
 		mCamLabel.setOnClickListener(this);
+		mFaceLabel.setOnClickListener(this);
 
 		showTabContents(false);
 	}
@@ -70,6 +78,9 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			
 			mCameraContainer.setVisibility(View.GONE);
 			mCamLabel.setBackgroundDrawable(mNormalTabImage);
+			
+			mRobotFaceContainer.setVisibility(View.GONE);
+			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
 		} else {
 			mInputContainer.setVisibility(View.GONE);
 			mInputLabel.setBackgroundDrawable(mNormalTabImage);
@@ -78,6 +89,9 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			
 			mCameraContainer.setVisibility(View.GONE);
 			mCamLabel.setBackgroundDrawable(mNormalTabImage);
+			
+			mRobotFaceContainer.setVisibility(View.GONE);
+			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
 		}
 	}
 	
@@ -88,8 +102,12 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			mOutputContainer.setVisibility(View.GONE);
 			mOutputLabel.setBackgroundDrawable(mNormalTabImage);
 			
+			
 			mCameraContainer.setVisibility(View.GONE);
 			mCamLabel.setBackgroundDrawable(mNormalTabImage);
+			
+			mRobotFaceContainer.setVisibility(View.GONE);
+			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
 			
 			return;
 		} 
@@ -101,6 +119,9 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			
 			mCameraContainer.setVisibility(View.GONE);
 			mCamLabel.setBackgroundDrawable(mNormalTabImage);
+			
+			mRobotFaceContainer.setVisibility(View.GONE);
+			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
 			
 			return;
 		}
@@ -114,11 +135,34 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			mOutputContainer.setVisibility(View.GONE);
 			mOutputLabel.setBackgroundDrawable(mNormalTabImage);
 			
+			mRobotFaceContainer.setVisibility(View.GONE);
+			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
+			
 			//mOutputController.
 			
 			return;
 			
 		}
+		
+		if(selection ==R.id.robotFaceLabel)
+		{
+			
+			mRobotFaceContainer.setVisibility(View.VISIBLE);
+			mFaceLabel.setBackgroundDrawable(mFocusedTabImage);
+			
+			mCameraContainer.setVisibility(View.GONE);
+			mCamLabel.setBackgroundDrawable(mNormalTabImage);			
+			mInputContainer.setVisibility(View.GONE);
+			mInputLabel.setBackgroundDrawable(mNormalTabImage);
+			mOutputContainer.setVisibility(View.GONE);
+			mOutputLabel.setBackgroundDrawable(mNormalTabImage);
+			
+			//mOutputController.
+			
+			return;
+			
+		}
+		
 		
 		mCameraContainer.setVisibility(View.GONE);
 		mCamLabel.setBackgroundDrawable(mNormalTabImage);
