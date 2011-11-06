@@ -102,6 +102,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	float calibrationAngle;
 	
 	boolean positionLost;
+	
+	RobotFaceView rfv;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -229,6 +231,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.client = new ClientCode(mActivity,this);
 		
 		myBehavior= new Behavior(this);
+		
+		/*
+		DemoKitPhone d= (DemoKitPhone)mActivity;
+		this.rfv = d.mfc.rfv;
+		this.rfv.bbc=this;
+		*/
+		this.rfv=(RobotFaceView)mActivity.findViewById(R.id.robotFaceView);
+		this.rfv.bbc=this;
+		this.rfv.bt=mActivity.beatTimer;
+		
 	}
 
 

@@ -25,7 +25,7 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 	Drawable mFocusedTabImage;
 	Drawable mNormalTabImage;
 	OutputController mOutputController;
-	FaceController mfc;
+	public FaceController mfc;
 
 	@Override
 	protected void hideControls() {
@@ -50,6 +50,10 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 
 		mOutputController = new OutputController(this, false);
 		mOutputController.accessoryAttached();
+		
+		mfc = new FaceController(this);
+		
+		
 		mInputLabel = (TextView) findViewById(R.id.inputLabel);
 		mOutputLabel = (TextView) findViewById(R.id.outputLabel);
 		mCamLabel = (TextView) findViewById(R.id.cameraLabel);

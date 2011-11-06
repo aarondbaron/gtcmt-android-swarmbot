@@ -21,6 +21,8 @@ public class FaceController {
 	OutputController oc;
 	private DemoKitActivity mActivity;
 	
+	RobotFaceView rfv;
+	
 	
 	public FaceController(BoeBotController b, InputController i, OutputController o,DemoKitActivity m)
 	{
@@ -35,6 +37,8 @@ public class FaceController {
 	public FaceController(DemoKitActivity mAct)
 	{
 		mActivity=mAct;
+		
+		rfv=(RobotFaceView) mActivity.findViewById(R.id.robotFaceView);
 	}
 	
 
