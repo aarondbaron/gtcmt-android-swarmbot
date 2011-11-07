@@ -104,6 +104,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	boolean positionLost;
 	
 	RobotFaceView rfv;
+	
+	int ID;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -344,7 +346,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				
 				
 				
-				
+				this.setMapping(1);
 				
 			}
 
@@ -795,7 +797,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
-
+	
+	
+	void fillPosition(int n, boolean b[])
+	{
+		if(n>=b.length || n<0)
+			return;
+		
+		clearRhythm(b);
+		b[n]=true;
+	}
 	// fill particular places
 	void fillPosition(int n[], int sn, boolean b[])
 	{    
@@ -1155,7 +1166,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
-
+	void setMapping(int a)
+	{
+		
+		mActivity.beatTimer.mapping=a;
+	}
 	////////////////////
 
 	public float map(float value, float istart, float istop, float ostart, float ostop) {

@@ -36,10 +36,12 @@ public class ClientCode implements OnClickListener{
 
 	Handler handler = new Handler();
 	private DemoKitActivity mActivity;
+	int myID=2;
 
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
 		bbc=BBC;
+		bbc.ID=myID;
 		this.mActivity = mActivity;
 		attachToView();
 	}
@@ -57,7 +59,7 @@ public class ClientCode implements OnClickListener{
 
 	///////////
 	public class ClientThread implements Runnable {
-		int myID=2;
+
 
 		public void run() {
 			try {
@@ -72,6 +74,32 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("header"))
 					{
 
+					}
+					
+					
+					if(line.contains("mapping"))
+					{
+						String test [] = line.split(",");
+						if(test[1]=="angle")
+						{
+							bbc.setMapping(1);
+							
+						}
+						if(test[1]=="neighbor")
+						{
+							bbc.setMapping(2);
+							
+						}
+						if(test[1]=="speed")
+						{
+							bbc.setMapping(3);
+							
+						}
+						if(test[1]=="ID")
+						{
+							bbc.setMapping(4);
+							
+						}
 					}
 
 					//[ID]position:
@@ -142,6 +170,7 @@ public class ClientCode implements OnClickListener{
 						//bbc.moveBehavior.orient2Loc(x, y);
 
 					}
+					
 
 					if(line.contains("wander"+myID))
 					{
@@ -271,7 +300,10 @@ public class ClientCode implements OnClickListener{
 								if(b.ID==ID)
 								{
 									//b.setVel(newx - b.x, newy-b.y);
-									b.setPos(newx,newy);
+									if(!posLost)
+									{
+										b.setPos(newx,newy);
+									}
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
 									b.positionLost=posLost;
@@ -279,7 +311,10 @@ public class ClientCode implements OnClickListener{
 								else //this means that the ID wasn't found in otherBots..so we need ot create it..
 								{
 									Bot newBot = new Bot();
-									newBot.setPos(newx, newy);
+									if(!posLost)
+									{
+										newBot.setPos(newx, newy);
+									}
 									//newBot.setAngle(angle)
 									//newBot.angle = (float) Math.atan2(b.vy, b.vx);
 									//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
