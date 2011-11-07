@@ -5,38 +5,40 @@ import android.util.Log;
 import android.widget.TextView;
 
 public class BeatTimer extends Thread{
-	
+
 	int generalIndex, previousIndex;
-	
+
 	long globalTimer;
-	
+
 	long globalTimeInterval;
-	
+
 	boolean generalTimingFlag;
-	
+
 	long appStartTimeMillis;
 	Handler handler=new Handler();
 	private boolean running;
-	
+
 	BoeBotController bbc;
 	InputController ic;
 	OutputController oc;
 
 	DemoKitActivity mActivity;
-	
+
 	boolean wander;
 	boolean move2Loc;
 	boolean orient2Loc;
-	
+
+	int mapping=0;
+
 	BeatTimer()
 	{
 		globalTimeInterval=125*2;
-		
+
 		globalTimer=System.currentTimeMillis();
 		appStartTimeMillis=globalTimer;
 		Log.d("beatTimer created", "checking here ");
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -63,7 +65,7 @@ public class BeatTimer extends Thread{
 							"\ntargetY="+bbc.targety+
 							"\ntargetAngle:"+bbc.targetangle+
 							"\norientCmpleted:"+bbc.myBehavior.orientComplete							
-							);
+					);
 				}
 			});
 		}
@@ -75,7 +77,7 @@ public class BeatTimer extends Thread{
 				bbc.myBehavior.fullWander();
 			}
 		}
-		
+
 		if(move2Loc)
 		{
 			if(bbc.myBehavior!=null)
@@ -91,7 +93,7 @@ public class BeatTimer extends Thread{
 							"\ntargetx="+bbc.targety);
 				}
 			});
-			
+
 		}
 		if(bbc!=null)
 		{
@@ -117,9 +119,9 @@ public class BeatTimer extends Thread{
 					bbc.myBehavior.wander();
 				}
 			}
-			*/
-			
-			
+			 */
+
+
 			globalTimer += globalTimeInterval;
 			incrementGeneralIndex();
 			//allowedToFire=true;
@@ -141,11 +143,36 @@ public class BeatTimer extends Thread{
 				if(bbc.sequencerMode)
 				{
 					boolean test=true;
-					
-					int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
-					//bbc.fillRhythm(f, bbc.sfxrseq);
-					bbc.fillEuclid(f, bbc.sfxrseq);
-					
+
+					switch(mapping)
+					{
+					case 0: break;
+					case 1: //angle
+						int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
+						//bbc.fillRhythm(f, bbc.sfxrseq);
+						bbc.fillEuclid(f, bbc.sfxrseq);
+						bbc.fillEuclid(f, bbc.instrumentseq);
+						break;
+					case 2: //neighbor
+						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
+						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
+						break;
+					case 3: //speed 
+						break;
+					case 4: //ID fill position using euclid
+						boolean[] t=bbc.euclidArray(bbc.otherBots.size()+1, bbc.sfxrseq.length);
+						
+						break;
+					case 5: //ID fill position
+						bbc.fillPosition(bbc.ID, bbc.sfxrseq);
+						bbc.fillPosition(bbc.ID, bbc.instrumentseq);						
+						break;
+
+					default: ; break;
+
+					}
+
+
 					/*
 					if(bbc.fseq[bbc.currentIndex])
 					{
@@ -180,16 +207,16 @@ public class BeatTimer extends Thread{
 						//mActivity.aTest.soundType(3);
 						//mActivity.aTest.replay();
 					}
-					*/
+					 */
 					if(bbc.sfxrseq[bbc.currentIndex])
 					{
 						test=false;
-						
+
 						mActivity.aTest.soundType(6);
 						mActivity.aTest.replay();
 					}
-					
-					
+
+
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
 						test=false;
@@ -197,7 +224,7 @@ public class BeatTimer extends Thread{
 						//mActivity.aTest.soundType(3);
 						//mActivity.aTest.replay();
 					}
-						
+
 					/*
 					if(test)
 					{
@@ -205,8 +232,8 @@ public class BeatTimer extends Thread{
 						//mActivity.aTest.replayRandom();
 
 					}
-					
-					
+
+
 					if(ic!=null)
 					{
 						if(bbc.useSensors)
@@ -214,68 +241,68 @@ public class BeatTimer extends Thread{
 							int f = (int) bbc.map((float)ic.ir0, 0, 512, 0, 16);
 							bbc.fillRhythm(f, bbc.sfxrseq);
 						}
-						
+
 					}
-					*/
-					
-					
+					 */
+
+
 				}
-				
+
 				////////////////////////////
 				//not sequencer mode...but free range... 
 				/*
 				if(bbc.instrumentseq[bbc.currentIndex])
 				{
-					
+
 					bbc.playInstrument();
 					//mActivity.aTest.soundType(3);
 					//mActivity.aTest.replay();
 				}
-				*/
-				
+				 */
+
 			}
 
 		}
 		else
 		{
 			if(System.currentTimeMillis() - globalTimer> globalTimeInterval/2)
-			  {
-				  //allowedToFire=false;
-				  generalTimingFlag=false;
-				  if(bbc!=null)
-				  {
-					  if(bbc.sequencerMode)
-					  {
-						 bbc.stopInstrument();
-					  }
-					  else
-					  {
-						  //bbc.stopInstrument();
-						  
-					  }
-				  }
-			  }
-			  
-		  }
+			{
+				//allowedToFire=false;
+				generalTimingFlag=false;
+				if(bbc!=null)
+				{
+					if(bbc.sequencerMode)
+					{
+						bbc.stopInstrument();
+					}
+					else
+					{
+						//bbc.stopInstrument();
+
+					}
+				}
+			}
+
+		}
 
 	}
-	
+
 	long timeFromStart()
 	{
-	  return System.currentTimeMillis()-appStartTimeMillis;
+		return System.currentTimeMillis()-appStartTimeMillis;
 	}
-	
+
 	void incrementGeneralIndex()
 	{
-	  generalIndex++;
-	  //allowedToFire=true;
-	  if(bbc!=null)
-		  bbc.currentIndex=generalIndex%bbc.fseq.length;
+		generalIndex++;
+		//allowedToFire=true;
+		if(bbc!=null)
+			bbc.currentIndex=generalIndex%bbc.fseq.length;
 	}
-	
+
 	public void setRunning(boolean run) {
-        running = run;
-    }
+		running = run;
+	}
 
 	public void resetIndex()
 	{

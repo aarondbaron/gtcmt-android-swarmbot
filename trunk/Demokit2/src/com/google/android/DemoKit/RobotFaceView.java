@@ -488,6 +488,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 
 			Pupil p;
+			
+			String text = "";
 			Eye(int x,int y)
 			{
 				this.x=x;
@@ -697,6 +699,11 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 					if(bbc.currentIndex==ID)
 					{
 						c.drawRect(x-sz, y-sz, x+sz, y+sz, blackpaint);
+					}
+					
+					if(bbc.instrumentseq[ID])
+					{
+						c.drawRect(x-sz, y-sz, x+sz, y+sz, paint2);
 					}
 					
 				}
