@@ -33,6 +33,8 @@ class FdView extends SampleCvViewBase {
     private CascadeClassifier   mCascade;
     
     public float minFaceSize = 0.2f;
+    
+    public float x,y;
 
     public FdView(Context context) {
         super(context);
@@ -160,7 +162,11 @@ class FdView extends SampleCvViewBase {
                     , new Size(faceSize, faceSize));
 
             for (Rect r : faces)
+            {
                 Core.rectangle(mRgba, r.tl(), r.br(), new Scalar(0, 255, 0, 255), 3);
+                x=r.x;
+                y=r.y;
+            }
         }
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);

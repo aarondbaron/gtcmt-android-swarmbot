@@ -3,6 +3,6 @@
 	android:id="@+id/sR" android:layout_width="match_parent"
 	android:orientation="horizontal" android:screenOrientation="landscape" android:layout_height="wrap_content">
     
-    <com.google.android.DemoKit.CtView android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/fdview"></com.google.android.DemoKit.CtView>  
+    <com.google.android.DemoKit.FdView android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/fdview"></com.google.android.DemoKit.FdView>  
 </LinearLayout>
 
