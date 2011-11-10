@@ -106,6 +106,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	RobotFaceView rfv;
 	
 	int ID;
+	
+	public FdView opcvFD;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -242,6 +244,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.rfv=(RobotFaceView)mActivity.findViewById(R.id.robotFaceView);
 		this.rfv.bbc=this;
 		this.rfv.bt=mActivity.beatTimer;
+		
+		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
 		
 	}
 

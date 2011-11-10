@@ -22,7 +22,7 @@ import android.view.View.OnTouchListener;
 
 public class RobotFaceView extends SurfaceView implements OnTouchListener, SurfaceHolder.Callback, Runnable{
 
-	Paint paint1,paint2,blackpaint;
+	Paint paint1,paint2,blackpaint,blackpaintText,redPaintHighlight;
 
 	private SurfaceHolder       mHolder;
 
@@ -63,16 +63,26 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		paint1 = new Paint();
 		paint2 = new Paint();
 		blackpaint = new Paint();
+		blackpaintText = new Paint();
+		redPaintHighlight = new Paint();
 
 		paint1.setColor(Color.WHITE);
 		paint1.setAntiAlias(true);
 
 		paint2.setColor(Color.BLUE);
 		paint2.setAntiAlias(true);
-		paint2.setStyle(Paint.Style.STROKE);
+		//paint2.setStyle(Paint.Style.STROKE);
 
 		blackpaint.setColor(Color.BLACK);
 		blackpaint.setAntiAlias(true);
+		
+		blackpaintText.setTextSize(25);
+		blackpaintText.setColor(Color.BLACK);
+		blackpaintText.setAntiAlias(true);
+		
+		redPaintHighlight.setColor(Color.RED);
+		redPaintHighlight.setAntiAlias(true);
+		redPaintHighlight.setStyle(Paint.Style.STROKE);
 
 
 
@@ -183,6 +193,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 		thread.robotEyes= new Eyes();
 		thread.robotTeeth = new Teeth(getWidth()/2,getHeight()-getHeight()/4);
+		thread.robotNose = new NoseButton();
 		thread.setRunning(true);
 		thread.start();
 
@@ -211,6 +222,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 		public Eyes robotEyes;
 		public Teeth robotTeeth;
+		public NoseButton robotNose;
+		
 		public RobotFaceViewThread(SurfaceHolder holder, Context context) 
 		{
 
@@ -238,6 +251,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 						//_panel.onDraw(c);
 						robotEyes.run(c);
 						robotTeeth.run(c);
+						robotNose.run(c);
 					}
 				} finally {
 					// do this in a finally so that if an exception is thrown
@@ -379,8 +393,14 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 		int sz=100;
 		int tsz=50;
+		
+		int cbuff=0;
+		int obuff=10;
+		
+		boolean drunk;
 
 		boolean showlog=false;
+		long glookTimer;
 		public Eyes()
 		{
 
@@ -394,6 +414,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			openTimer=System.currentTimeMillis();
 			closeTimer=System.currentTimeMillis();
+			
+			glookTimer=System.currentTimeMillis();
 		}
 
 		void resetEyePositions(int x, int y)
@@ -421,9 +443,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			}
 
 
-			if(tsz>sz)
+			if(tsz>sz+cbuff)
 			{
-				tsz=sz;
+				tsz=sz+cbuff;
 				closeOpen=true;
 
 				closeState=true;
@@ -431,9 +453,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				if(showlog)
 					Log.d("eye","closed");
 			}
-			if(tsz<0)
+			if(tsz<0+obuff)
 			{
-				tsz =0;
+				tsz =0+obuff;
 				closeOpen=false;
 				openState=true;
 				openTimer=System.currentTimeMillis();
@@ -455,12 +477,56 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			if(closeState)
 			{
-				if(System.currentTimeMillis()-closeTimer>750)
+				if(System.currentTimeMillis()-closeTimer>500)
 				{
 					closeState=false; 
 					closeOpen=false;
 					if(showlog)
 						Log.d("eye","closeState finished");
+				}
+			}
+			
+			if(drunk)
+			{
+				
+				
+			}
+			else
+			{
+				if(System.currentTimeMillis()-glookTimer>1500)
+				{
+					glookTimer+=1000;
+
+					double choi=Math.random();
+					e1.p.choice=choi;
+					e2.p.choice=choi;
+
+					int xta=(int) map((float)Math.random(),0,1,-(sz)/2,(sz)/2);
+					int yta=(int) map((float)Math.random(),0,1,-(sz)/2,(sz)/2);
+					
+					e1.p.xtarget=xta;
+					e1.p.ytarget=yta;
+					e2.p.xtarget=xta;
+					e2.p.ytarget=yta;
+					
+					if(choi<.5)
+					{
+						e1.p.xtarget=0;
+						e1.p.ytarget=0;
+						e2.p.xtarget=0;
+						e2.p.ytarget=0;
+					}
+					else
+					{
+						e1.p.xtarget=xta;
+						e1.p.ytarget=yta;
+						e2.p.xtarget=xta;
+						e2.p.ytarget=yta;
+					}
+					
+					
+					
+					
 				}
 			}
 		}
@@ -489,7 +555,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			Pupil p;
 			
-			String text = "";
+			String tt = "testing testing";
+			String other;
 			Eye(int x,int y)
 			{
 				this.x=x;
@@ -502,7 +569,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 			void update()
 			{
-
+				other= " x: "+ bbc.opcvFD.x + " y: " + bbc.opcvFD.y;
 			}
 
 			void render(Canvas c)
@@ -529,6 +596,49 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				float bottomy2 = y+(sz-tsz);
 				RectF ovalBounds2 = new RectF(leftx2, topy2, rightx2, bottomy2);
 				c.drawOval(ovalBounds2, paint1);
+				
+				
+				//////////text for eyelash??
+				// We must keep track of our position along the curve
+			    float arclength = 0;
+			    // For every box
+			    //this is temporary
+			    tt=other;
+			    for (int i = 0; i < tt.length(); i ++ ) {
+
+			      // The character and its width
+			      char currentChar = tt.charAt(i);
+			     
+			      // Instead of a constant width, we check the width of each character.
+			      float w = blackpaint.measureText(tt,i,i)+15; 
+			      // Each box is centered so we move half the width
+			      arclength += w/2;
+
+			      // Angle in radians is the arclength divided by the radius
+			      // Starting on the left side of the circle by adding PI
+			      float theta = (float) (Math.PI + arclength / (float)sz);
+
+			      //pushMatrix();
+			      c.save();
+
+			      // Polar to Cartesian conversion allows us to find the point along the curve. See Chapter 13 for a review of this concept.
+			      c.translate((float)(x+(sz)*Math.cos(theta)),(float) ( y+(sz)*Math.sin(theta))); 
+			      // Rotate the box (rotation is offset by 90 degrees)
+			      c.rotate((float)(  (theta + Math.PI/2.0)*(180.0/Math.PI))  ); 
+
+			      // Display the character
+			      //fill(0);
+			      //stroke(0);
+			      //text(currentChar,0,0);
+			      c.drawText(Character.toString(currentChar), 0, 0, blackpaintText);
+
+			      //popMatrix();
+			      c.restore();
+
+			      // Move halfway again
+			      arclength += w/2;
+			    }
+				
 			}
 
 			void run(Canvas c)
@@ -543,13 +653,88 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			//innerclass for eye
 			class Pupil
 			{
+				int xoff;
+				int yoff;
+				
+				int xtarget;
+				int ytarget;
+				
+				long lookTimer;
+				double choice;
 				Pupil()
 				{
 
-
+					lookTimer=System.currentTimeMillis();
 				}
 				void update()
 				{
+					
+					//if from camera
+					/*
+					int fw = (int) bbc.opcvFD.x;
+					int fh = (int) bbc.opcvFD.y;
+					int ww=bbc.opcvFD.mw;
+					int hh=bbc.opcvFD.mh;
+					
+					if(fw==0||fh==0)
+					{
+						xoff=0;
+					}
+					else
+					{
+						xoff=(int) map(fw-ww/2+100,-(ww)/2,(ww)/2,-(sz*.5f)/2,(sz*.5f)/2);
+					}
+					
+					if(fw==0||fh==0)
+					{
+						yoff=0;
+					}
+					else
+					{
+						yoff=(int) map(fh-hh/2+100,-(hh)/2,(hh)/2,-(sz*.5f)/2,(sz*.5f)/2);
+					}
+					*/
+					
+					//look straight or randomly
+					if(drunk)
+					{
+						if(System.currentTimeMillis()-lookTimer>1500)
+						{
+							lookTimer+=1000;
+
+							choice=Math.random();
+
+							xtarget=(int) map((float)Math.random(),0,1,-(sz)/2,(sz)/2);
+							ytarget=(int) map((float)Math.random(),0,1,-(sz)/2,(sz)/2);;
+						}
+					}
+					if(choice<.5)
+					{
+						xtarget=0;
+						ytarget=0;
+					}
+					else
+					{
+						if(xoff<xtarget)
+						{
+							xoff++;
+						}
+						if(xoff>xtarget)
+						{
+							xoff--;
+						}
+						if(yoff<ytarget)
+						{
+							yoff++;
+						}
+						if(yoff>ytarget)
+						{
+							yoff--;
+						}
+						
+					}
+
+					
 				}
 
 				void render(Canvas c)
@@ -557,10 +742,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 					//fill(0);
 					//ellipse(x,y,.2*sz,.2*sz);
 
-					float leftx = x-.2f*sz;
-					float topy = y-.2f*sz;
-					float rightx = x+.2f*sz;
-					float bottomy = y+.2f*sz;
+					float leftx = (x-xoff)-.2f*sz;
+					float topy = (y+yoff)-.2f*sz;
+					float rightx = (x-xoff)+.2f*sz;
+					float bottomy = (y+yoff)+.2f*sz;
 					RectF ovalBounds = new RectF(leftx, topy, rightx, bottomy);
 					c.drawOval(ovalBounds, blackpaint);
 				}
@@ -576,7 +761,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 
 	}
-	////end ends
+	////end eyes
 
 
 	//start teeth
@@ -696,14 +881,15 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				
 				if(bbc!=null)
 				{
-					if(bbc.currentIndex==ID)
-					{
-						c.drawRect(x-sz, y-sz, x+sz, y+sz, blackpaint);
-					}
 					
 					if(bbc.instrumentseq[ID])
 					{
 						c.drawRect(x-sz, y-sz, x+sz, y+sz, paint2);
+					}
+					
+					if(bbc.currentIndex==ID)
+					{
+						c.drawRect(x-sz, y-sz, x+sz, y+sz, redPaintHighlight);						
 					}
 					
 				}
@@ -721,11 +907,54 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 
 
 	//// end teeth
+	
+	//start nosebutton
+	class NoseButton
+	{
+		
+		int sz=50;
+		
+		boolean pressed;
+		int x,y;
+		
+		NoseButton()
+		{
+			x=getWidth()/2;
+			y=getHeight()/2;
+		}
+		
+		void run(Canvas c)
+		{
+			
+			update();
+			render(c);
+		}
+		
+		void update()
+		{
+			
+		}
+		
+		void render(Canvas c)
+		{
+			if(!pressed)
+				c.drawCircle(x, y, sz, paint2);
+			else
+				c.drawCircle(x, y, sz, paint1);
+			
+		}
+		
+	}
+	
+	//end nose button
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
 		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
+			float x=event.getX();
+			float y= event.getY();
+			/*
 			Point point = new Point();
 			point.x = event.getX();
 			point.y = event.getY();
@@ -734,6 +963,35 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			thread.points.add(point);
 			invalidate();
 			Log.d("robotfaceView", "point: " + point);
+			*/
+			
+			//check if x y near something
+			double f=Math.sqrt(Math.pow(x-thread.robotNose.x, 2)+Math.pow(y-thread.robotNose.y, 2));
+			if(f<thread.robotNose.sz)
+			{
+				bbc.setMapping(0);
+				bbc.instrumentseq[bbc.currentIndex]=!bbc.instrumentseq[bbc.currentIndex];
+				bbc.sfxrseq[bbc.currentIndex]=!bbc.sfxrseq[bbc.currentIndex];
+				Log.d("robotfaceView", "f: " + f);
+				
+				//this coudl be..but shoudl not be..should be depenednt on state it hink
+				this.thread.robotEyes.e1.tt="manual input";
+				this.thread.robotEyes.e2.tt="manual input";
+				
+				this.thread.robotNose.pressed=true;
+				
+			}
+			else
+			{
+				//shoudl not be.
+				this.thread.robotEyes.e1.tt="angle mapping";
+				this.thread.robotEyes.e2.tt="angle mapping";
+				
+				bbc.setMapping(1);
+				Log.d("robotfaceView", "f: " + f);
+			}
+			
+			
 			return true;
 			
 		}
@@ -747,12 +1005,19 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				thread.robotTeeth.state=0;
 			}
 			Log.d("robotfaceView", "motionUP: " +thread.robotTeeth.state );
+			this.thread.robotNose.pressed=false;
+			
 			return true;
+			
+			
 
 		}
 
 		return false;
 	}
+	
+	
+	
 
 
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
