@@ -139,7 +139,8 @@ public class SFXRData extends Thread {
   public void resetSample(boolean restart) {
     if (!restart)
       phase = 0;
-    fperiod = 100.0 / (p_base_freq * p_base_freq + 0.001);
+    //fperiod = 100.0 / (p_base_freq * p_base_freq + 0.001);
+    fperiod = (1f/p_base_freq)*44100f; //CHANGED FOR STATIC COIN
     period = (int) fperiod;
     fmaxperiod = 100.0 / (p_freq_limit * p_freq_limit + 0.001);
     fslide = 1.0 - Math.pow((double) p_freq_ramp, 3.0) * 0.01;
@@ -512,6 +513,16 @@ public class SFXRData extends Thread {
       p_env_decay = frnd(0.2f);
       p_hpf_freq = 0.1f;
       break;
+    case 7: // static coin
+        resetParams();
+        p_base_freq = 440;  //IN HERTZ
+        p_env_attack = 0.0f;
+        p_env_sustain = 0.2f;
+        p_env_decay = 0.5f;
+        p_env_punch = 1f;
+          p_arp_speed = 0.0f;
+          p_arp_mod = 0.0f; 
+        break;
     default:
       break;
     }

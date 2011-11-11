@@ -212,7 +212,7 @@ public class BeatTimer extends Thread{
 					{
 						test=false;
 
-						mActivity.aTest.soundType(6);
+						mActivity.aTest.soundType(7);
 						mActivity.aTest.replay();
 					}
 
