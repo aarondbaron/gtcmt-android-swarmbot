@@ -397,7 +397,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 		int cbuff=0;
 		int obuff=10;
 		
-		boolean drunk;
+		boolean drunk=false;
+		long drunkTimer;
 
 		boolean showlog=false;
 		long glookTimer;
@@ -416,6 +417,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			closeTimer=System.currentTimeMillis();
 			
 			glookTimer=System.currentTimeMillis();
+			drunkTimer=glookTimer;
 		}
 
 		void resetEyePositions(int x, int y)
@@ -488,8 +490,11 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 			
 			if(drunk)
 			{
-				
-				
+				if(System.currentTimeMillis()-drunkTimer>500+500*Math.random())
+				{
+					cbuff=(int)(15*Math.random());
+					obuff=(int)(15*Math.random()+10);
+				}
 			}
 			else
 			{
@@ -979,6 +984,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				this.thread.robotEyes.e2.tt="manual input";
 				
 				this.thread.robotNose.pressed=true;
+				this.thread.robotEyes.drunk=true;
+				this.thread.robotEyes.cbuff=10;
 				
 			}
 			else
@@ -989,6 +996,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener, Surfa
 				
 				bbc.setMapping(1);
 				Log.d("robotfaceView", "f: " + f);
+				this.thread.robotEyes.drunk=false;
+				this.thread.robotEyes.cbuff=0;
 			}
 			
 			
