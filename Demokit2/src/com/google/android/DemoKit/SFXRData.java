@@ -518,7 +518,7 @@ public class SFXRData extends Thread {
         p_base_freq = 440;  //IN HERTZ
         p_env_attack = 0.0f;
         p_env_sustain = 0.2f;
-        p_env_decay = 0.5f;
+        p_env_decay = 0.2f;
         p_env_punch = 1f;
           p_arp_speed = 0.0f;
           p_arp_mod = 0.0f; 
