@@ -34,7 +34,8 @@ class FdView extends SampleCvViewBase {
     
     public float minFaceSize = 0.2f;
     
-    public float x,y;
+    public float x,y,sz,numFaces;
+
 
     public FdView(Context context) {
         super(context);
@@ -161,11 +162,14 @@ class FdView extends SampleCvViewBase {
             mCascade.detectMultiScale(mGray, faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                     , new Size(faceSize, faceSize));
 
+            numFaces=faces.size();
+
             for (Rect r : faces)
             {
                 Core.rectangle(mRgba, r.tl(), r.br(), new Scalar(0, 255, 0, 255), 3);
                 x=r.x;
                 y=r.y;
+                sz=r.width;
             }
         }
 
