@@ -21,6 +21,8 @@ public abstract class SampleCvViewBase extends SurfaceView implements SurfaceHol
     private SurfaceHolder       mHolder;
     private VideoCapture        mCamera;
     private FpsMeter            mFps;
+    
+    public int mw, mh;
 
     public SampleCvViewBase(Context context) {
         super(context);
@@ -65,6 +67,9 @@ public abstract class SampleCvViewBase extends SurfaceView implements SurfaceHol
                             mFrameWidth = (int) size.width;
                             mFrameHeight = (int) size.height;
                             minDiff = Math.abs(size.height - height);
+                            mw=mFrameWidth;
+                            mh=mFrameHeight;
+                            Log.i(TAG, "mw: " + mw + " mh: "+ mh);
                         }
                     }
                 }
@@ -77,7 +82,7 @@ public abstract class SampleCvViewBase extends SurfaceView implements SurfaceHol
 
     public void surfaceCreated(SurfaceHolder holder) {
         Log.i(TAG, "surfaceCreated");
-        mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID);
+        mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID+1);
         if (mCamera.isOpened()) {
             (new Thread(this)).start();
         } else {
