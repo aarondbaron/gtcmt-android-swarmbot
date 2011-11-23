@@ -86,16 +86,19 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 			mRobotFaceContainer.setVisibility(View.GONE);
 			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
 		} else {
+			
+			mRobotFaceContainer.setVisibility(View.VISIBLE);
+			mFaceLabel.setBackgroundDrawable(mFocusedTabImage);
+			
 			mInputContainer.setVisibility(View.GONE);
 			mInputLabel.setBackgroundDrawable(mNormalTabImage);
-			mOutputContainer.setVisibility(View.VISIBLE);
-			mOutputLabel.setBackgroundDrawable(mFocusedTabImage);
+			mOutputContainer.setVisibility(View.GONE);
+			mOutputLabel.setBackgroundDrawable(mNormalTabImage);
 			
 			mCameraContainer.setVisibility(View.GONE);
 			mCamLabel.setBackgroundDrawable(mNormalTabImage);
 			
-			mRobotFaceContainer.setVisibility(View.GONE);
-			mFaceLabel.setBackgroundDrawable(mNormalTabImage);
+			
 		}
 	}
 	
