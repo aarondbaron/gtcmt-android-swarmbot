@@ -1,5 +1,6 @@
 package com.google.android.DemoKit;
 
+
 import java.util.Random;
 
 public class SFXRData extends Thread {
@@ -77,9 +78,13 @@ public class SFXRData extends Thread {
   public int arp_time;
   public int arp_limit;
   public double arp_mod;
+  
+  public float freq=220;
 
 
   Random rnd;
+  
+
 
   public SFXRData(int seed) {
     rnd = new Random(seed);
@@ -515,7 +520,7 @@ public class SFXRData extends Thread {
       break;
     case 7: // static coin
         resetParams();
-        p_base_freq = 220;  //IN HERTZ
+        p_base_freq = freq;  //IN HERTZ 440 220
         p_env_attack = 0.0f;
         p_env_sustain = 0.1f;
         p_env_decay = 0.02f;
@@ -705,7 +710,9 @@ public class SFXRData extends Thread {
     target[position + 3] = (byte) ((value2 & 0xff00) >> 8);
   }
 
-
+  
+  
+  
 
   /*
   AudioFormat getStereoAudioFormat() throws Exception {
