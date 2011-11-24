@@ -1,5 +1,9 @@
 package com.google.android.DemoKit;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -11,6 +15,9 @@ public class AudioTest
 	boolean threadRunning;
 	AndroidAudioDevice device;
 	
+	int base =72;
+	int[] pSet;
+	
    public AudioTest()
    {
 	   
@@ -19,6 +26,7 @@ public class AudioTest
       sdata.resetSample(false);
       
       threadRunning=true;
+      pSet=pentatonicSet(400);
       
       t= new Thread( new Runnable( ) 
       {
@@ -98,6 +106,16 @@ public class AudioTest
 	sdata.random(a);   
    }
    
+   public void setFreq(float f)
+   {
+	   sdata.freq=f;
+   }
+   public void randomPentFreq()
+   {
+	   int f=0;
+	   sdata.freq=f;
+   }
+   
    
 
    public void onStop()
@@ -131,4 +149,233 @@ public class AudioTest
 	//t.stop();
 	   
    }
+   
+   
+   
+//////////////////////////////////////////////////////////////
+   int[] pentatonicSet(int nrange)
+   {
+     int[] arr0 = new int[nrange/2];
+     int[] arr1 = new int[nrange/2];
+
+     arr0[0]= base;
+     arr1[0]= base;
+     for(int i=0; i < nrange/2-1; i++)
+     {
+
+       arr0[i+1]=nextPentatonic(arr0[i]);
+       arr1[i+1]= previousPentatonic(arr1[i]);
+     }
+
+     int[] result = Arrays.copyOf(arr0, arr0.length + arr1.length);
+     System.arraycopy(arr1, 0, result, arr0.length, arr1.length);
+
+     result=removeDuplicates(result);
+     Arrays.sort(result);
+     return result;
+   }
+   
+   int nextPentatonic(int current)
+   {
+     //assumption...current is already one of the pentatonic
+     int dif=current-base;
+
+     int n=0;
+
+     int f=0;
+
+     if(dif>0)
+     {
+       n=dif%12;
+
+       switch(n)
+       {
+       case 0: 
+         f= 2; 
+         break;
+       case 2: 
+         f=2; 
+         break;
+       case 4: 
+         f=3; 
+         break;
+       case 7: 
+         f=2; 
+         break;
+       case 9: 
+         f=3 ;
+         break;
+       default: 
+         //println("next pentatonic . c: " + current + " n: " + n);
+       }
+     }
+
+
+     if(dif<0)
+     {
+       ////
+
+       n= -(-dif)%12;
+
+       switch(n)
+       {
+
+       case 0: 
+         f= 2; 
+         break;
+
+
+       case -3: 
+         f= 3; 
+         break;
+       case -5: 
+         f= 2 ; 
+         break;
+       case -8: 
+         f= 3; 
+         break;
+       case -10: 
+         f= +2; 
+         break;
+       default: 
+         //println(" next  pentatonic . c: " + current + " n: " + n);
+       }
+     }
+
+
+     if(dif==0)
+     {
+       return current+2;
+     }
+
+
+
+
+     int res = current+f;
+     if(res>127)
+     {
+       res = current;
+       //println("over");
+     }
+     if(res<0)
+     {
+       res=current;
+       //println("neh");
+     }
+     return res;
+   }
+
+   int previousPentatonic(int current)
+   {
+     if(current==0)
+     {
+       return base;
+     }
+     //assumption...current is already one of the pentatonic
+     int dif=current-base;
+
+     int n=0;
+
+     int f=0;
+
+     if(dif>0)
+     {
+       n=dif%12;
+
+       switch(n)
+       {
+       case 0: 
+         f= -3; 
+         break;
+       case 2: 
+         f=-2; 
+         break;
+       case 4: 
+         f=-2; 
+         break;
+       case 7: 
+         f=-3; 
+         break;
+       case  9: 
+         f= -2 ;
+         break;
+       default: 
+         //println("prev pentatonic . c: " + current + " n: " + n);
+       }
+     }
+
+
+     if(dif<0)
+     {
+       n= -(-dif)%12;
+
+       switch(n)
+       {
+       case 0: 
+         f= -3; 
+         break;
+
+       case -3: 
+         f= -2; 
+         break;
+       case -5: 
+         f=-3; 
+         break;
+       case -8: 
+         f=-2; 
+         break;
+       case -10: 
+         f= -2; 
+         break;
+       default: 
+         //println("prev pentatonic . c: " + current + " n: " + n);
+       }
+     }
+
+
+     if(dif==0)
+     {
+       return current-3;
+     }
+
+
+
+
+     int res = current+f;
+     if(res>127)
+     {
+       res = current;
+       //println("over");
+     }
+     if(res<0)
+     {
+       res=current;
+       //println("neh");
+     }
+     return res;
+   }
+   
+   int[] removeDuplicates(int array[]) {  
+
+ 	    HashSet<Integer> hs = new HashSet<Integer>();  
+
+ 	    for(int i =0 ; i < array.length ; i++) {  
+ 	      hs.add(array[i]);
+ 	    }  
+
+ 	    int new_array[] = new int[hs.size()];  
+
+ 	    Iterator<Integer> itr = hs.iterator();  
+ 	    int i =0;  
+ 	    while(itr.hasNext()) {  
+ 	      new_array[i]=itr.next();  
+ 	      i++;
+ 	    }  
+
+ 	    return new_array;
+ 	  }  
+   ////////////////////////////////////////////////////////
+   
+   
+   
 }

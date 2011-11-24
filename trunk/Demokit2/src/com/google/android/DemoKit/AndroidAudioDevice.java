@@ -7,7 +7,7 @@ import android.media.AudioTrack;
 public class AndroidAudioDevice
 {
    AudioTrack track;
-   short[] buffer = new short[1024];
+   short[] buffer = new short[2048];
    int sr =44100;
  
    public AndroidAudioDevice( )

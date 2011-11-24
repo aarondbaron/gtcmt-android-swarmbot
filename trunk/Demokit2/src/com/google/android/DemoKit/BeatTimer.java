@@ -30,6 +30,7 @@ public class BeatTimer extends Thread{
 
 	int mapping=0;
 
+
 	BeatTimer()
 	{
 		globalTimeInterval=125*2;
@@ -98,12 +99,15 @@ public class BeatTimer extends Thread{
 		if(bbc!=null)
 		{
 			if(bbc.myBehavior!=null)
-			{
+			{ 
 				if(bbc.myBehavior.boundaryReached()&& this.mActivity.client.connected)
 				{
+					///NOTE NOTE NOTE TEMPORARY TEMPORARY..WHAT IS THIS???
+					/*
 					bbc.stopAll();
 					move2Loc=false;
 					wander=false;
+					*/
 				}
 			}
 		}
@@ -143,6 +147,9 @@ public class BeatTimer extends Thread{
 				if(bbc.sequencerMode)
 				{
 					boolean test=true;
+					
+					
+					
 
 					switch(mapping)
 					{
@@ -161,53 +168,74 @@ public class BeatTimer extends Thread{
 						break;
 					case 4: //ID fill position using euclid
 						boolean[] t=bbc.euclidArray(bbc.otherBots.size()+1, bbc.sfxrseq.length);
-						
+
 						break;
 					case 5: //ID fill position
 						bbc.fillPosition(bbc.ID, bbc.sfxrseq);
 						bbc.fillPosition(bbc.ID, bbc.instrumentseq);						
+						break;
+					case 6: //fill based on camera face size
+						int fff=(int) bbc.map(bbc.opcvFD.sz,160,400,1,8);
+						if(bbc.opcvFD.numFaces!=0)
+						{
+							bbc.fillEuclid(fff, bbc.sfxrseq);
+							bbc.fillEuclid(fff, bbc.instrumentseq);			
+						}
+						else
+						{
+							
+							//bbc.clearRhythm(bbc.sfxrseq);
+							//bbc.clearRhythm(bbc.instrumentseq);
+						}
+						
+						
+						
+						
+						
 						break;
 
 					default: ; break;
 
 					}
 
-
-					/*
-					if(bbc.fseq[bbc.currentIndex])
+					if(bbc.danceSequencer)
 					{
 
-						test=false;
-						bbc.forward();
-						//mActivity.aTest.soundType(0);
-						//mActivity.aTest.replay();
+						if(bbc.fseq[bbc.currentIndex])
+						{
+
+							test=false;
+							bbc.forward();
+							//mActivity.aTest.soundType(0);
+							//mActivity.aTest.replay();
+
+						}
+
+						if(bbc.bseq[bbc.currentIndex])
+						{
+							test=false;
+							bbc.backward();
+							//mActivity.aTest.soundType(1);
+							//mActivity.aTest.replay();
+						}
+
+						if(bbc.rseq[bbc.currentIndex])
+						{
+							test=false;
+							bbc.rotLeft();
+							//mActivity.aTest.soundType(2);
+							//mActivity.aTest.replay();
+						}
+
+						if(bbc.lseq[bbc.currentIndex])
+						{
+							test=false;
+							bbc.rotRight();
+							//mActivity.aTest.soundType(3);
+							//mActivity.aTest.replay();
+						}
 
 					}
-
-					if(bbc.bseq[bbc.currentIndex])
-					{
-						test=false;
-						bbc.backward();
-						//mActivity.aTest.soundType(1);
-						//mActivity.aTest.replay();
-					}
-
-					if(bbc.rseq[bbc.currentIndex])
-					{
-						test=false;
-						bbc.rotLeft();
-						//mActivity.aTest.soundType(2);
-						//mActivity.aTest.replay();
-					}
-
-					if(bbc.lseq[bbc.currentIndex])
-					{
-						test=false;
-						bbc.rotRight();
-						//mActivity.aTest.soundType(3);
-						//mActivity.aTest.replay();
-					}
-					 */
 					if(bbc.sfxrseq[bbc.currentIndex])
 					{
 						test=false;
@@ -279,6 +307,11 @@ public class BeatTimer extends Thread{
 					{
 						//bbc.stopInstrument();
 
+					}
+					
+					if(bbc.danceSequencer)
+					{
+						bbc.stop();
 					}
 				}
 			}
