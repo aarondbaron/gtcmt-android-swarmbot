@@ -108,6 +108,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	int ID;
 	
 	public FdView opcvFD;
+	
+	float myFreq=440;
+	
+	boolean danceSequencer;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -271,7 +275,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				forward();
 				clearAll();
 				//mActivity.aTest.replayRandom();
-				sequencerMode=false;
+				//sequencerMode=false;
 
 			}
 
@@ -280,7 +284,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				backward();
 				clearAll();
 				//mActivity.aTest.replayRandom();
-				sequencerMode=false;
+				//sequencerMode=false;
 			}
 
 			if(arg0.getId()==rotLeft.getId())
@@ -289,7 +293,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				rotLeft();
 				clearAll();
 				//mActivity.aTest.replayRandom();
-				sequencerMode=false;
+				//sequencerMode=false;
 			}
 
 			if(arg0.getId()==rotRight.getId())
@@ -297,7 +301,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				rotRight();
 				clearAll();
 				//mActivity.aTest.replayRandom();
-				sequencerMode=false;
+				//sequencerMode=false;
 			}
 
 			if(arg0.getId()==stop.getId())
@@ -406,6 +410,27 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 
 
+	}
+	
+	public void tempoUp()
+	{
+		if(mActivity.beatTimer.globalTimeInterval>25)
+		{
+			mActivity.beatTimer.globalTimeInterval-=25;
+			et.setText("" + mActivity.beatTimer.globalTimeInterval);
+			sequencerMode=true;
+		}
+	}
+	public void tempoDown()
+	{
+		mActivity.beatTimer.globalTimeInterval+=25;
+		et.setText("" + mActivity.beatTimer.globalTimeInterval);
+		sequencerMode=true;
+	}
+	
+	public long getTempo()
+	{
+		return mActivity.beatTimer.globalTimeInterval;
 	}
 
 	public void forward()
@@ -690,10 +715,51 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 	}
+	
+	void randomDance()
+	{
+		
+		int debt0=0;
+		int debt1=0;
+		int debt2=0;
+		int debt3=0;
+		int totalDebt=0;
+		
+		for(int i=0; i<fseq.length;i++)
+		{
+			int choice=(int) (4*Math.random());
+			switch(choice)
+			{
+			 case 0: 
+				 if(totalDebt<fseq.length-i)
+					 
+				 debt0++; break;
+			 case 1: 
+				 debt1++;break;
+			 case 2: 
+				 debt2++;break;
+			 case 3: 
+				 debt3++;break;
+			 
+			 default: ; break;
+			}
+			totalDebt=debt0+debt1+debt2+debt3;
+			
+			
+		}
+		
+		
+		
+	}
 
 
 	boolean[] euclidArray(int m, int k)
 	{
+		
+		if(k<0||m<0)
+		{
+			return new boolean[0];
+		}
 	  if(k<m||m==0)
 	    return new boolean[k];
 
@@ -799,6 +865,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		clearRhythm(sfxrseq);
 		clearRhythm(instrumentseq);
 
+	}
+	
+	void clearAllMovement()
+	{
+		clearRhythm(fseq);
+		clearRhythm(rseq);
+		clearRhythm(lseq);
+		clearRhythm(bseq);
 	}
 
 	
@@ -1084,13 +1158,50 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
+	
+	void euclidDance()
+	{
+		boolean[] b = new boolean[fseq.length];
+		
+		int n= (int)(7*Math.random()) +1;
+		fillEuclid(7,b);
+		clearAllMovement();
+		
+		int cnt=0;
+		for(int i =0; i< b.length; i++)
+		{
+			if(b[i])
+			{
+				switch(cnt)
+				{
+				case 0: fseq[i]=true; break;
+				case 1: bseq[i]=true; break;
+				case 2: rseq[i]=true; break;
+				case 3: lseq[i]=true; break;
+				default: ; break;
+				}
+				
+				cnt++;
+				if(cnt%4==0)
+				{
+					cnt=0;
+				}
+			}
+		}
+		
+		
+		
+		
+	 
+	}
 
 	void randomMirrorSP()
 	{
 		for(int i=0; i<fseq.length/2;i++)
 		{
-			int d = (int)(2*Math.random());
-			if(d==1)
+			int d = (int)(5*Math.random());
+			//this is just to allow for silences on occasion.  25% prob
+			if(d>=1)
 			{
 				int r = (int)(4*Math.random());
 
@@ -1122,8 +1233,38 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
+	
+	void toggleDance()
+	{
+		
+		danceSequencer=!danceSequencer;
+		rfv.thread.message.displayMessage("danceMode: " + danceSequencer);
+	}
+	
+	void setDanceSequencer(boolean b)
+	{
+		danceSequencer=b;
+		rfv.thread.message.displayMessage("danceMode: " + danceSequencer);
+	}
 
+	//
+	void setFreq(float f)
+	{
+		
 
+	    
+		myFreq=f;
+		this.mActivity.aTest.sdata.freq=myFreq;
+	}
+	
+	void setRandomPentFreq()
+	{
+		int ind = (int) (map((float)Math.random(),0,1,30,mActivity.aTest.pSet.length-30));
+		float fp3 = (float) Math.pow(2,(float)(this.mActivity.aTest.pSet[ind]-this.mActivity.aTest.base)/12.0f) *261.6255650f;
+
+	}
+	
+	//
 	///////////////musical mappings
 
 	//map based on number of neigbhors
@@ -1174,6 +1315,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		
 		mActivity.beatTimer.mapping=a;
+		
+		
+	}
+	
+	int getMapping()
+	{
+		return mActivity.beatTimer.mapping;
 	}
 	////////////////////
 

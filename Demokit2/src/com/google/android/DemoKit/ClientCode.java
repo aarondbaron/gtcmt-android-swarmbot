@@ -51,7 +51,11 @@ public class ClientCode implements OnClickListener{
 		connectToServer = (Button) mActivity.findViewById(R.id.connectServer);
 		connectToServer.setOnClickListener(this);		
 		serverIp = (EditText) mActivity.findViewById(R.id.serverIP);
-		serverIp.setText("143.215.110.128");
+		//serverIp.setText("143.215.110.128");
+		//serverIp.setText("192.168.1.27");
+		//serverIp.setText("172.17.10.16");
+		serverIp.setText("10.20.0.2");
+		
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
 	}
 
@@ -112,12 +116,14 @@ public class ClientCode implements OnClickListener{
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
 						Log.d("LINE","stop");
+						bbc.danceSequencer=false;
 					}
 					if(line.contains("forward"+myID))
 					{
 						bbc.forward();
 
 						Log.d("LINE","forward");
+						bbc.danceSequencer=false;
 					}
 
 					if(line.contains("backward"+myID))
@@ -125,6 +131,7 @@ public class ClientCode implements OnClickListener{
 						bbc.backward();
 
 						Log.d("LINE","backward");
+						bbc.danceSequencer=false;
 					}
 
 					if(line.contains("rotleft"+myID))
@@ -132,6 +139,7 @@ public class ClientCode implements OnClickListener{
 						bbc.rotLeft();
 
 						Log.d("LINE","rotleft");
+						bbc.danceSequencer=false;
 					}
 
 					if(line.contains("rotright"+myID))
@@ -139,6 +147,7 @@ public class ClientCode implements OnClickListener{
 						bbc.rotRight();
 
 						Log.d("LINE","rotright");
+						bbc.danceSequencer=false;
 					}
 
 					if(line.contains("calibrate"+myID))
@@ -169,6 +178,128 @@ public class ClientCode implements OnClickListener{
 						Log.d("ClientCode","orientx:"+x+"orienty:"+y);
 						//bbc.moveBehavior.orient2Loc(x, y);
 
+					}
+					
+					if(line.contains("dance"))
+					{
+						bbc.danceSequencer=!bbc.danceSequencer;
+						bbc.rfv.thread.message.displayMessage("dance:" + bbc.danceSequencer);
+						if(bbc.danceSequencer)
+						{
+							bbc.randomMirrorSP();
+						}
+						else
+						{
+							bbc.clearAllMovement();
+							bbc.stop();
+						
+						}
+						
+						Log.d("ClientCode","dance: " + bbc.danceSequencer);
+					
+					}
+					if(line.contains("eudanse"))
+					{
+						bbc.setMapping(0);
+						bbc.danceSequencer=!bbc.danceSequencer;
+						
+						if(bbc.danceSequencer)
+						{
+							bbc.euclidDance();
+							bbc.fillEuclid(4, bbc.sfxrseq);
+							bbc.fillEuclid(4, bbc.instrumentseq);
+						}
+						else
+						{
+							bbc.clearAllMovement();
+							bbc.clearRhythm(bbc.sfxrseq);
+							bbc.clearRhythm(bbc.instrumentseq);
+							bbc.stop();
+						
+						}
+						bbc.rfv.thread.message.displayMessage("eudance:" + bbc.danceSequencer);
+
+						Log.d("ClientCode","dance: " + bbc.danceSequencer);
+						
+					}
+					if(line.contains("tempoup"))
+					{
+						bbc.tempoUp();
+						bbc.rfv.thread.message.displayMessage("tempo:" + bbc.getTempo());
+						Log.d("client","tempoup" + bbc.getTempo());
+						
+					}
+					if(line.contains("tempodown"))
+					{
+						bbc.tempoDown();
+						bbc.rfv.thread.message.displayMessage("tempo:" + bbc.getTempo());
+						Log.d("client","tempodown"+ bbc.getTempo());
+					}
+						
+					if(line.contains("temporary"))
+					{
+						bbc.rfv.thread.message.displayMessage("temporary wander");
+						bbc.danceSequencer=false;
+						bbc.clearAllMovement();
+						bbc.myBehavior  = new Behavior(bbc);
+						bbc.myBehavior.m1=false;
+						bbc.myBehavior.m2=true;
+						//backward();
+						bbc.forward();				
+						bbc.myposx=200;
+						bbc.myposy=200;				
+						//mActivity.beatTimer.wander=true;
+						bbc.setWander(true);
+					}
+					
+					
+					if(line.contains("mapping"))
+					{
+						
+						
+						
+						String test [] = line.split(",");
+
+						int map = (int) Float.parseFloat(test[1]);
+						bbc.setMapping(map);
+						if(map==1)
+						{
+							bbc.rfv.thread.message.displayMessage("mapping: use compass" );
+						}
+						if(map==6)
+						{
+							bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
+						}
+						
+						Log.d("client","   map" + map);
+					}
+					
+					if(line.contains("reuc"))
+					{
+						bbc.setMapping(0);
+						int n = (int) (8*Math.random()+1);
+						bbc.rfv.thread.message.displayMessage("randomeuclid" );
+						bbc.fillEuclid(n, bbc.instrumentseq);
+						bbc.fillEuclid(n, bbc.sfxrseq);
+					}
+					
+					if(line.contains("seuc"))
+					{
+						bbc.setMapping(0);
+						String test [] = line.split(",");
+						int se = (int) Float.parseFloat(test[1]);
+						bbc.rfv.thread.message.displayMessage("euclid " + se );
+						
+						bbc.fillEuclid(se, bbc.instrumentseq);
+						bbc.fillEuclid(se, bbc.sfxrseq);
+					}
+					
+					if(line.contains("silence"))
+					{
+						bbc.rfv.thread.message.displayMessage("silence " );
+						bbc.setMapping(0);
+						bbc.clearRhythm(bbc.instrumentseq);
+						bbc.clearRhythm(bbc.sfxrseq);
 					}
 					
 
