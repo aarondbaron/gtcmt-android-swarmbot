@@ -20,6 +20,7 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -28,18 +29,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.SensorManager;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+//import android.nfc.NfcAdapter.CreateNdefMessageCallback;
+//import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
+//import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.android.future.usb.UsbAccessory;
 import com.android.future.usb.UsbManager;
 
-public class DemoKitActivity extends Activity implements Runnable {
+public class DemoKitActivity extends Activity implements Runnable /*, CreateNdefMessageCallback, OnNdefPushCompleteCallback*/ {
 	private static final String TAG = "DemoKit";
 
 	private static final String ACTION_USB_PERMISSION = "com.google.android.DemoKit.action.USB_PERMISSION";
@@ -74,6 +84,11 @@ public class DemoKitActivity extends Activity implements Runnable {
 
 	
 	public SurfaceView sv;
+	
+	private static final int MESSAGE_SENT = 1;
+    private static final int MESSAGE_RECEIVED=2;
+    //NfcAdapter mNfcAdapter;
+    
 	
 	protected class SwitchMsg {
 		private byte sw;
@@ -201,6 +216,19 @@ public class DemoKitActivity extends Activity implements Runnable {
 		//client = new ClientCode(this);
 		//client.attachToView();
 		//mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+		
+		
+		/*
+		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            //mInfoText = (TextView) findViewById(R.id.textView);
+           // mInfoText.setText("NFC is not available on this device.");
+        }
+        // Register callback to set NDEF message
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
+        // Register callback to listen for message-sent success
+        mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+        */
 	}
 
 	@Override
@@ -239,6 +267,12 @@ public class DemoKitActivity extends Activity implements Runnable {
 		} else {
 			Log.d(TAG, "mAccessory is null");
 		}
+		
+		/*
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            processIntent(getIntent());
+        }
+        */
 	}
 
 	@Override
@@ -449,5 +483,98 @@ public class DemoKitActivity extends Activity implements Runnable {
 			
 		}
 	}
+
+
+	/*
+	@Override
+	public void onNdefPushComplete(NfcEvent arg0) {
+		// TODO Auto-generated method stub
+		mHandler1.obtainMessage(MESSAGE_SENT).sendToTarget();
+		Log.d("onNdefPushComplete", "sent");
+	}
+	*/
+	
+	  /** This handler receives a message from onNdefPushComplete */
+    /*private final Handler mHandler1 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case MESSAGE_SENT:
+                Toast.makeText(getApplicationContext(), "Message sent!", Toast.LENGTH_LONG).show();
+                break;
+            }
+        }
+    };*/
+    
+    //should this be for ereceiveing?
+    
+    /*private final Handler mHandler2 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case MESSAGE_RECEIVED:
+                Toast.makeText(getApplicationContext(), "Message REceived!", Toast.LENGTH_LONG).show();
+                
+                break;
+            }
+        }
+    };
+    */
+    
+	/*
+	@Override
+	public NdefMessage createNdefMessage(NfcEvent arg0) {
+		Time time = new Time();
+        time.setToNow();
+        String text = ("Beam me up!\n\n" +
+                "Beam Time: " + time.format("%H:%M:%S") + "pattern:");
+        
+        
+        NdefMessage msg = new NdefMessage(
+                new NdefRecord[] { createMimeRecord(
+                        "application/aaron.tests.DrawingExampleActivity", text.getBytes())
+        
+          //,NdefRecord.createApplicationRecord("com.example.android.beam")
+        });
+        Log.d("createNDefMessage", "msg ready");
+        return msg;
+	}
+	*/
+	
+	 /**
+     * Creates a custom MIME type encapsulated in an NDEF record
+     *
+     * @param mimeType
+     */
+    /*public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
+        NdefRecord mimeRecord = new NdefRecord(
+                NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+        return mimeRecord;
+    }*/
+    
+    
+    /**
+     * Parses the NDEF Message from the intent and prints to the TextView
+     */
+    /*void processIntent(Intent intent) {
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES);
+        // only one message sent during the beam
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+        // record 0 contains the MIME type, record 1 is the AAR, if present
+        //mInfoText.setText(new String(msg.getRecords()[0].getPayload()));
+        String s=new String(msg.getRecords()[0].getPayload());
+       // drawView.setIncoming(s);
+        String[] ss=s.split(":");
+        String seq= ss[ss.length-1];
+        char[] seq2=seq.toCharArray();
+        
+        Log.d("processintent", Integer.toString(ss.length));
+        
+        
+        mHandler2.obtainMessage(MESSAGE_RECEIVED).sendToTarget();
+        Log.d("processintent", s);
+    }*/
 	
 }

@@ -1486,6 +1486,83 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		 
 	}
+	
+	void resetIndex()
+	{
+		
+		mActivity.beatTimer.resetIndex();
+		
+	
+	}
+	
+	
+	class MusicBehavior
+	{
+		MusicBehavior()
+		{
+			
+		}
+		
+		void euclid()
+		{
+			
+		}
+		void fillRhythm()
+		{
+			
+		}
+		void copyFromBot()
+		{
+			
+		}
+		void orientation()
+		{
+			
+		}
+		void neigbhor()
+		{
+			
+		}
+		void speed()
+		{
+			
+		}
+		
+		
+	}
+	
+	
+	
+	void loseN(boolean[]b, int n)
+	  {
+	    //first count how many hits
+	    int numhits=0;
+	    
+	    Vector inds = new Vector();
+	    for (int i=0; i <b.length;i++)
+	    {
+	      if (b[i] )
+	      {
+	        numhits++;
+	        inds.add(new Integer(i));
+	      }
+	    }
+	    
+	    if(n>numhits)
+	    {
+	     n=numhits; 
+	    }
+	    
+	    for(int i=0;i<n;i++)
+	    {
+	      
+	      int nn= (int)Math.random()*inds.size();      
+	      Integer ii = (Integer) inds.get(nn);      
+	      inds.remove(nn);//forgot to puthtis in last time
+	      b[ii.intValue()]=false;      
+	    }   
+	    
+	  }
 
 
 }
