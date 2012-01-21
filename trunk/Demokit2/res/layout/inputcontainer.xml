@@ -5,15 +5,25 @@
 	<include layout="@layout/templightcontainer" android:id="@+id/TempLightContainer_ref"
 		android:layout_width="match_parent" android:layout_height="wrap_content"
 		android:layout_weight="1" />
+	
+	<!-- 
 	<include layout="@layout/buttoncontainer" android:id="@+id/ButtonContainer_ref"
 		android:layout_width="match_parent" android:layout_height="wrap_content"
 		android:layout_weight="1" />
-		
+	 -->	
 	<!--  
 	<include layout="@layout/joycontainer" android:id="@+id/JoyContainer_ref"
 		android:layout_width="match_parent" android:layout_height="wrap_content"
 		android:layout_weight="0" />
 	-->
+
+	<Button
+	    android:id="@+id/incrementID"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1"
+	    android:text="incrementID" />
+
 	<TextView android:text="ServerIP" android:id="@+id/textView2" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 	<EditText android:id="@+id/serverIP" android:layout_height="wrap_content" android:layout_width="match_parent">
 		<requestFocus></requestFocus>

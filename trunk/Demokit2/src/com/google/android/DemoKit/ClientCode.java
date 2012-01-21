@@ -17,6 +17,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class ClientCode implements OnClickListener{
@@ -29,7 +30,7 @@ public class ClientCode implements OnClickListener{
 	BoeBotController bbc;
 	BeatTimer bt;
 
-	Button connectToServer;
+	Button connectToServer, incrementID;
 	EditText serverIp;
 
 	TextView fromServer;
@@ -54,9 +55,13 @@ public class ClientCode implements OnClickListener{
 		//serverIp.setText("143.215.110.128");
 		//serverIp.setText("192.168.1.27");
 		//serverIp.setText("172.17.10.16");
-		serverIp.setText("10.20.0.2");
+		//serverIp.setText("10.20.0.2");
+		serverIp.setText("10.0.1.4");
 		
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
+		
+		incrementID = (Button) mActivity.findViewById(R.id.incrementID);
+		incrementID.setOnClickListener(this);
 	}
 
 
@@ -78,6 +83,12 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("header"))
 					{
 
+					}
+					
+					
+					if(line.contains("sync"))
+					{
+						bbc.resetIndex();
 					}
 					
 					
@@ -104,6 +115,40 @@ public class ClientCode implements OnClickListener{
 							bbc.setMapping(4);
 							
 						}
+						
+					}
+					
+					if(line.contains("pattern"))
+					{
+						String test [] = line.split(",");
+						
+						char[] a= test[1].toCharArray();
+						for(int i=0;i<bbc.instrumentseq.length;i++)
+						{
+							if(a[i]=='0')
+							{
+								bbc.instrumentseq[i]=false;
+								bbc.sfxrseq[i]=false;
+							}
+							else
+							{
+								bbc.instrumentseq[i]=true;
+								bbc.sfxrseq[i]=true;
+							}
+							
+						}
+						
+						if(mActivity.beatTimer.generalMeasure%2==0)
+						{
+							
+						}
+						else
+						{
+							//int t = (int ) map(PVector.dist(this.loc,currentAvatar.loc), nearbyBoidBounds,500,0,number/2);   
+							bbc.loseN(bbc.instrumentseq,1);
+							bbc.loseN(bbc.sfxrseq,1);
+						}
+							
 					}
 
 					//[ID]position:
@@ -345,6 +390,22 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
+					
+					if(line.contains("cheat"))
+					{
+						String test [] = line.split(",");
+						int ID = (int) Float.parseFloat(test[3]);
+						
+						if(ID==myID)
+						{
+							
+						}
+						else
+						{
+							
+						}
+						
+					}
 
 
 
@@ -363,7 +424,7 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						int ID = (int) Float.parseFloat(test[3]);
 
-						
+						Log.i("pos","x:"+test[1]);
 
 						if(ID==myID)
 						{
@@ -378,7 +439,7 @@ public class ClientCode implements OnClickListener{
 							{
 								int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 								int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
-
+								
 
 								/*
 								bbc.myvelx=bbc.myposx-newx;
@@ -493,6 +554,19 @@ public class ClientCode implements OnClickListener{
 					cThread.start();
 				}
 			}
+		}
+		
+		if(v.getId()==incrementID.getId())
+		{
+			
+			myID++;
+			if(myID>2)
+			{
+				myID=0;
+			}
+			Log.d("clientcode","incrementing id: " + myID);
+			Toast.makeText(mActivity.getApplicationContext(), "incremented.  id is now " + myID, Toast.LENGTH_SHORT).show();
+		
 		}
 
 

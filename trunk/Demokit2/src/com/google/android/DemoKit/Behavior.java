@@ -30,6 +30,12 @@ public class Behavior
 	public boolean phase2move;
 	public boolean orientComplete;
 	public boolean initWanderComplete=false;
+	
+	public long fullwanderboundarytimer;
+	private boolean timeoutofboundary;
+	public long fullwanderplaywithneighbortimer;
+	private boolean playwithneighborfirsttime;
+	
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
@@ -177,6 +183,7 @@ public class Behavior
 		
 		if(boundary>-1)
 		{
+			fullwanderboundarytimer=System.currentTimeMillis();
 			if(neighbor==0)
 			{
 				this.orientComplete=this.orient2Loc(320,240);
@@ -197,8 +204,47 @@ public class Behavior
 		}
 		else//not in the boundary
 		{
+			if(System.currentTimeMillis()-fullwanderboundarytimer>4000)
+			{
+				timeoutofboundary=true;//remember to use this later 
+				if(bbc.numNeighbors!=0)
+				{
+					bbc.stop();
+					bbc.fillRhythm(bbc.numNeighbors, bbc.instrumentseq);
+					bbc.fillRhythm(bbc.numNeighbors, bbc.sfxrseq);
+					if(!playwithneighborfirsttime)
+					{
+						playwithneighborfirsttime=true;
+						fullwanderplaywithneighbortimer=System.currentTimeMillis();
+					}
+				}
+				else
+				{
+					this.wander();
+					bbc.fillRhythm(1, bbc.instrumentseq);
+					bbc.fillRhythm(1, bbc.sfxrseq);
+					initWanderComplete=false;
+				}
+				
+			}
+			else
+			{
+				
+			}
+			
+			
+			/*
+			if(bbc.numNeighbors!=0)
+			{
+				
+			}
+			else
+			{
+				
+			}
 			this.wander();
 			initWanderComplete=false;
+			*/
 		}
 		
 //		
