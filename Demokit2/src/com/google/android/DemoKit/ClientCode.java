@@ -200,11 +200,17 @@ public class ClientCode implements OnClickListener{
 								{
 									bbc.instrumentseq[i]=false;
 									bbc.sfxrseq[i]=false;
+									
+									//temporary only
+									bbc.avatarseq[i]=false;
 								}
 								else
 								{
 									bbc.instrumentseq[i]=true;
 									bbc.sfxrseq[i]=true;
+									
+									//temporary only
+									bbc.avatarseq[i]=true;
 								}
 							}
 
@@ -328,6 +334,12 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","calibration All done");
 					}
+					
+					if(line.contains("neighborBound"))
+					{
+						String test [] = line.split(",");
+						bbc.neighborBound= Integer.parseInt(test[1]);
+					}
 
 					if(line.contains("orientAll"))
 					{
@@ -399,6 +411,12 @@ public class ClientCode implements OnClickListener{
 						bbc.tempoDown();
 						bbc.rfv.thread.message.displayMessage("tempo:" + bbc.getTempo());
 						Log.d("client","tempodown"+ bbc.getTempo());
+					}
+					if(line.contains("setTempo"))
+					{
+
+						String test [] = line.split(",");
+						mActivity.beatTimer.globalTimeInterval=Integer.parseInt(test[1]);
 					}
 
 					if(line.contains("temporary"))
