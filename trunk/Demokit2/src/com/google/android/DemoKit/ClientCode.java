@@ -37,7 +37,13 @@ public class ClientCode implements OnClickListener{
 
 	Handler handler = new Handler();
 	private DemoKitActivity mActivity;
-	int myID=2;
+	int myID=0;
+
+	long syncTimer=0;
+	long waitTime=2000;
+	long t1,t2;
+	
+	boolean syncFlag=false;
 
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
@@ -57,9 +63,9 @@ public class ClientCode implements OnClickListener{
 		//serverIp.setText("172.17.10.16");
 		//serverIp.setText("10.20.0.2");
 		serverIp.setText("10.0.1.4");
-		
+
 		fromServer=(TextView)mActivity.findViewById(R.id.textView1);
-		
+
 		incrementID = (Button) mActivity.findViewById(R.id.incrementID);
 		incrementID.setOnClickListener(this);
 	}
@@ -84,71 +90,185 @@ public class ClientCode implements OnClickListener{
 					{
 
 					}
-					
-					
+
+
 					if(line.contains("sync"))
 					{
+						String test [] = line.split(",");
+						//bbc.resetIndex();
+
+						long mtime=Long.parseLong(test[1]);
+
+						if(mtime==0)
+						{
+
+						}
+						else
+						{
+							long timeDiff=Long.parseLong(test[2]);
+							Log.d("client", "myID: " + myID  +  "  sync: time diff -- " + timeDiff);
+
+							waitTime=mtime-timeDiff;						
+							//wait until appropriate time
+							//4seconds if id 0, 4 seconds - time from 0 to 1 if id 1;
+							syncTimer=System.currentTimeMillis();
+							
+							syncFlag=true;
+						}
+
+
+					}
+
+					if(System.currentTimeMillis()-syncTimer>waitTime && syncFlag)
+					{
 						bbc.resetIndex();
+						syncFlag=false;
 					}
 					
+					if(line.contains("mode"))
+					{
+						String test [] = line.split(",");
+						if(test[1]=="avatar")
+						{						
+						}						
+					}
 					
+					if(line.contains("setID"))
+					{
+						String test [] = line.split(",");
+						myID= Integer.parseInt(test[1]);
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								Toast.makeText(mActivity.getApplicationContext(), "ID set to -- " +  myID + " -- by server", Toast.LENGTH_LONG).show();
+							}
+						});
+						
+
+					}
+
+					
+					if(line.contains("getPattern"))
+					{
+						String s= "pattern," + myID + "," + bbc.patternToString(bbc.instrumentseq);
+						out.println(s);
+					}
+
 					if(line.contains("mapping"))
 					{
 						String test [] = line.split(",");
 						if(test[1]=="angle")
 						{
 							bbc.setMapping(1);
-							
+
 						}
 						if(test[1]=="neighbor")
 						{
 							bbc.setMapping(2);
-							
+
 						}
 						if(test[1]=="speed")
 						{
 							bbc.setMapping(3);
-							
+
 						}
 						if(test[1]=="ID")
 						{
 							bbc.setMapping(4);
-							
+
 						}
-						
+						if(test[1]=="avatar")
+						{
+							
+							bbc.setMapping(7);
+						}
+
 					}
-					
+
 					if(line.contains("pattern"))
 					{
 						String test [] = line.split(",");
-						
+
 						char[] a= test[1].toCharArray();
+
+
 						for(int i=0;i<bbc.instrumentseq.length;i++)
 						{
-							if(a[i]=='0')
+							if(i<a.length)
 							{
-								bbc.instrumentseq[i]=false;
-								bbc.sfxrseq[i]=false;
+								if(a[i]=='0')
+								{
+									bbc.instrumentseq[i]=false;
+									bbc.sfxrseq[i]=false;
+								}
+								else
+								{
+									bbc.instrumentseq[i]=true;
+									bbc.sfxrseq[i]=true;
+								}
 							}
-							else
-							{
-								bbc.instrumentseq[i]=true;
-								bbc.sfxrseq[i]=true;
-							}
-							
+
 						}
-						
+
 						if(mActivity.beatTimer.generalMeasure%2==0)
 						{
-							
+
 						}
 						else
 						{
 							//int t = (int ) map(PVector.dist(this.loc,currentAvatar.loc), nearbyBoidBounds,500,0,number/2);   
-							bbc.loseN(bbc.instrumentseq,1);
-							bbc.loseN(bbc.sfxrseq,1);
+							//bbc.loseN(bbc.instrumentseq,1);
+							//bbc.loseN(bbc.sfxrseq,1);
 						}
-							
+
+					}
+					
+					
+					if(line.contains("avatarpattern"))
+					{
+						String test [] = line.split(",");
+
+						char[] a= test[1].toCharArray();
+
+						bbc.avatarMode=true;
+						
+						for(int i=0;i<bbc.instrumentseq.length;i++)
+						{
+							if(i<a.length)
+							{
+								if(a[i]=='0')
+								{
+									bbc.avatarseq[i]=false;
+									if(myID==0)
+									{
+										bbc.instrumentseq[i]=false;
+										bbc.sfxrseq[i]=false;
+									}
+								}
+								else
+								{
+									bbc.avatarseq[i]=false;
+									if(myID==0)
+									{
+										bbc.instrumentseq[i]=false;
+										bbc.sfxrseq[i]=false;
+									}
+								}
+							}
+
+						}
+
+						if(mActivity.beatTimer.generalMeasure%2==0)
+						{
+
+						}
+						else
+						{
+							//int t = (int ) map(PVector.dist(this.loc,currentAvatar.loc), nearbyBoidBounds,500,0,number/2);   
+							//bbc.loseN(bbc.instrumentseq,1);
+							//bbc.loseN(bbc.sfxrseq,1);
+						}
+
 					}
 
 					//[ID]position:
@@ -224,7 +344,7 @@ public class ClientCode implements OnClickListener{
 						//bbc.moveBehavior.orient2Loc(x, y);
 
 					}
-					
+
 					if(line.contains("dance"))
 					{
 						bbc.danceSequencer=!bbc.danceSequencer;
@@ -237,17 +357,17 @@ public class ClientCode implements OnClickListener{
 						{
 							bbc.clearAllMovement();
 							bbc.stop();
-						
+
 						}
-						
+
 						Log.d("ClientCode","dance: " + bbc.danceSequencer);
-					
+
 					}
 					if(line.contains("eudanse"))
 					{
 						bbc.setMapping(0);
 						bbc.danceSequencer=!bbc.danceSequencer;
-						
+
 						if(bbc.danceSequencer)
 						{
 							bbc.euclidDance();
@@ -260,19 +380,19 @@ public class ClientCode implements OnClickListener{
 							bbc.clearRhythm(bbc.sfxrseq);
 							bbc.clearRhythm(bbc.instrumentseq);
 							bbc.stop();
-						
+
 						}
 						bbc.rfv.thread.message.displayMessage("eudance:" + bbc.danceSequencer);
 
 						Log.d("ClientCode","dance: " + bbc.danceSequencer);
-						
+
 					}
 					if(line.contains("tempoup"))
 					{
 						bbc.tempoUp();
 						bbc.rfv.thread.message.displayMessage("tempo:" + bbc.getTempo());
 						Log.d("client","tempoup" + bbc.getTempo());
-						
+
 					}
 					if(line.contains("tempodown"))
 					{
@@ -280,7 +400,7 @@ public class ClientCode implements OnClickListener{
 						bbc.rfv.thread.message.displayMessage("tempo:" + bbc.getTempo());
 						Log.d("client","tempodown"+ bbc.getTempo());
 					}
-						
+
 					if(line.contains("temporary"))
 					{
 						bbc.rfv.thread.message.displayMessage("temporary wander");
@@ -296,13 +416,13 @@ public class ClientCode implements OnClickListener{
 						//mActivity.beatTimer.wander=true;
 						bbc.setWander(true);
 					}
-					
-					
+
+
 					if(line.contains("mapping"))
 					{
-						
-						
-						
+
+
+
 						String test [] = line.split(",");
 
 						int map = (int) Float.parseFloat(test[1]);
@@ -315,10 +435,10 @@ public class ClientCode implements OnClickListener{
 						{
 							bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
 						}
-						
+
 						Log.d("client","   map" + map);
 					}
-					
+
 					if(line.contains("reuc"))
 					{
 						bbc.setMapping(0);
@@ -327,18 +447,18 @@ public class ClientCode implements OnClickListener{
 						bbc.fillEuclid(n, bbc.instrumentseq);
 						bbc.fillEuclid(n, bbc.sfxrseq);
 					}
-					
+
 					if(line.contains("seuc"))
 					{
 						bbc.setMapping(0);
 						String test [] = line.split(",");
 						int se = (int) Float.parseFloat(test[1]);
 						bbc.rfv.thread.message.displayMessage("euclid " + se );
-						
+
 						bbc.fillEuclid(se, bbc.instrumentseq);
 						bbc.fillEuclid(se, bbc.sfxrseq);
 					}
-					
+
 					if(line.contains("silence"))
 					{
 						bbc.rfv.thread.message.displayMessage("silence " );
@@ -346,7 +466,7 @@ public class ClientCode implements OnClickListener{
 						bbc.clearRhythm(bbc.instrumentseq);
 						bbc.clearRhythm(bbc.sfxrseq);
 					}
-					
+
 
 					if(line.contains("wander"+myID))
 					{
@@ -390,21 +510,21 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
-					
+
 					if(line.contains("cheat"))
 					{
 						String test [] = line.split(",");
 						int ID = (int) Float.parseFloat(test[3]);
-						
+
 						if(ID==myID)
 						{
-							
+
 						}
 						else
 						{
-							
+
 						}
-						
+
 					}
 
 
@@ -424,22 +544,23 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						int ID = (int) Float.parseFloat(test[3]);
 
-						Log.i("pos","x:"+test[1]);
+						//Log.i("pos","x:"+test[1]);
 
 						if(ID==myID)
 						{
+							Log.i("clientcode","mypos: " + "x:"+test[1]);
 							boolean posLost=false;
 							if(test[1]=="x" || test[2]=="x")
 							{
 								posLost=true;							
 							}
 							bbc.positionLost=posLost;
-							
+
 							if(!bbc.positionLost)
 							{
 								int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 								int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
-								
+
 
 								/*
 								bbc.myvelx=bbc.myposx-newx;
@@ -467,8 +588,8 @@ public class ClientCode implements OnClickListener{
 							{
 								posLost=true;							
 							}
-							
-							
+
+
 							int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
 
@@ -484,6 +605,18 @@ public class ClientCode implements OnClickListener{
 
 							//this would be ideal if we have a comparator...but for now
 							//Bot b =bbc.otherBots.get(ID);
+							//Log.d("clientcode", "size of otherBots " + bbc.otherBots.size());
+							if(bbc.otherBots.size()==0)
+							{
+								Log.d("clientcode", "adding new bot: " + ID);
+								Bot newBot = new Bot();
+								newBot.setPos(newx, newy);
+								newBot.ID=ID;
+								bbc.otherBots.add(newBot);
+							}
+
+							//boolean[] createNew= new boolean[bbc.otherBots.size()];
+							boolean cnew=true;
 
 							for(int i =0 ; i < bbc.otherBots.size();i++)
 							{
@@ -491,6 +624,7 @@ public class ClientCode implements OnClickListener{
 
 								if(b.ID==ID)
 								{
+									//Log.d("clientcode", "b.id==id  " + ID);
 									//b.setVel(newx - b.x, newy-b.y);
 									if(!posLost)
 									{
@@ -499,23 +633,33 @@ public class ClientCode implements OnClickListener{
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
 									b.positionLost=posLost;
+
+									cnew=false;
+									break;
 								}
 								else //this means that the ID wasn't found in otherBots..so we need ot create it..
 								{
-									Bot newBot = new Bot();
-									if(!posLost)
-									{
-										newBot.setPos(newx, newy);
-									}
-									//newBot.setAngle(angle)
-									//newBot.angle = (float) Math.atan2(b.vy, b.vx);
-									//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
-									b.positionLost=posLost;
-									bbc.otherBots.add(newBot);
+
+
 
 								}
+							}
 
-
+							if(cnew)
+							{
+								Log.d("clientcode", "new bot -- b.id!=id  " + ID);
+								Bot newBot = new Bot();
+								if(!posLost)
+								{
+									newBot.setPos(newx, newy);
+									newBot.ID=ID;
+									Log.d("clientcode", "new bot position set ");
+								}
+								//newBot.setAngle(angle)
+								//newBot.angle = (float) Math.atan2(b.vy, b.vx);
+								//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
+								newBot.positionLost=posLost;
+								bbc.otherBots.add(newBot);
 							}
 
 
@@ -555,10 +699,10 @@ public class ClientCode implements OnClickListener{
 				}
 			}
 		}
-		
+
 		if(v.getId()==incrementID.getId())
 		{
-			
+
 			myID++;
 			if(myID>2)
 			{
@@ -566,7 +710,7 @@ public class ClientCode implements OnClickListener{
 			}
 			Log.d("clientcode","incrementing id: " + myID);
 			Toast.makeText(mActivity.getApplicationContext(), "incremented.  id is now " + myID, Toast.LENGTH_SHORT).show();
-		
+
 		}
 
 

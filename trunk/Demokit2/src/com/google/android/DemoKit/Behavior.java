@@ -569,5 +569,56 @@ public class Behavior
 		else
 			return -1;//Right
 	}
+	
+	//this was a 
+	public void steer(float str, float dir)
+	{
+		if(str<=.01)
+		{		
+			bbc.writeR(128);
+			bbc.writeL(128);
+			return;
+		}
+		
+		bbc.writeR(0);
+		bbc.writeL(0);
+	
+	}
+	
+	public void doSteer()
+	{
+		
+	
+	}
+	
+	public void doMove()
+	{
+		float maxspeed = 2;
+		PVector vel = new PVector();
+		PVector acc = new PVector();
+		PVector loc = new PVector();
+		
+		vel.add(acc);
+        // Limit speed
+        vel.limit(maxspeed);
+        loc.add(vel);///will replace this with doVelocity..which corresponds to boe bot controls
+	}
+	
+	public void doVel(PVector vel, PVector loc, float angle)//given where you are and orientation, and your velocity..make this work 
+	{
+		float vmag= vel.mag();
+		PVector temp = new PVector(loc.x+vel.x, loc.y+vel.y );
+		float vang= vel.angleBetween(temp, loc);
+		
+		if(vang-angle>0)
+		{
+			//turn left "faster" depending on how far away and a how;
+		}
+		else
+		{
+			//turn right
+		}
+		
+	}
 
 }
