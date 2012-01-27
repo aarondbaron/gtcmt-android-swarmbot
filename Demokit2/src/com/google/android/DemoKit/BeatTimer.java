@@ -29,11 +29,15 @@ public class BeatTimer extends Thread{
 	boolean wander;
 	boolean move2Loc;
 	boolean orient2Loc;
+	
+	boolean seek;
 
 	int mapping=0;
 	
 	boolean onceFlag=false;
     boolean smuted=false;
+    
+    boolean measureFlag=false;
 
 	BeatTimer()
 	{

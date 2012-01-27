@@ -91,27 +91,31 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private int mNumAngles;
 	private int mRingBufferIndex;
 	private float[][] mAngles;
-	
+
 	public float  angleAzimuth;
-	
+
 	Vector<Bot> otherBots;
-	
+
 	Behavior myBehavior;
 	//Behavior moveBehavior;
-	
+
 	float calibrationAngle;
-	
+
 	boolean positionLost;
-	
+
 	RobotFaceView rfv;
-	
+
 	int ID;
-	
+
 	public FdView opcvFD;
-	
+
 	float myFreq=440;
-	
+
 	boolean danceSequencer;
+
+	boolean[] avatarseq;
+
+	boolean avatarMode;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -180,7 +184,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		paint.setColor(Color.RED);
 
 		otherBots = new Vector();
-		
+
 		//moveBehavior = new Behavior(this);
 
 	}
@@ -237,20 +241,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//view1.draw(canvas)
 
 		mActivity.client = new ClientCode(mActivity,this);
-		
+
 		myBehavior= new Behavior(this);
-		
+
 		/*
 		DemoKitPhone d= (DemoKitPhone)mActivity;
 		this.rfv = d.mfc.rfv;
 		this.rfv.bbc=this;
-		*/
+		 */
 		this.rfv=(RobotFaceView)mActivity.findViewById(R.id.robotFaceView);
 		this.rfv.bbc=this;
 		this.rfv.bt=mActivity.beatTimer;
-		
+
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
-		
+
 	}
 
 
@@ -317,11 +321,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				//ensureSamePosition();
 				//mActivity.aTest.replayRandom();
 				sequencerMode=true;
-				*/
-				
-				
-				
-				
+				 */
+
+
+
+
 				myBehavior  = new Behavior(this);
 				myBehavior.m1=false;
 				myBehavior.m2=true;
@@ -330,9 +334,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				this.myposx=200;
 				this.myposy=200;				
 				mActivity.beatTimer.wander=true;
-				
-				
-				
+
+
+
 				//orient test
 				/*
 				this.myposx=640/2;
@@ -341,21 +345,21 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				this.targetx=0;
 				this.targety=0;
 				this.orientToLoc(true);
-				*/
-				
+				 */
+
 				//wander test
 				/*
 				this.myposx=640/2;
 				this.myposy=480/2;
 				myBehavior.initWander();
 				this.setWander(true);
-				*/
-				
-				
-				
-				
+				 */
+
+
+
+
 				this.setMapping(1);
-				
+
 			}
 
 			if(arg0.getId()==tempoUp.getId())
@@ -411,7 +415,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 	}
-	
+
 	public void tempoUp()
 	{
 		if(mActivity.beatTimer.globalTimeInterval>25)
@@ -427,7 +431,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		et.setText("" + mActivity.beatTimer.globalTimeInterval);
 		sequencerMode=true;
 	}
-	
+
 	public long getTempo()
 	{
 		return mActivity.beatTimer.globalTimeInterval;
@@ -490,18 +494,44 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 128);
 	}
-	
+
 	public void moveToLoc(boolean b)
 	{
-		
+
 		mActivity.beatTimer.move2Loc=b;
 	}
-	
+
 	public void orientToLoc(boolean b)
 	{
 		//set value
 		mActivity.beatTimer.orient2Loc=b;
 	}
+
+	PVector steer(PVector target, boolean slowdown) {
+		float maxspeed=2;
+		float maxforce =.05f;
+		PVector steer;  // The steering vector
+		PVector desired = PVector.sub(target, new PVector (this.myposx,this.myposy) );  // A vector pointing from the location to the target
+		float d = desired.mag(); // Distance from the target is the magnitude of the vector
+		// If the distance is greater than 0, calc steering (otherwise return zero vector)
+		if (d > 0) {  
+			// Normalize desired
+			desired.normalize();
+			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
+			if ((slowdown) && (d < 100.0f)) desired.mult(maxspeed*(d/100.0f)); // This damping is somewhat arbitrary
+			else desired.mult(maxspeed);
+			// Steering = Desired minus Velocity
+			PVector vel = new PVector(getSpeed()*(float)Math.cos(getAngle()) , getSpeed()*(float)Math.sin(getAngle()));
+			steer = PVector.sub(desired, vel);
+			steer.limit(maxforce);  // Limit to maximum steering force
+		} 
+		else {
+			steer = new PVector(0, 0);
+		}
+		return steer;
+	}
+
+
 	public void writeL(int b)
 	{
 		lbyte =b;
@@ -514,6 +544,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		rbyte=b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte)b);
+	}
+
+	public float getSpeed()
+	{
+		float f = 10; 
+		return f;
+	}
+	public float getAngle()
+	{		
+		return this.angleAzimuth;
 	}
 
 	public int getRByte()
@@ -635,7 +675,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.beatTimer.wander=false;
 		mActivity.beatTimer.move2Loc=false;
 	}
-	
+
 	public void setWander(boolean b)
 	{
 		if(b)
@@ -715,105 +755,105 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 	}
-	
+
 	void randomDance()
 	{
-		
+
 		int debt0=0;
 		int debt1=0;
 		int debt2=0;
 		int debt3=0;
 		int totalDebt=0;
-		
+
 		for(int i=0; i<fseq.length;i++)
 		{
 			int choice=(int) (4*Math.random());
 			switch(choice)
 			{
-			 case 0: 
-				 if(totalDebt<fseq.length-i)
-					 
-				 debt0++; break;
-			 case 1: 
-				 debt1++;break;
-			 case 2: 
-				 debt2++;break;
-			 case 3: 
-				 debt3++;break;
-			 
-			 default: ; break;
+			case 0: 
+				if(totalDebt<fseq.length-i)
+
+					debt0++; break;
+			case 1: 
+				debt1++;break;
+			case 2: 
+				debt2++;break;
+			case 3: 
+				debt3++;break;
+
+			default: ; break;
 			}
 			totalDebt=debt0+debt1+debt2+debt3;
-			
-			
+
+
 		}
-		
-		
-		
+
+
+
 	}
 
 
 	boolean[] euclidArray(int m, int k)
 	{
-		
+
 		if(k<0||m<0)
 		{
 			return new boolean[0];
 		}
-	  if(k<m||m==0)
-	    return new boolean[k];
+		if(k<m||m==0)
+			return new boolean[k];
 
 
-	  Vector d[] = new Vector[m];
-	  for(int i=0; i <m; i++)
-	  {
-	    d[i] = new Vector();
-	    d[i].add("1");
-	  }
+		Vector d[] = new Vector[m];
+		for(int i=0; i <m; i++)
+		{
+			d[i] = new Vector();
+			d[i].add("1");
+		}
 
-	  int dif=k-m;
-	  //Number of zeros
+		int dif=k-m;
+		//Number of zeros
 
-	  for(int i=0; i< dif; i++)
-	  {
-	    //println(i%m);
-	    d[i%m].add("0");
-	  }
+		for(int i=0; i< dif; i++)
+		{
+			//println(i%m);
+			d[i%m].add("0");
+		}
 
-	  Vector r = new Vector();
+		Vector r = new Vector();
 
-	  for(int i=0; i< d.length;i++)
-	  {
-	    r.addAll(d[i]);
-	  }
+		for(int i=0; i< d.length;i++)
+		{
+			r.addAll(d[i]);
+		}
 
 
-	  boolean b[]= new boolean[k];
-	  for(int i =0; i < r.size(); i++)
-	  {
-	    String s = (String) r.get(i);
-	    //print(s);
-	    if(s.equals("1"))
-	    {
-	      b[i]=true;
-	    }
-	  }
-	  //println();
-	  return b;
+		boolean b[]= new boolean[k];
+		for(int i =0; i < r.size(); i++)
+		{
+			String s = (String) r.get(i);
+			//print(s);
+			if(s.equals("1"))
+			{
+				b[i]=true;
+			}
+		}
+		//println();
+		return b;
 	}
-	
+
 	void fillEuclid(int a, boolean b[])
 	{
 		//clearRhythm(b);
-		
+
 		boolean[] ea=euclidArray(a,b.length);
 		for(int i=0; i<b.length;i++)
 		{
-			
+
 			b[i]=ea[i];
-			
+
 		}
-		
+
 	}
 	void fillRhythm(int a, boolean b[])
 	{
@@ -866,7 +906,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		clearRhythm(instrumentseq);
 
 	}
-	
+
 	void clearAllMovement()
 	{
 		clearRhythm(fseq);
@@ -875,13 +915,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		clearRhythm(bseq);
 	}
 
-	
-	
+
+
 	void fillPosition(int n, boolean b[])
 	{
 		if(n>=b.length || n<0)
 			return;
-		
+
 		clearRhythm(b);
 		b[n]=true;
 	}
@@ -1158,15 +1198,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
-	
+
 	void euclidDance()
 	{
 		boolean[] b = new boolean[fseq.length];
-		
+
 		int n= (int)(7*Math.random()) +1;
 		fillEuclid(7,b);
 		clearAllMovement();
-		
+
 		int cnt=0;
 		for(int i =0; i< b.length; i++)
 		{
@@ -1180,7 +1220,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				case 3: lseq[i]=true; break;
 				default: ; break;
 				}
-				
+
 				cnt++;
 				if(cnt%4==0)
 				{
@@ -1188,11 +1228,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				}
 			}
 		}
-		
-		
-		
-		
-	 
+
+
+
+
+
 	}
 
 	void randomMirrorSP()
@@ -1233,14 +1273,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
-	
+
 	void toggleDance()
 	{
-		
+
 		danceSequencer=!danceSequencer;
 		rfv.thread.message.displayMessage("danceMode: " + danceSequencer);
 	}
-	
+
 	void setDanceSequencer(boolean b)
 	{
 		danceSequencer=b;
@@ -1250,20 +1290,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	//
 	void setFreq(float f)
 	{
-		
 
-	    
+
+
 		myFreq=f;
 		this.mActivity.aTest.sdata.freq=myFreq;
 	}
-	
+
 	void setRandomPentFreq()
 	{
 		int ind = (int) (map((float)Math.random(),0,1,30,mActivity.aTest.pSet.length-30));
 		float fp3 = (float) Math.pow(2,(float)(this.mActivity.aTest.pSet[ind]-this.mActivity.aTest.base)/12.0f) *261.6255650f;
 
 	}
-	
+
 	//
 	///////////////musical mappings
 
@@ -1279,7 +1319,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		int othery= targety;
 
 		//determine if close by in a circle		
-		
+
 		sequencerMode=true;
 		if( Math.sqrt( Math.pow((myposx-otherx),2) + Math.pow((myposy-othery),2) ) < rad )
 		{
@@ -1294,36 +1334,238 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			fillRhythm(5,instrumentseq);
 			fillRhythm(5, sfxrseq); 
 		}
-		*/
-		
+		 */
+
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 			Bot b = otherBots.get(i);
-			
+
 			if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < rad )	
 			{
 				numNeighbors++;
-			
+
 			}
-			
+
 		}
 
 
 	}
 
-	void setMapping(int a)
+
+	//in relation to avatar
+	void avatarMapping(int a)
 	{
-		
-		mActivity.beatTimer.mapping=a;
-		
-		
+		if(mActivity.client.myID==0)
+		{
+			return;
+		}
+
+		int rad=100;
+		for(int i =0 ; i < otherBots.size();i++)
+		{
+			Bot b = otherBots.get(i);
+			if(b.ID==0)
+			{
+				switch(a)
+				{
+				case 0: break;
+				case 1: break;
+				case 2: break;
+
+				default: ; 
+
+
+
+				}
+				if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < rad )	
+				{
+
+
+				}
+
+			}
+			else
+			{
+
+			}
+
+
+
+
+		}
+
+	}
+
+	//avatarFunctions?? ..could also be human functions..or some of them could be.
+	void av1()
+	{
+		//p1
+		clearRhythm(instrumentseq);
+		clearRhythm(sfxrseq);
+		//get global seq pattern and fill according to id
+		int szz = otherBots.size()+1;//totalFlock.boids.size();//12
+		int myind= mActivity.client.myID;//totalFlock.boids.indexOf(this);//0
+		int tlength=instrumentseq.length;//gseq.seq.length;//16
+
+		// if 0, index 0 and 12. if 1, 1 and 13. if 2, 2 and 14. 3, 3 and 15. if 4, just 4
+
+
+		int divisions= tlength/(myind+1);    
+		int nums= tlength%(myind+1) ;
+
+		Vector indices = new Vector();
+
+		boolean test=true;
+		int ii=0;
+		while(test)
+		{
+			int tind=myind+ii*szz;
+			if(tind>=tlength)
+			{
+				test=false; 
+			}
+			else
+			{
+				indices.add(new Integer(tind));
+				ii++;
+			}
+		}
+
+
+		/////
+		int extra = numNeighbors + 1;
+		for(int i=0; i <indices.size();i++)
+		{
+
+			Integer d = (Integer) indices.get(i);
+			int dd= d.intValue()%tlength;
+			boolean b = avatarseq[dd];       
+			instrumentseq[dd] = b;
+			sfxrseq[dd]=b;
+
+		}
+
+
+		///approaching the idea...	
+		/*
+		extra = numNeighbors + 1;
+		for(int i=0; i <indices.size();i++)
+		{
+
+			Integer d = (Integer) indices.get(i);
+			for(int j=0;j<extra;j++)
+			{
+				int dd = d.intValue() + j*tlength/2;
+				dd= dd%tlength;
+				boolean b = avatarseq[dd];       
+				instrumentseq[dd] = b;
+				sfxrseq[dd]=b;
+			}
+		}
+		 */
+
+
+		//in the future
+		/*
+		for(int i=0; i< myNeigbhors.size(); i++)
+		{
+			Boid b = (Boid) myNeigbhors.get(i);
+			boolean[] b1=b.getBoolArray();
+			boolean[] b2=getBoolArray();
+
+
+			for(int j=0;j<number;j++)
+			{
+				roll[j].pressed=b1[j]||b2[j];
+
+			}
+
+			//b.copyFromMusicShape(this);
+			//copyFromMusicShape(b);
+
+		}
+		*/
+
+
+
+
+
+
 	}
 	
+	//split rhythm into two groups
+	void splitRhythm(int a)
+	{
+		clearRhythm(instrumentseq);
+		clearRhythm(sfxrseq);
+	    boolean[] b = avatarseq;
+	    
+	    if(numNeighbors%2==0)
+	    {
+	      for(int i=0; i<b.length;i++)
+	      {
+	         if(i%2==0)
+	         {
+	           instrumentseq[i]=b[i];
+	           sfxrseq[i]=b[i];
+	         }
+	      
+	      }
+	    }
+	    else
+	    {
+	      for(int i=0; i<b.length;i++)
+	      {
+	         if(i%2==1)
+	         {
+	        	 instrumentseq[i]=b[i];
+	        	 sfxrseq[i]=b[i];
+	         }
+	      
+	      }
+	    }
+		
+	}
+
+
+	void setMapping(int a)
+	{
+
+		mActivity.beatTimer.mapping=a;
+
+
+	}
+
 	int getMapping()
 	{
 		return mActivity.beatTimer.mapping;
 	}
 	////////////////////
+
+	boolean[] getPattern()
+	{
+
+		return instrumentseq;
+	}
+
+	String patternToString(boolean[] b)
+	{
+		String s = "";
+
+		for(int i=0; i < b.length; i++)
+		{
+			if(b[i])
+			{
+				s += "1";
+			}
+			else
+			{
+				s+="0";
+			}
+		}
+
+		return s;
+	}
 
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
@@ -1357,6 +1599,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 
+	}
+
+	double distanceToTarget(double x, double y)
+	{
+		return Math.sqrt( Math.pow((myposx-x),2) + Math.pow((myposy-y),2) );
 	}
 
 
@@ -1438,40 +1685,40 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		 */
 
 
-		
+
 		if(event.sensor==mOrientationSensor) {
-    		if(mNumAngles==RING_BUFFER_SIZE) {
-    			// subtract oldest vector
-	    		mAngles[0][0]-=mAnglesRingBuffer[mRingBufferIndex][0][0];
-	    		mAngles[0][1]-=mAnglesRingBuffer[mRingBufferIndex][0][1];
-	    		mAngles[1][0]-=mAnglesRingBuffer[mRingBufferIndex][1][0];
-	    		mAngles[1][1]-=mAnglesRingBuffer[mRingBufferIndex][1][1];
-	    		mAngles[2][0]-=mAnglesRingBuffer[mRingBufferIndex][2][0];
-	    		mAngles[2][1]-=mAnglesRingBuffer[mRingBufferIndex][2][1];
-    		} else {
-    			mNumAngles++;
-    		}
+			if(mNumAngles==RING_BUFFER_SIZE) {
+				// subtract oldest vector
+				mAngles[0][0]-=mAnglesRingBuffer[mRingBufferIndex][0][0];
+				mAngles[0][1]-=mAnglesRingBuffer[mRingBufferIndex][0][1];
+				mAngles[1][0]-=mAnglesRingBuffer[mRingBufferIndex][1][0];
+				mAngles[1][1]-=mAnglesRingBuffer[mRingBufferIndex][1][1];
+				mAngles[2][0]-=mAnglesRingBuffer[mRingBufferIndex][2][0];
+				mAngles[2][1]-=mAnglesRingBuffer[mRingBufferIndex][2][1];
+			} else {
+				mNumAngles++;
+			}
 
-    		// convert angles into x/y
-    		mAnglesRingBuffer[mRingBufferIndex][0][0]=(float) Math.cos(Math.toRadians(event.values[0]));
-    		mAnglesRingBuffer[mRingBufferIndex][0][1]=(float) Math.sin(Math.toRadians(event.values[0]));
-    		mAnglesRingBuffer[mRingBufferIndex][1][0]=(float) Math.cos(Math.toRadians(event.values[1]));
-    		mAnglesRingBuffer[mRingBufferIndex][1][1]=(float) Math.sin(Math.toRadians(event.values[1]));
-    		mAnglesRingBuffer[mRingBufferIndex][2][0]=(float) Math.cos(Math.toRadians(event.values[2]));
-    		mAnglesRingBuffer[mRingBufferIndex][2][1]=(float) Math.sin(Math.toRadians(event.values[2]));
+			// convert angles into x/y
+			mAnglesRingBuffer[mRingBufferIndex][0][0]=(float) Math.cos(Math.toRadians(event.values[0]));
+			mAnglesRingBuffer[mRingBufferIndex][0][1]=(float) Math.sin(Math.toRadians(event.values[0]));
+			mAnglesRingBuffer[mRingBufferIndex][1][0]=(float) Math.cos(Math.toRadians(event.values[1]));
+			mAnglesRingBuffer[mRingBufferIndex][1][1]=(float) Math.sin(Math.toRadians(event.values[1]));
+			mAnglesRingBuffer[mRingBufferIndex][2][0]=(float) Math.cos(Math.toRadians(event.values[2]));
+			mAnglesRingBuffer[mRingBufferIndex][2][1]=(float) Math.sin(Math.toRadians(event.values[2]));
 
-    		// accumulate new x/y vector
-    		mAngles[0][0]+=mAnglesRingBuffer[mRingBufferIndex][0][0];
-    		mAngles[0][1]+=mAnglesRingBuffer[mRingBufferIndex][0][1];
-    		mAngles[1][0]+=mAnglesRingBuffer[mRingBufferIndex][1][0];
-    		mAngles[1][1]+=mAnglesRingBuffer[mRingBufferIndex][1][1];
-    		mAngles[2][0]+=mAnglesRingBuffer[mRingBufferIndex][2][0];
-    		mAngles[2][1]+=mAnglesRingBuffer[mRingBufferIndex][2][1];
+			// accumulate new x/y vector
+			mAngles[0][0]+=mAnglesRingBuffer[mRingBufferIndex][0][0];
+			mAngles[0][1]+=mAnglesRingBuffer[mRingBufferIndex][0][1];
+			mAngles[1][0]+=mAnglesRingBuffer[mRingBufferIndex][1][0];
+			mAngles[1][1]+=mAnglesRingBuffer[mRingBufferIndex][1][1];
+			mAngles[2][0]+=mAnglesRingBuffer[mRingBufferIndex][2][0];
+			mAngles[2][1]+=mAnglesRingBuffer[mRingBufferIndex][2][1];
 
-    		mRingBufferIndex++;
-    		if(mRingBufferIndex==RING_BUFFER_SIZE) {
-    			mRingBufferIndex=0;
-    		}
+			mRingBufferIndex++;
+			if(mRingBufferIndex==RING_BUFFER_SIZE) {
+				mRingBufferIndex=0;
+			}
 
 			// convert back x/y into angles
 			float azimuth=(float) Math.toDegrees(Math.atan2((double)mAngles[0][1], (double)mAngles[0][0]));
@@ -1482,87 +1729,87 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			//mHeadingView.setText(getString(R.string.heading)+": "+(int)azimuth+"°");
 			azimuthlabel.setText("azimuth:" + azimuth);
 			angleAzimuth=azimuth;
-    	}
+		}
 
-		 
+
 	}
-	
+
 	void resetIndex()
 	{
-		
+
 		mActivity.beatTimer.resetIndex();
-		
-	
+
+
 	}
-	
-	
+
+
 	class MusicBehavior
 	{
 		MusicBehavior()
 		{
-			
+
 		}
-		
+
 		void euclid()
 		{
-			
+
 		}
 		void fillRhythm()
 		{
-			
+
 		}
 		void copyFromBot()
 		{
-			
+
 		}
 		void orientation()
 		{
-			
+
 		}
 		void neigbhor()
 		{
-			
+
 		}
 		void speed()
 		{
-			
+
 		}
-		
-		
+
+
 	}
-	
-	
-	
+
+
+
 	void loseN(boolean[]b, int n)
-	  {
-	    //first count how many hits
-	    int numhits=0;
-	    
-	    Vector inds = new Vector();
-	    for (int i=0; i <b.length;i++)
-	    {
-	      if (b[i] )
-	      {
-	        numhits++;
-	        inds.add(new Integer(i));
-	      }
-	    }
-	    
-	    if(n>numhits)
-	    {
-	     n=numhits; 
-	    }
-	    
-	    for(int i=0;i<n;i++)
-	    {
-	      
-	      int nn= (int)Math.random()*inds.size();      
-	      Integer ii = (Integer) inds.get(nn);      
-	      inds.remove(nn);//forgot to puthtis in last time
-	      b[ii.intValue()]=false;      
-	    }   
-	    
-	  }
+	{
+		//first count how many hits
+		int numhits=0;
+
+		Vector inds = new Vector();
+		for (int i=0; i <b.length;i++)
+		{
+			if (b[i] )
+			{
+				numhits++;
+				inds.add(new Integer(i));
+			}
+		}
+
+		if(n>numhits)
+		{
+			n=numhits; 
+		}
+
+		for(int i=0;i<n;i++)
+		{
+
+			int nn= (int)Math.random()*inds.size();      
+			Integer ii = (Integer) inds.get(nn);      
+			inds.remove(nn);//forgot to puthtis in last time
+			b[ii.intValue()]=false;      
+		}   
+
+	}
 
 
 }
