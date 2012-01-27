@@ -235,6 +235,14 @@ public class BeatTimer extends Thread{
 					case 8:
 						break;
 						
+					case 9:
+						if(mActivity.client.myID!=0)
+						{
+							bbc.splitRhythm(0);
+							//bbc.av1();
+						}
+						break;
+						
 						
 						
 

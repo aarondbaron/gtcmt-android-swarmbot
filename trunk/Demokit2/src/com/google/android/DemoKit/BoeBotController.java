@@ -116,6 +116,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	boolean[] avatarseq;
 
 	boolean avatarMode;
+	
+	int neighborBound=150;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -134,6 +136,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		sfxrseq = new boolean[16];
 		instrumentseq = new boolean[16];
+		
+		avatarseq = new boolean[16];
 
 		//svthread = new Thread();
 		//svthread.start();
@@ -1312,7 +1316,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	void numberOfNeigbhors()
 	{
 		numNeighbors=0;
-		int rad =150;
+		//int rad =150;
 		/*
 		//get coords of other
 		int otherx=targetx;
@@ -1340,7 +1344,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			Bot b = otherBots.get(i);
 
-			if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < rad )	
+			if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < neighborBound )	
 			{
 				numNeighbors++;
 
@@ -1360,7 +1364,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			return;
 		}
 
-		int rad=100;
+		//int rad=100;
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 			Bot b = otherBots.get(i);
@@ -1377,11 +1381,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 				}
-				if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < rad )	
+				
+				
+				if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < neighborBound )	
 				{
 
 
 				}
+				
 
 			}
 			else
@@ -1433,6 +1440,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 		/////
+		
+		/*
 		int extra = numNeighbors + 1;
 		for(int i=0; i <indices.size();i++)
 		{
@@ -1444,11 +1453,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			sfxrseq[dd]=b;
 
 		}
+		*/
 
 
 		///approaching the idea...	
-		/*
-		extra = numNeighbors + 1;
+		
+		int extra = numNeighbors + 1;
 		for(int i=0; i <indices.size();i++)
 		{
 
@@ -1462,7 +1472,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				sfxrseq[dd]=b;
 			}
 		}
-		 */
+		 
 
 
 		//in the future
