@@ -320,6 +320,27 @@ public class ClientCode implements OnClickListener{
 						Log.d("LINE","rotright");
 						bbc.danceSequencer=false;
 					}
+					
+					if(line.contains("leftmotor"+myID))
+					{
+						String test [] = line.split(",");
+						int i = Integer.parseInt(test[1]);
+						bbc.writeL(i);
+
+						Log.d("LINE","leftmotor");
+						
+						
+						bbc.danceSequencer=false;
+					}
+					if(line.contains("rightmotor"+myID))
+					{
+						String test [] = line.split(",");
+						int i = Integer.parseInt(test[1]);
+						bbc.writeR(i);
+						
+						Log.d("LINE","rightmotor");
+						bbc.danceSequencer=false;
+					}
 
 					if(line.contains("calibrate"+myID))
 					{
@@ -417,6 +438,7 @@ public class ClientCode implements OnClickListener{
 
 						String test [] = line.split(",");
 						mActivity.beatTimer.globalTimeInterval=Integer.parseInt(test[1]);
+						Log.d("client","setTempo"+ bbc.getTempo());
 					}
 
 					if(line.contains("temporary"))
