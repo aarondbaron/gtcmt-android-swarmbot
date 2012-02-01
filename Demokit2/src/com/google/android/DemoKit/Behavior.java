@@ -604,7 +604,7 @@ public class Behavior
         loc.add(vel);///will replace this with doVelocity..which corresponds to boe bot controls
 	}
 	
-	public void doVel(PVector vel, PVector loc, float angle)//given where you are and orientation, and your velocity..make this work 
+	public void doVel(PVector vel, PVector loc, float angle)//given where you are and orientation, and your desired? velocity..make this work 
 	{
 		float vmag= vel.mag();
 		PVector temp = new PVector(loc.x+vel.x, loc.y+vel.y );
@@ -612,7 +612,7 @@ public class Behavior
 		
 		float dif = vang-angle;
 		
-		//imagine 90 deg is wher we want.. and we are at 269 , or -91
+		//imagine 90 deg is wher we want.. and we are at 269 (-91)
 		// we turn right maximally..meaning that right wheel is full throttle, left is full throttle other direction
 		// as the angle decreases, the left wheel starts to slow down to 128 and then when it is 0 it should be full throttle in same direction
 		

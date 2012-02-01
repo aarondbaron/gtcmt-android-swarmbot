@@ -74,7 +74,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public float[] mI = new float[16];
 	public float[] mOrientation = new float[3];
 
-
+	public int[] vxs,vys;
+	public int vxyindex;
+	public float[] aest;
+	
 	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
 	float myangle, targetangle;
 	int numNeighbors;
@@ -144,6 +147,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.beatTimer.bbc=this;
 		sequencerMode=true;
+		
+		vxs = new int[10];
+		vys = new int[10];
+		aest=new float[10];
 
 		/*
 		mAccelerometer = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -446,11 +453,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 0);
-		rbyte=(byte)0;
+		rbyte= 0;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
-		lbyte=(byte)255;
+		lbyte= 255;
 
 	}
 
@@ -458,10 +465,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 255);
-		rbyte = (byte)255;
+		rbyte =  255;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 0);
-		lbyte = (byte) 0;
+		lbyte =   0;
 	}
 
 	public void rotLeft()
@@ -469,21 +476,21 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 0);
-		rbyte = (byte) 0;
+		rbyte =   0;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 0);
-		lbyte=(byte) 0;
+		lbyte=  0;
 	}
 
 	public void rotRight()
 	{
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 255);
-		rbyte=(byte)255;
+		rbyte= 255;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 255);
-		lbyte =(byte)255;
+		lbyte = 255;
 	}
 
 	public void stop()
@@ -492,8 +499,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte) 128);
 
-		rbyte=(byte)128;
-		lbyte=(byte)128;
+		rbyte= 128;
+		lbyte= 128;
 
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget2, (byte) 128);
