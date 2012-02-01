@@ -610,7 +610,14 @@ public class Behavior
 		PVector temp = new PVector(loc.x+vel.x, loc.y+vel.y );
 		float vang= vel.angleBetween(temp, loc);
 		
-		if(vang-angle>0)
+		float dif = vang-angle;
+		
+		//imagine 90 deg is wher we want.. and we are at 269 , or -91
+		// we turn right maximally..meaning that right wheel is full throttle, left is full throttle other direction
+		// as the angle decreases, the left wheel starts to slow down to 128 and then when it is 0 it should be full throttle in same direction
+		
+		
+		if(dif>0)
 		{
 			//turn left "faster" depending on how far away and a how;
 		}
