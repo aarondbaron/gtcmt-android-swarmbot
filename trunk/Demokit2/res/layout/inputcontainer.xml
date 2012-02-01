@@ -31,7 +31,20 @@
 	<Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="ConnectToServer" android:id="@+id/connectServer"></Button>
 	
 	<TextView android:layout_height="wrap_content"  android:id="@+id/textView1" android:layout_width="wrap_content" android:text="TextView" android:layout_weight="1"></TextView>
-	
+
+	<TextView
+	    android:id="@+id/vestimates"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1"
+	    android:text="vestimates" />
+
+	<TextView
+	    android:id="@+id/angleestimates"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1"
+	    android:text="angleestimates" />
 		
 </LinearLayout>
 
