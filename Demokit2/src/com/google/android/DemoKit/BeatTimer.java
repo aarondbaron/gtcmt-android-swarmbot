@@ -13,7 +13,7 @@ public class BeatTimer extends Thread{
 	long globalTimeInterval;
 
 	boolean generalTimingFlag;
-	
+
 	long generalMeasure;
 
 	long appStartTimeMillis;
@@ -29,15 +29,15 @@ public class BeatTimer extends Thread{
 	boolean wander;
 	boolean move2Loc;
 	boolean orient2Loc;
-	
+
 	boolean seek;
 
 	int mapping=0;
-	
+
 	boolean onceFlag=false;
-    boolean smuted=false;
-    
-    boolean measureFlag=false;
+	boolean smuted=false;
+
+	boolean measureFlag=false;
 
 	BeatTimer()
 	{
@@ -83,7 +83,27 @@ public class BeatTimer extends Thread{
 			if(bbc.myBehavior!=null)
 			{
 				//Log.d("beatTimer", "wander");
-				bbc.myBehavior.fullWander();
+				if(!bbc.myBehavior.boundaryReached())
+				{
+					//bbc.myBehavior.fullWander();
+					
+					
+					
+					//if they get near a neigbhor?
+					
+					
+					if(!bbc.myBehavior.initWanderComplete)
+					{
+						bbc.myBehavior.initWander();
+						bbc.myBehavior.initWanderComplete=true;
+					}
+					bbc.myBehavior.wander();
+				}
+				else
+				{
+					bbc.stop();
+					bbc.myBehavior.initWanderComplete=false;
+				}
 			}
 		}
 
@@ -115,7 +135,7 @@ public class BeatTimer extends Thread{
 					bbc.stopAll();
 					move2Loc=false;
 					wander=false;
-					*/
+					 */
 				}
 			}
 		}
@@ -155,9 +175,9 @@ public class BeatTimer extends Thread{
 				if(bbc.sequencerMode)
 				{
 					boolean test=true;
-					
-					
-					
+
+
+
 					// this shoudl be in boebotcontroller.
 					switch(mapping)
 					{
@@ -191,12 +211,12 @@ public class BeatTimer extends Thread{
 						}
 						else
 						{
-							
+
 							//bbc.clearRhythm(bbc.sfxrseq);
 							//bbc.clearRhythm(bbc.instrumentseq);
 						}
 						break;
-						
+
 					case 7: //avatarIdea
 						if(mActivity.client.myID==0)
 						{
@@ -231,20 +251,30 @@ public class BeatTimer extends Thread{
 							}
 						}
 						break;
-						
+
 					case 8:
+						int c = (int) (this.generalMeasure % (bbc.otherBots.size()+1) );
+						if(c==bbc.ID)
+						{
+							
+							
+						}
 						break;
-						
+
 					case 9:
+
+						break;
+
+					case 10:
 						if(mActivity.client.myID!=0)
 						{
 							bbc.splitRhythm(0);
 							//bbc.av1();
 						}
 						break;
-						
-						
-						
+
+
+
 
 					default: ; break;
 
@@ -292,21 +322,21 @@ public class BeatTimer extends Thread{
 					{
 						test=false;
 
-						
-							mActivity.aTest.soundType(7);
-							mActivity.aTest.replay();
-						
-						
+
+						mActivity.aTest.soundType(7);
+						mActivity.aTest.replay();
+
+
 					}
 
 
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
 						test=false;
-						
-						
-							bbc.playInstrument();
-						
+
+
+						bbc.playInstrument();
+
 						//mActivity.aTest.soundType(3);
 						//mActivity.aTest.replay();
 					}
@@ -324,7 +354,7 @@ public class BeatTimer extends Thread{
 					{
 						if(bbc.useSensors)
 						{
-							int f = (int) bbc.map((float)ic.ir0, 0, 512, 0, 16);
+							int f = (int) bbc.map((float)ic.ir0, 0, 512, 0, bbc.sfxrseq.length);
 							bbc.fillRhythm(f, bbc.sfxrseq);
 						}
 
@@ -366,7 +396,7 @@ public class BeatTimer extends Thread{
 						//bbc.stopInstrument();
 
 					}
-					
+
 					if(bbc.danceSequencer)
 					{
 						bbc.stop();
@@ -390,16 +420,16 @@ public class BeatTimer extends Thread{
 		if(bbc!=null)
 		{
 			bbc.currentIndex=generalIndex%bbc.fseq.length;
-			
+
 			if(bbc.currentIndex==0)
 			{
-				
+
 				generalMeasure++;
 			}
-			
+
 		}
-		
-		
+
+
 	}
 
 	public void setRunning(boolean run) {

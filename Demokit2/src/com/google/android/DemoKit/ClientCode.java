@@ -134,11 +134,34 @@ public class ClientCode implements OnClickListener{
 						{						
 						}						
 					}
+					
+					if(line.contains("djembe"))
+					{
+						mActivity.beatTimer.generalMeasure=0;
+						switch(bbc.dj)
+						{
+						case 0: bbc.setRhythm(bbc.djembe0);break;
+						case 1: bbc.setRhythm(bbc.djembe1);break;
+						case 2: bbc.setRhythm(bbc.djembe2);break;
+						case 3: bbc.setRhythm(bbc.djembe3);break;
+						default: ;
+						
+						
+						}
+						
+						bbc.dj++;
+						if(bbc.dj>=4)
+						{
+							bbc.dj=0;
+						}
+						Log.d("client", "djembe");
+					}
 
 					if(line.contains("setID"))
 					{
 						String test [] = line.split(",");
 						myID= Integer.parseInt(test[1]);
+						bbc.ID=myID;
 						handler.post(new Runnable() {
 							@Override
 							public void run() {
@@ -327,7 +350,7 @@ public class ClientCode implements OnClickListener{
 					{
 						String test [] = line.split(",");
 						int i = Integer.parseInt(test[1]);
-						bbc.writeL(i);
+						bbc.writeL(i);  //gotta check this...
 
 						Log.d("LINE","leftmotor");
 
@@ -612,7 +635,8 @@ public class ClientCode implements OnClickListener{
 								//dont' take estimate if lybte or rbyte is 128
 								if(  ! (bbc.lbyte == 128 && bbc.rbyte == 128)  )
 								{
-
+									bbc.pastx[bbc.vxyindex]=newx;
+									bbc.pasty[bbc.vxyindex]=newy;
 									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
 									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
 									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
@@ -709,6 +733,10 @@ public class ClientCode implements OnClickListener{
 								newBot.setPos(newx, newy);
 								newBot.ID=ID;
 								bbc.otherBots.add(newBot);
+								if(ID==0)
+								{
+									bbc.currentAvatar=newBot;
+								}
 							}
 
 							//boolean[] createNew= new boolean[bbc.otherBots.size()];
@@ -756,6 +784,11 @@ public class ClientCode implements OnClickListener{
 								//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
 								newBot.positionLost=posLost;
 								bbc.otherBots.add(newBot);
+								
+								if(ID==0)
+								{
+									bbc.currentAvatar=newBot;
+								}
 							}
 
 

@@ -30,50 +30,50 @@ public class Behavior
 	public boolean phase2move;
 	public boolean orientComplete;
 	public boolean initWanderComplete=false;
-	
+
 	public long fullwanderboundarytimer;
 	private boolean timeoutofboundary;
 	public long fullwanderplaywithneighbortimer;
 	private boolean playwithneighborfirsttime;
-	
+
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
 		interval=interval/8;
 		this.bbc=bbc;		
 		int off=100;
-		
+
 		lowm1=  128;
 		highm1= 255-off;
-		
+
 		lowm2 = 128;
 		highm2 =  0+off;
-		
+
 		delta=  1;
-		
+
 		m1=false;
 		m2=true;
 
 	}
-	
+
 
 	void move()
 	{
 		move2Loc(bbc.targetx,bbc.targety);
 		//phase1move=true;
 	}
-	
+
 	void orient()
 	{		
 		orientComplete=orient2Loc(bbc.targetx,bbc.targety);
-		
+
 		//MAybe here
 		if(orientComplete)
 		{
 			bbc.orientToLoc(false);
 		}	
 	}
-	
+
 	boolean orient2Loc(int x,int y)
 	{
 		int diffx=x-bbc.myposx;
@@ -116,10 +116,10 @@ public class Behavior
 		//step one...find the vector 
 		int diffx=x-bbc.myposx;
 		int diffy=y-bbc.myposy;
-		
+
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
-				
+
 		if(phase1move)
 		{
 			if(ang<0)
@@ -128,7 +128,7 @@ public class Behavior
 			float currentangle = bbc.angleAzimuth;
 			bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
 			int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
-	
+
 			if(bbc.modDistance < 10)
 			{
 				phase1move=false;
@@ -152,7 +152,7 @@ public class Behavior
 			}		
 		}
 		//phase 2
-		
+
 		float rad=50;
 		if(phase2move)
 		{
@@ -164,8 +164,8 @@ public class Behavior
 			}
 			else
 			{
-//				bbc.writeL(127);
-//				bbc.writeR(129);
+				//				bbc.writeL(127);
+				//				bbc.writeR(129);
 				bbc.forward();
 			}
 		}	
@@ -175,12 +175,12 @@ public class Behavior
 
 	}
 
-	
+
 	void fullWander()
 	{
 		int boundary=this.whichBoundaryReached();
 		int neighbor=bbc.numNeighbors;
-		
+
 		if(boundary>-1)
 		{
 			fullwanderboundarytimer=System.currentTimeMillis();
@@ -199,7 +199,7 @@ public class Behavior
 			}
 			else
 			{
-				
+
 			}
 		}
 		else//not in the boundary
@@ -225,66 +225,66 @@ public class Behavior
 					bbc.fillRhythm(1, bbc.sfxrseq);
 					initWanderComplete=false;
 				}
-				
+
 			}
 			else
 			{
-				
+
 			}
-			
-			
+
+
 			/*
 			if(bbc.numNeighbors!=0)
 			{
-				
+
 			}
 			else
 			{
-				
+
 			}
 			this.wander();
 			initWanderComplete=false;
-			*/
+			 */
 		}
-		
-//		
-//		if(!this.boundaryReached()&&bbc.numNeighbors==0)
-//		{
-//			wander();
-//			bbc.clearRhythm(bbc.sfxrseq);
-//			bbc.clearRhythm(bbc.instrumentseq);
-//		}
-//		else//Not ok to wander, have neighbors, or at boundary
-//		{
-//			int w=this.whichBoundaryReached();
-//			switch(w)
-//			{
-//				case -1:	
-//					if(bbc.numNeighbors==0)
-//						wander();
-//					else{
-//						bbc.stop();
-//						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
-//						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
-//					}
-//					break;
-//				case 0:	
-//					//orientComplete=false;
-//					this.orient2Loc(320, 240);
-//					break;
-//				case 1:		
-//					this.orient2Loc(320, 240);
-//					break;
-//				case 2:
-//					this.orient2Loc(320, 240);
-//					break;
-//				case 3:
-//					this.orient2Loc(320, 240);
-//					break;
-//			}
-//		}
-		
-		
+
+		//		
+		//		if(!this.boundaryReached()&&bbc.numNeighbors==0)
+		//		{
+		//			wander();
+		//			bbc.clearRhythm(bbc.sfxrseq);
+		//			bbc.clearRhythm(bbc.instrumentseq);
+		//		}
+		//		else//Not ok to wander, have neighbors, or at boundary
+		//		{
+		//			int w=this.whichBoundaryReached();
+		//			switch(w)
+		//			{
+		//				case -1:	
+		//					if(bbc.numNeighbors==0)
+		//						wander();
+		//					else{
+		//						bbc.stop();
+		//						bbc.fillEuclid(bbc.numNeighbors, bbc.instrumentseq);
+		//						bbc.fillEuclid(bbc.numNeighbors, bbc.sfxrseq);
+		//					}
+		//					break;
+		//				case 0:	
+		//					//orientComplete=false;
+		//					this.orient2Loc(320, 240);
+		//					break;
+		//				case 1:		
+		//					this.orient2Loc(320, 240);
+		//					break;
+		//				case 2:
+		//					this.orient2Loc(320, 240);
+		//					break;
+		//				case 3:
+		//					this.orient2Loc(320, 240);
+		//					break;
+		//			}
+		//		}
+
+
 	}
 
 	public void initWander()
@@ -296,9 +296,9 @@ public class Behavior
 		m2=true;
 		m1IncDec=false;
 		m2IncDec=false;
-		
+
 	}
-	
+
 	public void wander()
 	{
 		//Description..
@@ -318,11 +318,11 @@ public class Behavior
 
 
 		////assuming m1 L m2 R
-		
+
 		/*
 		if(boundaryReached() )
 		{
-			
+
 			wanderPhase1=false;
 			wanderPhase2=true;
 		}
@@ -331,10 +331,10 @@ public class Behavior
 			wanderPhase1=true;
 			wanderPhase2=false;
 		}
-		*/
+		 */
 		wanderPhase1=true;
 		wanderPhase2=false;
-		
+
 		//middlewait check
 		if(middleWait)
 		{
@@ -344,7 +344,7 @@ public class Behavior
 				middleWait=false;
 			}
 		}
-		
+
 		//checkifnearNeigbhor...
 		if(bbc.numNeighbors>0)
 		{
@@ -450,37 +450,37 @@ public class Behavior
 			}
 		}
 
-	
-//		
-//		//WANDER PHASE 2
-//		// if reach boundary
-//		if(System.currentTimeMillis()-boundaryTimer>2000 && wanderPhase2)
-//		{
-//
-//			
-//
-//
-//				//record only once
-//				if(!once)
-//				{
-//					tempAzimuth=bbc.angleAzimuth;
-//					once=true;
-//
-//					bbc.rotLeft();//or Right???
-//				}
-//
-//				if(ModularDistance((int) tempAzimuth,(int)bbc.angleAzimuth,360) < 90)
-//				{
-//					//bbc.stop();
-//					bbc.forward();
-//					boundaryTimer=System.currentTimeMillis();
-//					//need to wait some time before checking boundary again..
-//					//then release from boundary phase.
-//					wanderPhase2=false;
-//					wanderPhase1=true;
-//					once=false;
-//				}
-//			}
+
+		//		
+		//		//WANDER PHASE 2
+		//		// if reach boundary
+		//		if(System.currentTimeMillis()-boundaryTimer>2000 && wanderPhase2)
+		//		{
+		//
+		//			
+		//
+		//
+		//				//record only once
+		//				if(!once)
+		//				{
+		//					tempAzimuth=bbc.angleAzimuth;
+		//					once=true;
+		//
+		//					bbc.rotLeft();//or Right???
+		//				}
+		//
+		//				if(ModularDistance((int) tempAzimuth,(int)bbc.angleAzimuth,360) < 90)
+		//				{
+		//					//bbc.stop();
+		//					bbc.forward();
+		//					boundaryTimer=System.currentTimeMillis();
+		//					//need to wait some time before checking boundary again..
+		//					//then release from boundary phase.
+		//					wanderPhase2=false;
+		//					wanderPhase1=true;
+		//					once=false;
+		//				}
+		//			}
 
 	}
 
@@ -504,7 +504,7 @@ public class Behavior
 		{
 			bound=true;
 		}
-		if(bbc.myposx>maxh - buff)
+		if(bbc.myposy>maxh - buff)
 		{
 			bound=true;
 		}
@@ -512,8 +512,65 @@ public class Behavior
 
 		return bound;
 	}
-	
-	
+
+	public void avoidBoundary()
+	{
+		boolean checkFlag=false;
+		long tempTimer=System.currentTimeMillis();
+
+		if(boundaryReached())
+		{
+			//under assumption that we always move forward
+			PVector v = new PVector();
+			v.x=bbc.vxs[bbc.vxyindex];
+			v.y=bbc.vxs[bbc.vxyindex];
+			PVector loc = new PVector(bbc.myposx,bbc.myposy);
+			float a=0;
+			for(int i=0;i<bbc.aest.length;i++)
+			{
+				a+=bbc.aest[i];
+
+			}
+			a =a /(float)bbc.aest.length;
+
+			//if()
+			int w = whichBoundaryReached();
+			switch(w)
+			{
+			case 0: 
+				if(a>Math.PI/2 && a< 3*Math.PI/2)
+				{
+				  bbc.rotRight();//?
+				}
+				else
+				{
+					bbc.rotLeft();//?
+				}
+				break;
+			case 1: break;
+			case 2: break;
+			case 3: break;
+			default: ;
+
+			}
+			bbc.backward();
+			checkFlag=true;
+
+		}
+
+		if(checkFlag)
+		{
+			if(System.currentTimeMillis()-tempTimer>1000)
+			{
+				checkFlag=false;
+				bbc.forward();
+			}
+		}
+
+	}
+
+
+
 	public int whichBoundaryReached()
 	{
 		int maxh,maxw;
@@ -537,7 +594,7 @@ public class Behavior
 			bound=true;
 			return 2;
 		}
-		if(bbc.myposx>maxh - buff)
+		if(bbc.myposy>maxh - buff)
 		{
 			bound=true;
 			return 3;
@@ -546,8 +603,8 @@ public class Behavior
 
 		return -1;
 	}
-	
-	
+
+
 
 	// Calculates x in modulo m
 	public int Mod(int x, int m)
@@ -569,7 +626,7 @@ public class Behavior
 		else
 			return -1;//Right
 	}
-	
+
 	//this was a 
 	public void steer(float str, float dir)
 	{
@@ -579,44 +636,44 @@ public class Behavior
 			bbc.writeL(128);
 			return;
 		}
-		
+
 		bbc.writeR(0);
 		bbc.writeL(0);
-	
+
 	}
-	
+
 	public void doSteer()
 	{
-		
-	
+
+
 	}
-	
+
 	public void doMove()
 	{
 		float maxspeed = 2;
 		PVector vel = new PVector();
 		PVector acc = new PVector();
 		PVector loc = new PVector();
-		
+
 		vel.add(acc);
-        // Limit speed
-        vel.limit(maxspeed);
-        loc.add(vel);///will replace this with doVelocity..which corresponds to boe bot controls
+		// Limit speed
+		vel.limit(maxspeed);
+		loc.add(vel);///will replace this with doVelocity..which corresponds to boe bot controls
 	}
-	
+
 	public void doVel(PVector vel, PVector loc, float angle)//given where you are and orientation, and your desired? velocity..make this work 
 	{
 		float vmag= vel.mag();
 		PVector temp = new PVector(loc.x+vel.x, loc.y+vel.y );
 		float vang= vel.angleBetween(temp, loc);
-		
+
 		float dif = vang-angle;
-		
+
 		//imagine 90 deg is wher we want.. and we are at 269 (-91)
 		// we turn right maximally..meaning that right wheel is full throttle, left is full throttle other direction
 		// as the angle decreases, the left wheel starts to slow down to 128 and then when it is 0 it should be full throttle in same direction
-		
-		
+
+
 		if(dif>0)
 		{
 			//turn left "faster" depending on how far away and a how;
@@ -625,7 +682,7 @@ public class Behavior
 		{
 			//turn right
 		}
-		
+
 	}
 
 }

@@ -295,6 +295,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						tempup.run(c);
 						tempdown.run(c);
 						message.run(c);
+						
+						c.drawText("angle: " + bbc.angleAzimuth, getWidth()/2, getHeight()-getHeight()/16, blackpaintText);
 					}
 				} finally {
 					// do this in a finally so that if an exception is thrown
@@ -765,7 +767,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 
 	// start teeth
 	class Teeth {
-		int numTeeth = 16;
+		int numTeeth = bbc.SEQUENCERLENGTH;
 
 		Tooth[] t;
 		Tooth[][] rteeth;
