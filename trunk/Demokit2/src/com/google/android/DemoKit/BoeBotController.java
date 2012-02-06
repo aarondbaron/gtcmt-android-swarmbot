@@ -77,7 +77,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public int[] vxs,vys;
 	public int vxyindex;
 	public float[] aest;
-	
+	public int[] pastx,pasty;
+
 	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
 	float myangle, targetangle;
 	int numNeighbors;
@@ -98,6 +99,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public float  angleAzimuth;
 
 	Vector<Bot> otherBots;
+	Bot currentAvatar;
 
 	Behavior myBehavior;
 	//Behavior moveBehavior;
@@ -119,8 +121,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	boolean[] avatarseq;
 
 	boolean avatarMode;
-	
+
 	int neighborBound=150;
+
+	int SEQUENCERLENGTH=16;
+	
+	boolean[] djembe0,djembe1,djembe2,djembe3;
+	int dj=0;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -132,25 +139,103 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mCommandTarget3 = (byte) (instrument - 1 + 0x10);
 		mCommandTarget4 = (byte) (1 - 1 + 0x10);
 
-		fseq = new boolean[16];
-		bseq = new boolean[16];
-		rseq = new boolean[16];
-		lseq = new boolean[16];
+		fseq = new boolean[SEQUENCERLENGTH];
+		bseq = new boolean[SEQUENCERLENGTH];
+		rseq = new boolean[SEQUENCERLENGTH];
+		lseq = new boolean[SEQUENCERLENGTH];
 
-		sfxrseq = new boolean[16];
-		instrumentseq = new boolean[16];
+		sfxrseq = new boolean[SEQUENCERLENGTH];
+		instrumentseq = new boolean[SEQUENCERLENGTH];
+
+		avatarseq = new boolean[SEQUENCERLENGTH];
 		
-		avatarseq = new boolean[16];
-
+		
+		djembe0 = new boolean[SEQUENCERLENGTH];
+		djembe1 = new boolean[SEQUENCERLENGTH];
+		djembe2 = new boolean[SEQUENCERLENGTH];
+		djembe3 = new boolean[SEQUENCERLENGTH];
+		
+		////////////////////////////////////////////
+		djembe0[0] = true;
+		
+		djembe0[2] = true;
+		djembe0[3] = true;
+		
+		djembe0[5] = true;
+		
+		djembe0[7] = true;
+		djembe0[8] = true;
+		
+		djembe0[10] = true;
+		djembe0[11] = true;
+		djembe0[12] = true;
+		
+		
+		//////////////////////////////////////
+		
+		djembe1[0] = true;
+		
+		
+		
+		djembe1[4] = true;
+		
+		
+		
+		djembe1[8] = true;
+		
+		djembe1[10] = true;
+		
+		djembe1[12] = true;
+		djembe1[13] = true;
+		///////////////////////////
+		
+		djembe2[0] = true;
+		
+		djembe2[2] = true;
+		djembe2[3] = true;
+		
+		
+		djembe2[6] = true;
+		
+		djembe2[8] = true;
+		
+		djembe2[10] = true;
+		djembe2[11] = true;
+		
+		
+		djembe2[14] = true;
+		
+		/////////////////////////////
+		djembe3[0] = true;
+		djembe3[1] = true;
+		
+		djembe3[3] = true;
+		djembe3[4] = true;
+		djembe3[5] = true;
+		djembe3[6] = true;
+		
+		djembe3[8] = true;
+		djembe3[9] = true;
+		
+		djembe3[11] = true;
+		djembe3[12] = true;
+		djembe3[13] = true;
+		djembe3[14] = true;
+		//////////////////////////
+		//setRhythm(djembe1);
+		
+		
 		//svthread = new Thread();
 		//svthread.start();
 
 		mActivity.beatTimer.bbc=this;
 		sequencerMode=true;
-		
+
 		vxs = new int[10];
 		vys = new int[10];
 		aest=new float[10];
+		pastx=new int[10];
+		pasty = new int[10];
 
 		/*
 		mAccelerometer = mActivity.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -888,6 +973,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
+	void setRhythm(boolean[] b)
+	{
+		for(int i=0; i<b.length;i++)
+		{
+			sfxrseq[i]=b[i];
+			instrumentseq[i]=b[i];
+
+		}
+	}
+
 	void invertRhythm(boolean b[])
 	{
 		for (int i=0; i<b.length;i++)
@@ -926,6 +1021,29 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		clearRhythm(bseq);
 	}
 
+	void shiftRhythmRight(boolean[] b)
+	{
+		//roll[number-1].pressed=roll[0].pressed;
+		boolean temp = b[b.length-1];
+		for (int i=b.length-1; i>0;i--)
+		{
+			b[i]=b[i-1];
+		}
+
+		b[0] = temp;
+	}
+
+	void shiftRhythmLeft(boolean[] b)
+	{
+		//roll[number-1].pressed=roll[0].pressed;
+		boolean temp = b[0];
+		for (int i=0; i<b.length-1;i++)
+		{
+			b[i]=b[i+1];
+		}
+
+		b[b.length - 1] = temp;
+	}
 
 
 	void fillPosition(int n, boolean b[])
@@ -1366,49 +1484,121 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	//in relation to avatar
 	void avatarMapping(int a)
 	{
-		if(mActivity.client.myID==0)
+		switch(a)
 		{
-			return;
-		}
-
-		//int rad=100;
-		for(int i =0 ; i < otherBots.size();i++)
-		{
-			Bot b = otherBots.get(i);
-			if(b.ID==0)
+		case 0: // play avatar and rhythm shift based on distance from avatar 
+			if(mActivity.client.myID==0)
 			{
-				switch(a)
-				{
-				case 0: break;
-				case 1: break;
-				case 2: break;
-
-				default: ; 
-
-
-
-				}
-				
-				
-				if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < neighborBound )	
-				{
-
-
-				}
-				
 
 			}
 			else
 			{
+				
+				float dist=0;
+				if(currentAvatar!=null)
+				{
+					PVector av=new PVector(currentAvatar.x,currentAvatar.y);
+					PVector loc = new PVector(this.myposx,this.myposy);
+					
+					dist = av.dist(loc);
+				}
+				
+				setRhythm(avatarseq);
+				int num = (int) map(dist,20,600,0,4);
+				for(int i=0;i<num;i++)
+				{
+					shiftRhythmRight(instrumentseq);
+					shiftRhythmRight(sfxrseq);
+				}
+			}
+			break;
+		case 1: // rhythm split based on ID-- from avatar 
+			
+			if(mActivity.client.myID==0)
+			{
 
 			}
+			else
+			{
+				clearRhythm(instrumentseq);
+				clearRhythm(sfxrseq);
+				if(ID%2==0)
+				{
+					for(int i=0;i<avatarseq.length;i++)
+					{
+						if(i%2==0)
+						{
+							instrumentseq[i]=avatarseq[i];
+							sfxrseq[i]=avatarseq[i];
+						}
+					}
+				}
+				else
+				{
+					for(int i=0;i<avatarseq.length;i++)
+					{
+						if(i%2==1)
+						{
+							instrumentseq[i]=avatarseq[i];
+							sfxrseq[i]=avatarseq[i];
+						}
+					}
+				}
+			}
+			
+			
+			break;
+		case 2: 
+			if(mActivity.client.myID==0)
+			{
 
+			}
+			else
+			{
+				
+				float dist=0;
+				if(currentAvatar!=null)
+				{
+					PVector av=new PVector(currentAvatar.x,currentAvatar.y);
+					PVector loc = new PVector(this.myposx,this.myposy);
+					
+					dist = av.dist(loc);
+				}
+				
+				setRhythm(avatarseq);
+				int num = (int) map(dist,20,600,0,4);
+				for(int i=0;i<num;i++)
+				{
+					shiftRhythmRight(instrumentseq);
+					shiftRhythmRight(sfxrseq);
+				}
+			}
+			break;
+			
+			
+		case 5: 
+			// different sets of rhythsms between avatar and others.  either avatar  changes as get closer, or the others do.
+			// change by index modification..addition or removing..
+			break;
 
-
+		default: ; 
 
 		}
 
+		if(mActivity.client.myID==0)
+		{
+
+			return;
+		}
+		else
+		{
+
+		}
+		//if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < neighborBound )	
+
 	}
+
+
 
 	//avatarFunctions?? ..could also be human functions..or some of them could be.
 	void av1()
@@ -1447,7 +1637,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 		/////
-		
+
 		/*
 		int extra = numNeighbors + 1;
 		for(int i=0; i <indices.size();i++)
@@ -1460,11 +1650,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			sfxrseq[dd]=b;
 
 		}
-		*/
+		 */
 
 
 		///approaching the idea...	
-		
+
 		int extra = numNeighbors + 1;
 		for(int i=0; i <indices.size();i++)
 		{
@@ -1479,7 +1669,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				sfxrseq[dd]=b;
 			}
 		}
-		 
+
 
 
 		//in the future
@@ -1501,7 +1691,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			//copyFromMusicShape(b);
 
 		}
-		*/
+		 */
 
 
 
@@ -1509,39 +1699,39 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 	}
-	
+
 	//split rhythm into two groups
 	void splitRhythm(int a)
 	{
 		clearRhythm(instrumentseq);
 		clearRhythm(sfxrseq);
-	    boolean[] b = avatarseq;
-	    
-	    if(numNeighbors%2==0)
-	    {
-	      for(int i=0; i<b.length;i++)
-	      {
-	         if(i%2==0)
-	         {
-	           instrumentseq[i]=b[i];
-	           sfxrseq[i]=b[i];
-	         }
-	      
-	      }
-	    }
-	    else
-	    {
-	      for(int i=0; i<b.length;i++)
-	      {
-	         if(i%2==1)
-	         {
-	        	 instrumentseq[i]=b[i];
-	        	 sfxrseq[i]=b[i];
-	         }
-	      
-	      }
-	    }
-		
+		boolean[] b = avatarseq;
+
+		if(numNeighbors%2==0)
+		{
+			for(int i=0; i<b.length;i++)
+			{
+				if(i%2==0)
+				{
+					instrumentseq[i]=b[i];
+					sfxrseq[i]=b[i];
+				}
+
+			}
+		}
+		else
+		{
+			for(int i=0; i<b.length;i++)
+			{
+				if(i%2==1)
+				{
+					instrumentseq[i]=b[i];
+					sfxrseq[i]=b[i];
+				}
+
+			}
+		}
+
 	}
 
 
@@ -1827,6 +2017,54 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}   
 
 	}
+	
+
+	  int[] randomRangeList(int n, int mi, int ma)
+	  {
+	    int[] result = new int[n];
+	    int r = ma-mi;
+
+	    Vector v = new Vector();
+	    for (int i=0; i< r;i++)
+	    {
+	      v.add(new Integer(mi+i));
+	    }
+
+	    for (int i=0;i<n;i++)
+	    {
+	      int c = (int)(Math.random()* (double)v.size());
+	      Integer ii= (Integer) v.get(c);
+	      result[i]= ii.intValue();
+	    }
+
+
+	    return result;
+	  }
+	  
+	  void fillRhythmDist(Bot b)
+	  {
+	    //copyFromMusicShape(b);//until we can...copy avatarpat
+		 setRhythm(avatarseq);
+		  
+		 PVector p1 = new PVector(b.x,b.y);
+		 PVector p2= new PVector(this.myposx,this.myposy);
+
+	    float d = map(PVector.dist(p1, p2), neighborBound, 500, 0, instrumentseq.length);
+	    if (d<0)
+	    {
+	      d=0;
+	    }
+
+	    int nums[] = randomRangeList((int)d, 0, instrumentseq.length);
+
+	    for (int i=0; i<nums.length; i++)
+	    {
+	      sfxrseq[nums[i]]=!sfxrseq[nums[i]];
+	      instrumentseq[nums[i]]=!instrumentseq[nums[i]];
+	    }
+
+	    //rebuildMusicShape();
+	  }
 
 
 }
