@@ -565,6 +565,12 @@ public class ClientCode implements OnClickListener{
 
 
 								//bbc.moveBehavior.move2Loc(x, y);
+								
+								//////////////////////////////////
+								//////////////////////////////////
+								bbc.target.x=x;
+								bbc.target.y=y;
+								
 
 								Log.e("move","move to done x:"+x+"y:"+y);
 							}
@@ -640,11 +646,27 @@ public class ClientCode implements OnClickListener{
 									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
 									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
 									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
+									
+									
+									int testind;
+									if(bbc.vxyindex+1 >= bbc.vxs.length)
+									{
+										testind=0;
+									}
+									else
+									{
+										testind =bbc.vxs.length+1;
+									}
+									bbc.vest.x=newx-bbc.pastx[testind];
+									bbc.vest.x=newx-bbc.pastx[testind];
+									
 									bbc.vxyindex++;
+									
 									if(bbc.vxyindex>=bbc.vxs.length)
 									{
 										bbc.vxyindex=0;									
 									}
+									
 									
 									handler.post(new Runnable() {
 										@Override
