@@ -78,10 +78,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public int vxyindex;
 	public float[] aest;
 	public int[] pastx,pasty;
+	public PVector vest;
+	
 
 	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
 	float myangle, targetangle;
 	int numNeighbors;
+	PVector target;
 
 	int rbyte, lbyte;
 	public int modDistance;
@@ -282,6 +285,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		otherBots = new Vector();
 
 		//moveBehavior = new Behavior(this);
+		target = new PVector();
 
 	}
 
@@ -350,6 +354,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.rfv.bt=mActivity.beatTimer;
 
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
+		
+		vest = new PVector();
 
 	}
 
@@ -632,14 +638,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		lbyte =b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
-				mCommandTarget1, (byte)b);
+				mCommandTarget2, (byte)b);
 
 	}
 	public void writeR(int b)
 	{
 		rbyte=b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
-				mCommandTarget2, (byte)b);
+				mCommandTarget1, (byte)b);
 	}
 
 	public float getSpeed()

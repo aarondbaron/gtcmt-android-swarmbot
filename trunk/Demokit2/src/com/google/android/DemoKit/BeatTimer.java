@@ -39,6 +39,8 @@ public class BeatTimer extends Thread{
 
 	boolean measureFlag=false;
 
+	boolean wanderDance;
+
 	BeatTimer()
 	{
 		globalTimeInterval=125*2;
@@ -86,12 +88,12 @@ public class BeatTimer extends Thread{
 				if(!bbc.myBehavior.boundaryReached())
 				{
 					//bbc.myBehavior.fullWander();
-					
-					
-					
+
+
+
 					//if they get near a neigbhor?
-					
-					
+
+
 					if(!bbc.myBehavior.initWanderComplete)
 					{
 						bbc.myBehavior.initWander();
@@ -105,6 +107,36 @@ public class BeatTimer extends Thread{
 					bbc.myBehavior.initWanderComplete=false;
 				}
 			}
+		}
+
+		if(wanderDance)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				if(!bbc.myBehavior.boundaryReached())
+				{
+
+					if(bbc.numNeighbors==0)
+					{
+						if(!bbc.myBehavior.initWanderComplete)
+						{
+							bbc.myBehavior.initWander();
+							bbc.myBehavior.initWanderComplete=true;
+						}
+						bbc.myBehavior.wander();
+					}
+					else
+					{
+						bbc.euclidDance();//eudance();
+						
+
+					}
+
+				}
+
+			}
+
+
 		}
 
 		if(move2Loc)
@@ -256,8 +288,8 @@ public class BeatTimer extends Thread{
 						int c = (int) (this.generalMeasure % (bbc.otherBots.size()+1) );
 						if(c==bbc.ID)
 						{
-							
-							
+
+
 						}
 						break;
 

@@ -35,13 +35,14 @@ public class Behavior
 	private boolean timeoutofboundary;
 	public long fullwanderplaywithneighbortimer;
 	private boolean playwithneighborfirsttime;
+	private long danceTimer;
 
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
-		interval=interval/8;
+		interval=interval/16;
 		this.bbc=bbc;		
-		int off=100;
+		int off=60;
 
 		lowm1=  128;
 		highm1= 255-off;
@@ -174,6 +175,8 @@ public class Behavior
 	{
 
 	}
+	
+	
 
 
 	void fullWander()
@@ -291,9 +294,9 @@ public class Behavior
 	{
 		bbc.forward();
 		middleWait=false;
-		//timer=System.currentTimeMillis();
-		m1=false;
-		m2=true;
+		timer=System.currentTimeMillis();
+		m1=true;
+		m2=false;
 		m1IncDec=false;
 		m2IncDec=false;
 
@@ -338,10 +341,12 @@ public class Behavior
 		//middlewait check
 		if(middleWait)
 		{
+			
 			//wait sometime
-			if(System.currentTimeMillis()-middleTimer>500)
+			if(System.currentTimeMillis()-middleTimer>250)
 			{
 				middleWait=false;
+				Log.d("wander wait", "middlewait ended");
 			}
 		}
 
@@ -370,16 +375,18 @@ public class Behavior
 
 				if(m1)
 				{
-					Log.d("Behavior","motor1");
+					
 					//increment speed phase Left
 					if(m1IncDec)
 					{
+						Log.d("Behavior","increment speed phase left");
 						if(bbc.getLByte()<highm1)
 						{
 							bbc.writeL(  (bbc.getLByte()+ delta)  ); //pos1+=delta
 						}
 						else
 						{
+							Log.d("BehaviorSwitch","speedhaseleftswitch");
 							//time to switch
 							m1=false;
 							m2=true;
@@ -390,19 +397,22 @@ public class Behavior
 					else
 					{
 						//decrement speed phase Left
+						Log.d("Behavior","decrement speed phase left");
 						if(bbc.getLByte()>lowm1)
 						{
 							bbc.writeL( (bbc.getLByte() - delta) ); // pos1-=delta
 						}
 						else
 						{
+							Log.d("BehaviorSwitch","speedhaseleftswitch");
 							//time to switch
 							//m1=false;
 							//m2=true;
 							m1IncDec=true;							
 							//time to wait?
-							middleTimer=System.currentTimeMillis();
+							middleTimer=System.currentTimeMillis();///this isn't actually middle here
 							middleWait=true;
+							Log.d("wander wait", "middlewait started");
 						}
 					}
 				}
@@ -410,11 +420,12 @@ public class Behavior
 
 				if(m2)
 				{
-					Log.d("Behavior","motor2");
+					
 
 					if(m2IncDec)
 					{
 						//increment speed phase RIGHT
+						Log.d("Behavior","increment spheed phase right");
 						if(bbc.getRByte()>highm2)
 						{
 							bbc.writeR( ( bbc.getRByte()-delta)  ) ; // pos2-=delta;
@@ -422,6 +433,7 @@ public class Behavior
 						else
 						{
 							//time to switch
+							Log.d("BehaviorSwitch","increment spheed phase right");
 							m1=true;
 							m2=false;
 
@@ -431,6 +443,7 @@ public class Behavior
 					else
 					{
 						//decrement speed phase Right
+						Log.d("Behavior","decrement spheed phase right");
 						if(bbc.getRByte()<lowm2)
 						{
 							bbc.writeR(  (bbc.getRByte()+delta));//  pos2+=delta;
@@ -438,12 +451,14 @@ public class Behavior
 						else
 						{
 							//time to switch
+							Log.d("BehaviorSwitch","increment spheed phase right");
 							//m1=true;
 							//m2=false;          
 							m2IncDec=true;
 							//time to wait
-							middleTimer=System.currentTimeMillis();
+							middleTimer=System.currentTimeMillis();//this shoudlnt be here but up above in stead.
 							middleWait=true;
+							Log.d("wander wait", "middlewait started");
 						}
 					}
 				}			
@@ -677,12 +692,41 @@ public class Behavior
 		if(dif>0)
 		{
 			//turn left "faster" depending on how far away and a how;
+			int m=440;
+			m = (int)bbc.map(dif,0,90,255/*??*/,128);
+			bbc.writeL(m);
+			bbc.writeR(255);//??
 		}
 		else
 		{
 			//turn right
+			
+			
+			int m=440;
+			m = (int)bbc.map(dif,0,90,255/*??*/,128);
+			bbc.writeR(m);
+			bbc.writeL(0);//??
 		}
 
+	}
+	
+	public void timedDance(long t)
+	{
+		if(System.currentTimeMillis()-danceTimer<t)
+		{
+			bbc.danceSequencer=true;
+			//bbc.euclidDance();
+		}
+		else
+		{
+			bbc.danceSequencer=false;
+		}
+		
+	}
+	
+	public void seek(PVector target)
+	{
+		
 	}
 
 }
