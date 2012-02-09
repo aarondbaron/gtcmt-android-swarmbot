@@ -14,6 +14,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.content.Context;
 import android.view.SurfaceView;
 import android.view.View;
@@ -31,15 +32,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 {
 
 	private final int bbs1, bbs2;
-	private final byte mCommandTarget1;
-	private final byte mCommandTarget2;
-	private final byte mCommandTarget3;
-	private final byte mCommandTarget4;
-	public TextView mLabel, azimuthlabel,move2locLabel;
+	public final byte mCommandTarget1;
+	public final byte mCommandTarget2;
+	public final byte mCommandTarget3;
+	public final byte mCommandTarget4;
+	public TextView mLabel, azimuthlabel,move2locLabel, byteLabel;
 	private Slider mSlider;
 	private DemoKitActivity mActivity;
 
-	private Button forward, backward,rotLeft,rotRight, stop,randomiseAll, tempoUp,tempoDown, instrumentOn, instrumentOff, toggleSequencer,useSensorsButton;
+	private Button forward, backward,rotLeft,rotRight, stop,randomiseAll, tempoUp,tempoDown, instrumentOn, instrumentOff, toggleSequencer,useSensorsButton, wanderButton;
 
 	private EditText et,acctext, comptext;
 
@@ -79,12 +80,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public float[] aest;
 	public int[] pastx,pasty;
 	public PVector vest;
+	public float avest;
 	
 
 	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
 	float myangle, targetangle;
 	int numNeighbors;
 	PVector target;
+	PVector vel;
 
 	int rbyte, lbyte;
 	public int modDistance;
@@ -131,9 +134,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	boolean[] djembe0,djembe1,djembe2,djembe3;
 	int dj=0;
+	
+	OutputController oc;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
+		mActivity.bbc=this;
 		bbs1 = servo1;
 		bbs2 = servo2;
 		instrument = 3;
@@ -286,6 +292,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		//moveBehavior = new Behavior(this);
 		target = new PVector();
+		vel = new PVector();
 
 	}
 
@@ -306,17 +313,26 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		toggleSequencer = (Button) mActivity.findViewById(R.id.toggleSeq);
 		useSensorsButton = (Button) mActivity.findViewById(R.id.useSensorsButton);	
+		
+		wanderButton = (Button) mActivity.findViewById(R.id.wanderbutton);
+		
+	
 
+		/*
 		view1 = (RectView) mActivity.findViewById(R.id.view1);
 		view1.bbc=this;
-
 		view1.setVisibility(View.GONE);
+		*/
 
 		et = (EditText) mActivity.findViewById(R.id.editText1);
-		acctext =  (EditText) mActivity.findViewById(R.id.acctext);
-		comptext = (EditText) mActivity.findViewById(R.id.comptext);
-		azimuthlabel = (TextView) mActivity.findViewById(R.id.az);
+		//acctext =  (EditText) mActivity.findViewById(R.id.acctext);
+		//comptext = (EditText) mActivity.findViewById(R.id.comptext);
+		//azimuthlabel = (TextView) mActivity.findViewById(R.id.az);
 		move2locLabel=(TextView)mActivity.findViewById(R.id.Mov2Loc);
+		byteLabel = (TextView) mActivity.findViewById(R.id.bytevaltextview);
+		
+		
+
 
 
 		forward.setOnClickListener(this);
@@ -334,6 +350,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		toggleSequencer.setOnClickListener(this);
 		useSensorsButton.setOnClickListener(this);
 
+		wanderButton.setOnClickListener(this);
 		//et.setOnTouchListener(this);
 
 		//sv = (SurfaceView) mActivity.findViewById(R.id.surfaceView1);
@@ -356,8 +373,21 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
 		
 		vest = new PVector();
+		
+		
 
 	}
+	
+	////???
+	public final Runnable mUpdateUITimerTask = new Runnable() {
+	    public void run() {
+	        // do whatever you want to change here, like:
+	    	byteLabel.setText("lbyte" + lbyte);
+	    }
+	};
+	public final Handler mHandler = new Handler();
+	
+	/////??
 
 
 
@@ -462,6 +492,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 				this.setMapping(1);
 
+			}
+			
+			if(arg0.getId()==wanderButton.getId())
+			{
+				if(this.myBehavior!=null)
+				{
+					this.myposx=100;
+					this.myposy=100;
+				
+					myBehavior.initWanderComplete=false;
+					myBehavior.initWander();
+					myBehavior.initWanderComplete=true;
+					setWander(true);	
+					
+					
+				}
 			}
 
 			if(arg0.getId()==tempoUp.getId())
@@ -1940,7 +1986,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			//mCompassRenderer.setOrientation(azimuth, pitch, roll);
 			if(azimuth<0) azimuth=(360+azimuth)%360;
 			//mHeadingView.setText(getString(R.string.heading)+": "+(int)azimuth+"°");
-			azimuthlabel.setText("azimuth:" + azimuth);
+			//azimuthlabel.setText("azimuth:" + azimuth);
 			angleAzimuth=azimuth;
 		}
 

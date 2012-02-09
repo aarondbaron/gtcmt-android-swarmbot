@@ -409,10 +409,13 @@ public class Behavior
 							//m1=false;
 							//m2=true;
 							m1IncDec=true;							
+							
+							
 							//time to wait?
 							middleTimer=System.currentTimeMillis();///this isn't actually middle here
 							middleWait=true;
 							Log.d("wander wait", "middlewait started");
+							
 						}
 					}
 				}
@@ -455,10 +458,12 @@ public class Behavior
 							//m1=true;
 							//m2=false;          
 							m2IncDec=true;
-							//time to wait
+							
+							//time to wait?
 							middleTimer=System.currentTimeMillis();//this shoudlnt be here but up above in stead.
 							middleWait=true;
 							Log.d("wander wait", "middlewait started");
+							
 						}
 					}
 				}			
@@ -693,9 +698,9 @@ public class Behavior
 		{
 			//turn left "faster" depending on how far away and a how;
 			int m=440;
-			m = (int)bbc.map(dif,0,90,255/*??*/,128);
+			m = (int)bbc.map(dif,0,180,255/*??*/,128);
 			bbc.writeL(m);
-			bbc.writeR(255);//??
+			bbc.writeR(0);//??
 		}
 		else
 		{
@@ -703,9 +708,9 @@ public class Behavior
 			
 			
 			int m=440;
-			m = (int)bbc.map(dif,0,90,255/*??*/,128);
+			m = (int)bbc.map(dif,0,-180,0/*??*/,128);
 			bbc.writeR(m);
-			bbc.writeL(0);//??
+			bbc.writeL(255);//??
 		}
 
 	}
@@ -728,5 +733,32 @@ public class Behavior
 	{
 		
 	}
+	
+	PVector getPointBehindLeader(Bot target)
+	  {
+	    PVector tloc= new PVector(target.x, target.y);   
+	    PVector behind = new PVector(tloc.x, tloc.y);
+
+	    float distBehind=50;
+
+	    //float theta = target.vel.heading2D() + radians(90);
+
+	    /// how can you get this  must transmit?????
+	    //PVector nVel = new PVector(-target.vel.x, -target.vel.y);
+	    //in the meantime..
+	    PVector nVel = new PVector(0, 0);
+	    nVel.normalize();
+
+	    behind.x += distBehind*nVel.x;
+	    behind.y += distBehind*nVel.y;
+
+	    return behind;
+	  }
+	
+	
+	
+	///////////////
+	//djemble behavior
+	//1.  
 
 }

@@ -494,11 +494,17 @@ public class ClientCode implements OnClickListener{
 						bbc.setMapping(map);
 						if(map==1)
 						{
-							bbc.rfv.thread.message.displayMessage("mapping: use compass" );
+							if(bbc.rfv.thread.message!=null)
+							{
+								bbc.rfv.thread.message.displayMessage("mapping: use compass" );
+							}
 						}
 						if(map==6)
 						{
-							bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
+							if(bbc.rfv.thread.message!=null)
+							{
+								bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
+							}
 						}
 
 						Log.d("client","   map" + map);
@@ -655,10 +661,12 @@ public class ClientCode implements OnClickListener{
 									}
 									else
 									{
-										testind =bbc.vxs.length+1;
+										testind =bbc.vxyindex+1;
 									}
 									bbc.vest.x=newx-bbc.pastx[testind];
 									bbc.vest.x=newx-bbc.pastx[testind];
+									
+									bbc.avest=bbc.vest.heading2D();
 									
 									bbc.vxyindex++;
 									
