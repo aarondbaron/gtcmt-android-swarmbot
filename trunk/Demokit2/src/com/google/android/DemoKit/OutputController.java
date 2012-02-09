@@ -30,8 +30,10 @@ public class OutputController extends AccessoryController {
 	private void setupServoController(int servoIndex, int viewId) {
 		ServoController sc = new ServoController(mHostActivity, servoIndex);
 		sc.attachToView((ViewGroup) findViewById(viewId));
+		
 	}
 
+	/*
 	private void setupLedController(int index, int viewId) {
 		ColorLEDController ledC = new ColorLEDController(mHostActivity, index,
 				getResources(), mVertical);
@@ -43,12 +45,14 @@ public class OutputController extends AccessoryController {
 				getResources());
 		r.attachToView((ViewGroup) findViewById(viewId));
 	}
+	*/
 	
 	private void setupBoeBotController(int servo1,int servo2)
 	{
 		BoeBotController b = new BoeBotController(mHostActivity,servo1, servo2);
 		
 		b.attachToView();
+		b.oc=this;
 		
 	}
 	
@@ -61,10 +65,12 @@ public class OutputController extends AccessoryController {
 	}
 	
 	//potentially?
+	/*
 	private void setupRobotFaceController()
 	{
 		FaceController f = new FaceController(mHostActivity);
 	
 	}
+	*/
 
 }

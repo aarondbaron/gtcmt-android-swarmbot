@@ -58,27 +58,42 @@ public class BeatTimer extends Thread{
 		{
 			//Log.d("in running", "checking HERE FOR RUNNING IF THE THREd started ");
 			update();
+
+			
+
 		}
 	}
 
 	void update()
 	{
+		
+		
+		
+		
 		if(orient2Loc)
 		{
 			if(bbc.myBehavior!=null)
 			{			
 				bbc.myBehavior.orient();
 			}
+			
+			/*
 			handler.post(new Runnable() {
-				@Override
+				@Override	
 				public void run() {
 					bbc.move2locLabel.setText("targetX: "+bbc.targetx+
 							"\ntargetY="+bbc.targety+
 							"\ntargetAngle:"+bbc.targetangle+
-							"\norientCmpleted:"+bbc.myBehavior.orientComplete							
+							"\norientCmpleted:"+bbc.myBehavior.orientComplete		
+							
 					);
+					
+					//mActivity.bbc.byteLabel.setText("lbyte" + bbc.lbyte + "rbyte" );
+					//TextView t = (TextView) mActivity.findViewById(R.id.slidertextView1);
+					//t.setText(bbc.oc.s)
 				}
 			});
+			*/
 		}
 		if(wander)
 		{
@@ -128,7 +143,7 @@ public class BeatTimer extends Thread{
 					else
 					{
 						bbc.euclidDance();//eudance();
-						
+
 
 					}
 
@@ -158,6 +173,22 @@ public class BeatTimer extends Thread{
 		}
 		if(bbc!=null)
 		{
+			
+			//mActivity.bbc.mHandler.postDelayed(mActivity.bbc.mUpdateUITimerTask, 500);
+			
+			/*
+			handler.post(new Runnable() {
+				@Override	
+				public void run() {
+					if(bbc!=null)
+					{
+						bbc.byteLabel.setText("lbyte" + bbc.lbyte + "rbyte" );
+					}
+
+				}
+			});
+			*/
+			
 			if(bbc.myBehavior!=null)
 			{ 
 				if(bbc.myBehavior.boundaryReached()&& this.mActivity.client.connected)
@@ -215,7 +246,9 @@ public class BeatTimer extends Thread{
 					{
 					case 0: break;
 					case 1: //angle
-						int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
+						
+						//int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
+						int f = (int) bbc.map((float)(bbc.avest + Math.PI), 0, (float)(2*Math.PI), 1, bbc.sfxrseq.length/2);
 						//bbc.fillRhythm(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.instrumentseq);
@@ -314,15 +347,12 @@ public class BeatTimer extends Thread{
 
 					if(bbc.danceSequencer)
 					{
-
 						if(bbc.fseq[bbc.currentIndex])
 						{
-
 							test=false;
 							bbc.forward();
 							//mActivity.aTest.soundType(0);
 							//mActivity.aTest.replay();
-
 						}
 
 						if(bbc.bseq[bbc.currentIndex])
@@ -332,7 +362,6 @@ public class BeatTimer extends Thread{
 							//mActivity.aTest.soundType(1);
 							//mActivity.aTest.replay();
 						}
-
 						if(bbc.rseq[bbc.currentIndex])
 						{
 							test=false;
@@ -340,7 +369,6 @@ public class BeatTimer extends Thread{
 							//mActivity.aTest.soundType(2);
 							//mActivity.aTest.replay();
 						}
-
 						if(bbc.lseq[bbc.currentIndex])
 						{
 							test=false;
@@ -348,29 +376,18 @@ public class BeatTimer extends Thread{
 							//mActivity.aTest.soundType(3);
 							//mActivity.aTest.replay();
 						}
-
 					}
+
 					if(bbc.sfxrseq[bbc.currentIndex])
 					{
 						test=false;
-
-
 						mActivity.aTest.soundType(7);
 						mActivity.aTest.replay();
-
-
 					}
-
-
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
 						test=false;
-
-
 						bbc.playInstrument();
-
-						//mActivity.aTest.soundType(3);
-						//mActivity.aTest.replay();
 					}
 
 					/*

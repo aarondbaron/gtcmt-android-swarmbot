@@ -79,6 +79,7 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 	AudioTest aTest;
 	AndroidAudioDevice aDevice;
 	ClientCode client;
+	BoeBotController bbc;
 	
 	public SensorManager mSensorManager;
 
@@ -472,7 +473,9 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 	public void onStopTrackingTouch(SeekBar seekBar) {
 	}
 	
-	
+	public float map(float value, float istart, float istop, float ostart, float ostop) {
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	}
 	
 	class SVThread
 	{

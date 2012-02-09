@@ -18,18 +18,46 @@
 		<Button android:layout_width="wrap_content" android:id="@+id/backward" android:text="bck" android:layout_height="wrap_content" android:layout_below="@+id/forward" android:layout_alignRight="@+id/forward"></Button>
 		<Button android:id="@+id/toggleSeq" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="tSeq" android:layout_below="@+id/backward" android:layout_alignLeft="@+id/backward" android:layout_alignRight="@+id/backward"></Button>
 		<Button android:text="sens" android:layout_height="wrap_content" android:id="@+id/useSensorsButton" android:layout_toRightOf="@+id/toggleSeq" android:layout_width="wrap_content" android:layout_alignTop="@+id/toggleSeq" android:layout_alignBottom="@+id/toggleSeq"></Button>
-		<EditText android:id="@+id/comptext" android:layout_height="wrap_content" android:inputType="numberDecimal" android:layout_width="wrap_content" android:layout_toRightOf="@+id/useSensorsButton" android:layout_alignTop="@+id/useSensorsButton" android:layout_alignBottom="@+id/useSensorsButton"></EditText>
+		<!--  
 		<com.google.android.DemoKit.RectView android:layout_height="wrap_content" android:id="@+id/view1" android:layout_below="@+id/toggleSeq" android:layout_alignLeft="@+id/toggleSeq" android:layout_width="wrap_content"></com.google.android.DemoKit.RectView>
+		-->
 		<Button android:layout_width="wrap_content" android:layout_toRightOf="@+id/instrumentOn" android:text="Off" android:layout_height="wrap_content" android:layout_alignTop="@+id/instrumentOn" android:layout_alignBottom="@+id/instrumentOn" android:id="@+id/instrumentOff"></Button>
 		<Button android:text="rndAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/randomiseAll" android:layout_toRightOf="@+id/instrumentOff" android:layout_alignTop="@+id/instrumentOff" android:layout_alignBottom="@+id/instrumentOff"></Button>
 		<Button android:layout_width="wrap_content" android:id="@+id/button1" android:layout_toRightOf="@+id/randomiseAll" android:layout_height="wrap_content" android:text="Button" android:layout_alignTop="@+id/randomiseAll" android:layout_alignBottom="@+id/randomiseAll"></Button>
 		<EditText android:layout_width="wrap_content" android:id="@+id/editText1" android:inputType="number" android:layout_height="wrap_content" android:layout_toRightOf="@+id/tempoUp" android:layout_alignTop="@+id/tempoUp" android:layout_alignBottom="@+id/tempoUp"></EditText>
 		<Button android:layout_width="50dip" android:id="@+id/tempoDown" android:text="tmDn" android:layout_height="wrap_content" android:layout_toRightOf="@+id/editText1" android:layout_alignTop="@+id/editText1" android:layout_alignBottom="@+id/editText1"></Button>
-		<EditText android:inputType="numberDecimal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/acctext" android:layout_toRightOf="@+id/comptext" android:layout_alignTop="@+id/comptext" android:layout_alignBottom="@+id/comptext"></EditText>
-		<TextView android:id="@+id/az" android:layout_width="wrap_content" android:layout_toRightOf="@+id/acctext" android:layout_height="wrap_content" android:text="TextView" android:layout_alignTop="@+id/acctext" android:layout_alignBottom="@+id/acctext"></TextView>
 		<Button android:layout_width="wrap_content" android:id="@+id/stop" android:text="stop" android:layout_height="wrap_content" android:layout_toRightOf="@+id/rotLeft" android:layout_alignTop="@+id/rotLeft"></Button>
 		<Button android:text="On" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/instrumentOn" android:layout_toRightOf="@+id/stop" android:layout_alignTop="@+id/stop" android:layout_alignBottom="@+id/stop"></Button>
 		<TextView android:layout_width="wrap_content" android:text="TextView" android:id="@+id/Mov2Loc" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_marginRight="14dp"></TextView>
+
+		<!-- 
+		<TextView
+		    android:id="@+id/az"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignBaseline="@+id/useSensorsButton"
+		    android:layout_alignBottom="@+id/useSensorsButton"
+		    android:layout_toRightOf="@+id/useSensorsButton"
+		    android:text="TextView" />
+		-->
+
+		<Button
+		    android:id="@+id/wanderbutton"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_below="@+id/instrumentOff"
+		    android:layout_centerHorizontal="true"
+		    android:text="wander" />
+
+		<TextView
+		    android:id="@+id/bytevaltextview"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignBaseline="@+id/useSensorsButton"
+		    android:layout_alignBottom="@+id/useSensorsButton"
+		    android:layout_toRightOf="@+id/wanderbutton"
+		    android:text="TextView" />
+
 		</RelativeLayout>
 	</TableLayout>
 </LinearLayout>
