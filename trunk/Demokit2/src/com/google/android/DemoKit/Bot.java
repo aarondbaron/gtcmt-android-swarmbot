@@ -7,6 +7,7 @@ public class Bot
 	int vx, vy;
 	private float angle;
 	float azimuthAngle;
+	float camang;
 
 	int ID;
 	

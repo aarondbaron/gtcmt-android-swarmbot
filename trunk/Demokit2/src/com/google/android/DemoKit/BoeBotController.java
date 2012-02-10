@@ -128,7 +128,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	boolean avatarMode;
 
-	int neighborBound=150;
+	int neighborBound=75;
 
 	int SEQUENCERLENGTH=16;
 	
@@ -136,6 +136,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	int dj=0;
 	
 	OutputController oc;
+	
+	float camang;
+	
+	Estimator e;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -294,6 +298,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		target = new PVector();
 		vel = new PVector();
 
+		e = new Estimator(this);
 	}
 
 	public void attachToView() {
@@ -821,6 +826,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//mActivity.aTest.replayRandom();
 		sequencerMode=false;
 		mActivity.beatTimer.wander=false;
+		this.setWanderDance(false);
 		mActivity.beatTimer.move2Loc=false;
 	}
 
@@ -833,6 +839,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		else
 		{
 			mActivity.beatTimer.wander=b;
+		}
+	}
+	
+	public void setWanderDance(boolean b)
+	{
+		if(b)
+		{
+			mActivity.beatTimer.wanderDance=b;
+			mActivity.beatTimer.wanderDanceOnce=false;
+		}
+		else
+		{
+			mActivity.beatTimer.wanderDance=b;
+			mActivity.beatTimer.wanderDanceOnce=false;
 		}
 	}
 

@@ -311,6 +311,7 @@ public class ClientCode implements OnClickListener{
 						bbc.stop();
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
+						bbc.setWanderDance(false);
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
 					}
@@ -444,6 +445,15 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("ClientCode","dance: " + bbc.danceSequencer);
 
+					}
+					if(line.contains("wndnce"))
+					{
+						bbc.setMapping(2);
+						bbc.myBehavior.initWander();
+						bbc.myBehavior.initWanderComplete=true;
+						bbc.setWanderDance(true);
+						
+						
 					}
 					if(line.contains("tempoup"))
 					{
@@ -619,7 +629,8 @@ public class ClientCode implements OnClickListener{
 					{
 
 						String test [] = line.split(",");
-						int ID = (int) Float.parseFloat(test[3]);
+						//note...used to be 3..now its 4 because of new format
+						int ID = (int) Float.parseFloat(test[4]);
 
 						//Log.i("pos","x:"+test[1]);
 
@@ -635,20 +646,33 @@ public class ClientCode implements OnClickListener{
 
 							if(!bbc.positionLost)
 							{
-								int newx=(int) Float.parseFloat(    line.split(",")[1]  );
-								int newy=(int) Float.parseFloat(    line.split(",")[2]  );
+								//int newx=(int) Float.parseFloat(    line.split(",")[1]  );
+								//int newy=(int) Float.parseFloat(    line.split(",")[2]  );
+								//position
+								int newx=(int) Float.parseFloat(   test[1]  );
+								int newy=(int) Float.parseFloat(    test[2]  );								
+								//angle from cam
+								float newang= Float.parseFloat(test[3]); 
 
+								
+								bbc.camang=newang;
 								/*
 								bbc.myvelx=bbc.myposx-newx;
 								bbc.myvely=bbc.myposy-newy;						
 								bbc.myangle = (float) Math.atan2(bbc.myvelx, bbc.myvely);
 								 */
 								//given the structure of the robot...assuming we know how it moves..
-								//dont' take estimate if lybte or rbyte is 128
+								//dont' take position estimate if lybte or rbyte is 128
 								if(  ! (bbc.lbyte == 128 && bbc.rbyte == 128)  )
 								{
 									bbc.pastx[bbc.vxyindex]=newx;
 									bbc.pasty[bbc.vxyindex]=newy;
+									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
+									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
+									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
+									
+									bbc.e.px[bbc.e.iter]=newx;
+									bbc.e.py[bbc.e.iter]=newy;
 									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
 									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
 									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
@@ -740,8 +764,10 @@ public class ClientCode implements OnClickListener{
 							}
 
 
-							int newx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							int newy=(int) Float.parseFloat(    line.split(",")[2]  )    ;
+							int newx=(int) Float.parseFloat(    test[1]       ) ;
+							int newy=(int) Float.parseFloat(    test[2]  )    ;
+							
+							float newang = Float.parseFloat( test[3]);
 
 							//bbc.targetvelx=bbc.targetx-newx;
 							//bbc.targetvely=bbc.targety-newy;						
@@ -761,6 +787,7 @@ public class ClientCode implements OnClickListener{
 								Log.d("clientcode", "adding new bot: " + ID);
 								Bot newBot = new Bot();
 								newBot.setPos(newx, newy);
+								newBot.camang=newang;
 								newBot.ID=ID;
 								bbc.otherBots.add(newBot);
 								if(ID==0)
@@ -783,6 +810,7 @@ public class ClientCode implements OnClickListener{
 									if(!posLost)
 									{
 										b.setPos(newx,newy);
+										b.camang=newang;
 									}
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
@@ -806,6 +834,7 @@ public class ClientCode implements OnClickListener{
 								if(!posLost)
 								{
 									newBot.setPos(newx, newy);
+									newBot.camang=newang;
 									newBot.ID=ID;
 									Log.d("clientcode", "new bot position set ");
 								}
