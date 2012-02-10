@@ -40,6 +40,8 @@ public class BeatTimer extends Thread{
 	boolean measureFlag=false;
 
 	boolean wanderDance;
+	long wanderDanceTimer;
+	boolean wanderDanceOnce;
 
 	BeatTimer()
 	{
@@ -130,23 +132,56 @@ public class BeatTimer extends Thread{
 			{
 				if(!bbc.myBehavior.boundaryReached())
 				{
-
-					if(bbc.numNeighbors==0)
+					Log.d("beatTimer", "wanderDance ");
+					if(bbc.numNeighbors==0 && !wanderDanceOnce)
 					{
 						if(!bbc.myBehavior.initWanderComplete)
 						{
 							bbc.myBehavior.initWander();
 							bbc.myBehavior.initWanderComplete=true;
+							
 						}
 						bbc.myBehavior.wander();
+						wanderDanceOnce=false;
+						bbc.danceSequencer=false;
 					}
 					else
 					{
-						bbc.euclidDance();//eudance();
+						Log.d("beatTimer", "wanderDance " + bbc.numNeighbors);
+						bbc.myBehavior.initWanderComplete=false;
+						
+						if(!wanderDanceOnce)
+						{
+							bbc.euclidDance();
+							wanderDanceOnce=true;
+							bbc.danceSequencer=true;
+							wanderDanceTimer=System.currentTimeMillis();
+						}
+						
+						//dance for x seconds
+						if(System.currentTimeMillis()-wanderDanceTimer> 1000*10)
+						{
+							
+							//bbc.euclidDance();//eudance();
+							//transtion to next stage of wandering to escape--meaning ignore for a couple seconds
+							//for now just stop
+							bbc.danceSequencer=false;
+							bbc.stop();
+							
+						}
+						else
+						{
+							
+						}
 
 
 					}
 
+				}
+				else
+				{
+					bbc.stop();
+					bbc.myBehavior.initWanderComplete=false;
 				}
 
 			}
@@ -254,8 +289,8 @@ public class BeatTimer extends Thread{
 						bbc.fillEuclid(f, bbc.instrumentseq);
 						break;
 					case 2: //neighbor
-						bbc.fillEuclid(bbc.numNeighbors+1, bbc.sfxrseq);
-						bbc.fillEuclid(bbc.numNeighbors+1, bbc.instrumentseq);
+						bbc.fillEuclid(bbc.numNeighbors*2+2, bbc.sfxrseq);
+						bbc.fillEuclid(bbc.numNeighbors*2+2, bbc.instrumentseq);
 						break;
 					case 3: //speed 
 						break;

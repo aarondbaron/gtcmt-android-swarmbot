@@ -42,13 +42,16 @@ public class Behavior
 		step = (byte) 10;
 		interval=interval/16;
 		this.bbc=bbc;		
-		int off=60;
+		int off=20;
+		int off2=4;
 
-		lowm1=  128;
-		highm1= 255-off;
+		lowm1=  128+off2;
+		//highm1= 255-off;
+		highm1=128+off;
 
-		lowm2 = 128;
-		highm2 =  0+off;
+		lowm2 = 128-off2;  //iteresting to see what happens if these values were randomized
+		//highm2 =  0+off;
+		highm2=128-off;
 
 		delta=  1;
 
@@ -292,7 +295,9 @@ public class Behavior
 
 	public void initWander()
 	{
-		bbc.forward();
+		//bbc.forward();
+		bbc.writeL(148);
+		bbc.writeR(108);
 		middleWait=false;
 		timer=System.currentTimeMillis();
 		m1=true;
