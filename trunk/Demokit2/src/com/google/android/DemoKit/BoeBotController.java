@@ -1143,6 +1143,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 		//rebuildMusicShape();
 	}
+	
+	void fillNow(boolean b[])
+	{
+		b[this.currentIndex]=true;
+	}
 
 	boolean isCompletelySilent()
 	{
