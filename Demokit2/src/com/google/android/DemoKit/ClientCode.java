@@ -547,6 +547,14 @@ public class ClientCode implements OnClickListener{
 						bbc.clearRhythm(bbc.instrumentseq);
 						bbc.clearRhythm(bbc.sfxrseq);
 					}
+					
+					if(line.contains("fnow"))
+					{
+						bbc.fillNow(bbc.instrumentseq);
+						bbc.fillNow(bbc.sfxrseq);
+					
+					}
+					
 
 
 					if(line.contains("wander"+myID))
@@ -673,9 +681,10 @@ public class ClientCode implements OnClickListener{
 									
 									bbc.e.px[bbc.e.iter]=newx;
 									bbc.e.py[bbc.e.iter]=newy;
-									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
-									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
-									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
+									bbc.e.times[bbc.e.iter]=System.currentTimeMillis();
+									//bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
+									//bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
+									//bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
 									
 									
 									int testind;

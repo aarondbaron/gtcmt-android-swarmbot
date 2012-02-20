@@ -8,6 +8,8 @@ public class Estimator {
 	int n;
 	
 	int[] px,py;
+	long[] times;
+	long timer;
 	
 	int iter=0;
 	
@@ -25,6 +27,8 @@ public class Estimator {
 		
 		px= new int[n];
 		py= new int[n];
+		times = new long[n];
+		timer=System.currentTimeMillis();
 		
 		
 	}
