@@ -621,6 +621,22 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
+					
+					if(line.contains("startMove"))
+					{
+						String test [] = line.split(",");
+						int v1 = (int) Float.parseFloat(test[1]);
+						int v2 = (int) Float.parseFloat(test[2]);
+						
+						bbc.writeL(v1);
+						bbc.writeR(v2);
+						
+					}
+					if(line.contains("stopMove"))
+					{
+						
+						bbc.stop();
+					}
 
 
 
