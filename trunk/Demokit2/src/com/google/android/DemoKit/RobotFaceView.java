@@ -29,6 +29,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	public BoeBotController bbc;
 	public FaceController fc;
 	public BeatTimer bt;
+	
+	public long jiggleTimer;
+	public boolean jiggle;
 
 	RobotFaceViewThread thread;
 	int cnt;
@@ -297,6 +300,14 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						message.run(c);
 						
 						c.drawText("angle: " + bbc.angleAzimuth, getWidth()/2, getHeight()-getHeight()/16, blackpaintText);
+						
+						if(jiggle)
+						{
+							if(System.currentTimeMillis()-jiggleTimer>1000)
+							{
+								jiggle=false;
+							}
+						}
 					}
 				} finally {
 					// do this in a finally so that if an exception is thrown
@@ -744,12 +755,32 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				void render(Canvas c) {
 					// fill(0);
 					// ellipse(x,y,.2*sz,.2*sz);
-
+					
+					int rnd;
+					
+					
 					float leftx = (x - xoff) - .2f * sz;
 					float topy = (y + yoff) - .2f * sz;
 					float rightx = (x - xoff) + .2f * sz;
 					float bottomy = (y + yoff) + .2f * sz;
-					RectF ovalBounds = new RectF(leftx, topy, rightx, bottomy);
+					
+					RectF ovalBounds;
+					if(!jiggle)
+					{
+						 ovalBounds = new RectF(leftx, topy, rightx, bottomy);
+					}
+					else
+					{
+						float f1,f2,f3,f4;
+						float m=3;
+						f1=m*(float)(2*Math.random()-1);
+						f2=m*(float)(2*Math.random()-1);
+						f3=m*(float)(2*Math.random()-1);
+						f4=m*(float)(2*Math.random()-1);
+						 ovalBounds = new RectF(leftx+f1, topy+f2, rightx+f3, bottomy+f4);
+					}
+					
+					//RectF ovalBounds = new RectF(leftx, topy, rightx, bottomy);
 					c.drawOval(ovalBounds, blackpaint);
 				}
 
@@ -1268,6 +1299,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				this.thread.robotEyes.cbuff = 10;
 				
 				thread.message.displayMessage("manual input");
+				
+				jiggleTimer=System.currentTimeMillis();
+				jiggle=true;
 
 			} else {
 				// shoudl not be.

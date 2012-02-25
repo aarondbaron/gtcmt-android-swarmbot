@@ -45,12 +45,18 @@ public class ClientCode implements OnClickListener{
 
 	boolean syncFlag=false;
 
+	long initialConnectTimer;
+	boolean initialConnect=false;
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
 		bbc=BBC;
 		bbc.ID=myID;
 		this.mActivity = mActivity;
 		attachToView();
+		
+		
+	    initialConnectTimer = System.currentTimeMillis();
+	    
 	}
 
 	public void attachToView()
@@ -819,6 +825,9 @@ public class ClientCode implements OnClickListener{
 								{
 									bbc.currentAvatar=newBot;
 								}
+								
+								double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
+								bbc.distances.add(new Float(dist));
 							}
 
 							//boolean[] createNew= new boolean[bbc.otherBots.size()];
@@ -836,6 +845,12 @@ public class ClientCode implements OnClickListener{
 									{
 										b.setPos(newx,newy);
 										b.camang=newang;
+										
+										
+										//double dist=Math.sqrt( Math.pow((bbc.myposx-b.x),2) + Math.pow((bbc.myposy-b.y),2) ) ;
+										//bbc.distances.set(ID, new Float(dist));
+										
+										
 									}
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
@@ -861,6 +876,10 @@ public class ClientCode implements OnClickListener{
 									newBot.setPos(newx, newy);
 									newBot.camang=newang;
 									newBot.ID=ID;
+									
+									double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
+									bbc.distances.add(new Float(dist));
+									
 									Log.d("clientcode", "new bot position set ");
 								}
 								//newBot.setAngle(angle)
@@ -895,6 +914,18 @@ public class ClientCode implements OnClickListener{
 
 	/////////////
 
+	public void doStuff()
+	{
+		Log.d("ClientCode", "attempting to connect");
+		if (!connected) {
+
+			serverIpAddress = serverIp.getText().toString();
+			if (!serverIpAddress.equals("")) {
+				Thread cThread = new Thread(new ClientThread());
+				cThread.start();
+			}
+		}
+	}
 
 	@Override
 	public void onClick(View v) {
@@ -902,15 +933,7 @@ public class ClientCode implements OnClickListener{
 
 		if(v.getId()== connectToServer.getId())
 		{
-			Log.d("ClientCode", "attempting to connect");
-			if (!connected) {
-
-				serverIpAddress = serverIp.getText().toString();
-				if (!serverIpAddress.equals("")) {
-					Thread cThread = new Thread(new ClientThread());
-					cThread.start();
-				}
-			}
+			doStuff();
 		}
 
 		if(v.getId()==incrementID.getId())
