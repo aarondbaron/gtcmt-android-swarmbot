@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+import com.google.android.DemoKit.ClientCode.ClientThread;
+
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
@@ -42,6 +44,8 @@ public class BeatTimer extends Thread{
 	boolean wanderDance;
 	long wanderDanceTimer;
 	boolean wanderDanceOnce;
+	
+	
 
 	BeatTimer()
 	{
@@ -61,24 +65,36 @@ public class BeatTimer extends Thread{
 			//Log.d("in running", "checking HERE FOR RUNNING IF THE THREd started ");
 			update();
 
-			
+			if(mActivity.client!=null)
+			{
+				if(!mActivity.client.initialConnect )
+				{
+					if(System.currentTimeMillis()-mActivity.client.initialConnectTimer>4000)
+					{
+						mActivity.client.doStuff();					
+						mActivity.client.initialConnect=true;
+					}
+				}
+			}
+
+
 
 		}
 	}
 
 	void update()
 	{
-		
-		
-		
-		
+
+
+
+
 		if(orient2Loc)
 		{
 			if(bbc.myBehavior!=null)
 			{			
 				bbc.myBehavior.orient();
 			}
-			
+
 			/*
 			handler.post(new Runnable() {
 				@Override	
@@ -87,15 +103,15 @@ public class BeatTimer extends Thread{
 							"\ntargetY="+bbc.targety+
 							"\ntargetAngle:"+bbc.targetangle+
 							"\norientCmpleted:"+bbc.myBehavior.orientComplete		
-							
+
 					);
-					
+
 					//mActivity.bbc.byteLabel.setText("lbyte" + bbc.lbyte + "rbyte" );
 					//TextView t = (TextView) mActivity.findViewById(R.id.slidertextView1);
 					//t.setText(bbc.oc.s)
 				}
 			});
-			*/
+			 */
 		}
 		if(wander)
 		{
@@ -120,8 +136,27 @@ public class BeatTimer extends Thread{
 				}
 				else
 				{
+					
+					/*
+					////////////////////////////////////////
 					bbc.stop();
 					bbc.myBehavior.initWanderComplete=false;
+					//////////////////////////////////////////
+					*/
+					
+					//slow down
+					//do forwardreal once
+					if(!bbc.myBehavior.avBoundFwdReal)
+					{
+						bbc.forwardReal();
+						bbc.myBehavior.avBoundFwdReal=!bbc.myBehavior.avBoundFwdReal;
+						
+					}
+					
+					bbc.myBehavior.avoidBoundary();
+					
+					
+					
 				}
 			}
 		}
@@ -139,7 +174,7 @@ public class BeatTimer extends Thread{
 						{
 							bbc.myBehavior.initWander();
 							bbc.myBehavior.initWanderComplete=true;
-							
+
 						}
 						bbc.myBehavior.wander();
 						wanderDanceOnce=false;
@@ -149,7 +184,7 @@ public class BeatTimer extends Thread{
 					{
 						Log.d("beatTimer", "wanderDance " + bbc.numNeighbors);
 						bbc.myBehavior.initWanderComplete=false;
-						
+
 						if(!wanderDanceOnce)
 						{
 							bbc.euclidDance();
@@ -157,21 +192,21 @@ public class BeatTimer extends Thread{
 							bbc.danceSequencer=true;
 							wanderDanceTimer=System.currentTimeMillis();
 						}
-						
+
 						//dance for x seconds
 						if(System.currentTimeMillis()-wanderDanceTimer> 1000*10)
 						{
-							
+
 							//bbc.euclidDance();//eudance();
 							//transtion to next stage of wandering to escape--meaning ignore for a couple seconds
 							//for now just stop
 							bbc.danceSequencer=false;
 							bbc.stop();
-							
+
 						}
 						else
 						{
-							
+
 						}
 
 
@@ -208,9 +243,9 @@ public class BeatTimer extends Thread{
 		}
 		if(bbc!=null)
 		{
-			
+
 			//mActivity.bbc.mHandler.postDelayed(mActivity.bbc.mUpdateUITimerTask, 500);
-			
+
 			/*
 			handler.post(new Runnable() {
 				@Override	
@@ -222,8 +257,8 @@ public class BeatTimer extends Thread{
 
 				}
 			});
-			*/
-			
+			 */
+
 			if(bbc.myBehavior!=null)
 			{ 
 				if(bbc.myBehavior.boundaryReached()&& this.mActivity.client.connected)
@@ -281,7 +316,7 @@ public class BeatTimer extends Thread{
 					{
 					case 0: break;
 					case 1: //angle
-						
+
 						//int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
 						int f = (int) bbc.map((float)(bbc.avest + Math.PI), 0, (float)(2*Math.PI), 1, bbc.sfxrseq.length/2);
 						//bbc.fillRhythm(f, bbc.sfxrseq);
@@ -361,7 +396,20 @@ public class BeatTimer extends Thread{
 						}
 						break;
 
-					case 9:
+
+
+					case 9: ///shift avatar based on ID
+
+						//bbc.clearRhythm(bbc.instrumentseq);
+						//bbc.clearRhythm(bbc.sfxrseq);
+
+						bbc.setRhythm(bbc.avatarseq);;
+
+						for(int i=0; i <bbc.ID; i++)
+						{
+							bbc.shiftRhythmLeft(bbc.instrumentseq);
+							bbc.shiftRhythmLeft(bbc.sfxrseq);
+						}
 
 						break;
 

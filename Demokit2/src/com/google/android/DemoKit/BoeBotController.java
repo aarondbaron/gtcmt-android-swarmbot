@@ -140,6 +140,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	float camang;
 	
 	Estimator e;
+	
+	Vector distances;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -299,6 +301,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		vel = new PVector();
 
 		e = new Estimator(this);
+		
+		distances=new Vector();
 	}
 
 	public void attachToView() {
@@ -590,6 +594,54 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		return mActivity.beatTimer.globalTimeInterval;
 	}
 
+	
+	
+	public void forwardReal()
+	{
+		///////////////
+		rbyte= 128-20;
+		writeR(rbyte);
+		lbyte= 128+20;
+		writeL(lbyte);
+		/////////////
+	}
+	public void turnLeft()
+	{
+		////assuming forward real was called
+		
+		if(lbyte>128)
+		{
+			lbyte--;
+			writeL(lbyte);
+		}
+		
+		
+	}
+	
+	public void turnRight()
+	{
+		////assuming forward real was called
+		if(rbyte<128)
+		{
+			rbyte++;
+			writeL(rbyte);
+		}
+		
+	}
+	public void slowDown()
+	{
+		if(rbyte<128)
+		{
+			rbyte++;
+			writeR(rbyte);
+		}		
+		if(lbyte>128)
+		{
+			lbyte--;
+			writeL(lbyte);
+		}
+		
+	}
 	public void forward()
 	{
 
@@ -602,6 +654,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		lbyte= 255;
 
 	}
+
 
 	public void backward()
 	{
@@ -1510,7 +1563,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
+	
+	
+	
+	//distance to avatar...calculate for all bots
 	//
+	void distanceToAvatar()
+	{
+		
+	}
 	///////////////musical mappings
 
 	//map based on number of neigbhors
@@ -1545,8 +1606,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 			Bot b = otherBots.get(i);
+			
+			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
 
-			if( Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) < neighborBound )	
+			if( dist < neighborBound )	
 			{
 				numNeighbors++;
 

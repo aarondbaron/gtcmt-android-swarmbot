@@ -37,6 +37,11 @@ public class Behavior
 	private boolean playwithneighborfirsttime;
 	private long danceTimer;
 
+
+	boolean avBoundFwdReal;
+	boolean boundOk;
+	long avoidBoundTimer;
+
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
@@ -87,7 +92,9 @@ public class Behavior
 		if(ang<0)
 			ang+=360;
 		bbc.targetangle=ang;
-		float currentangle = bbc.angleAzimuth;
+		//float currentangle = bbc.angleAzimuth;
+		float currentangle = bbc.camang;
+
 		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
 		int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
 
@@ -101,20 +108,20 @@ public class Behavior
 		{
 			if(result==-1)
 			{
-				bbc.writeL(130);//Right
-				bbc.writeR(130);
+				bbc.writeL(128+7);//Right
+				bbc.writeR(128+7);
 			}
 			else
 			{
-				bbc.writeL(127);//Left
-				bbc.writeR(127);
+				bbc.writeL(128-7);//Left
+				bbc.writeR(128-7);
 			}
 			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
 			return false;
 		}		
 
 	}
-	//this assumes we start out with robot facing in positive x direction and 0 y.
+	//this assumes we start out with robot facing in positive x direction and 0 y...if not using camang
 	void move2Loc(int x,int y)
 	{
 		//step one...find the vector 
@@ -124,14 +131,19 @@ public class Behavior
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
 
+		if(ang<0)
+			ang+=360;
+		bbc.targetangle=ang;
+		//float currentangle = bbc.angleAzimuth;
+		float currentangle = bbc.camang;
+		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
+		int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
+
+		double distToTarget = Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) );
+
 		if(phase1move)
 		{
-			if(ang<0)
-				ang+=360;
-			bbc.targetangle=ang;
-			float currentangle = bbc.angleAzimuth;
-			bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
-			int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
+
 
 			if(bbc.modDistance < 10)
 			{
@@ -144,13 +156,13 @@ public class Behavior
 			{
 				if(result==-1)
 				{
-					bbc.writeL(130);//Right
-					bbc.writeR(130);
+					bbc.writeL(128+7);//Right
+					bbc.writeR(128+7);
 				}
 				else
 				{
-					bbc.writeL(127);//Left
-					bbc.writeR(127);
+					bbc.writeL(128-7);//Left
+					bbc.writeR(128-7);
 				}
 				Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
 			}		
@@ -160,7 +172,8 @@ public class Behavior
 		float rad=50;
 		if(phase2move)
 		{
-			if(Math.sqrt( Math.pow((bbc.myposx-x),2) + Math.pow((bbc.myposy-x),2) ) < rad )
+
+			if(distToTarget < rad )
 			{
 				phase1move=true;
 				phase2move=false;
@@ -168,6 +181,11 @@ public class Behavior
 			}
 			else
 			{
+				if(bbc.modDistance>15)
+				{
+					phase1move=true;
+					phase2move=false;
+				}
 				//				bbc.writeL(127);
 				//				bbc.writeR(129);
 				bbc.forward();
@@ -178,8 +196,8 @@ public class Behavior
 	{
 
 	}
-	
-	
+
+
 
 
 	void fullWander()
@@ -305,6 +323,10 @@ public class Behavior
 		m1IncDec=false;
 		m2IncDec=false;
 
+		this.avBoundFwdReal=false;
+
+
+
 	}
 
 	public void wander()
@@ -346,7 +368,7 @@ public class Behavior
 		//middlewait check
 		if(middleWait)
 		{
-			
+
 			//wait sometime
 			if(System.currentTimeMillis()-middleTimer>250)
 			{
@@ -380,7 +402,7 @@ public class Behavior
 
 				if(m1)
 				{
-					
+
 					//increment speed phase Left
 					if(m1IncDec)
 					{
@@ -414,13 +436,13 @@ public class Behavior
 							//m1=false;
 							//m2=true;
 							m1IncDec=true;							
-							
-							
+
+
 							//time to wait?
 							middleTimer=System.currentTimeMillis();///this isn't actually middle here
 							middleWait=true;
 							Log.d("wander wait", "middlewait started");
-							
+
 						}
 					}
 				}
@@ -428,7 +450,7 @@ public class Behavior
 
 				if(m2)
 				{
-					
+
 
 					if(m2IncDec)
 					{
@@ -463,12 +485,12 @@ public class Behavior
 							//m1=true;
 							//m2=false;          
 							m2IncDec=true;
-							
+
 							//time to wait?
 							middleTimer=System.currentTimeMillis();//this shoudlnt be here but up above in stead.
 							middleWait=true;
 							Log.d("wander wait", "middlewait started");
-							
+
 						}
 					}
 				}			
@@ -550,6 +572,9 @@ public class Behavior
 			v.x=bbc.vxs[bbc.vxyindex];
 			v.y=bbc.vxs[bbc.vxyindex];
 			PVector loc = new PVector(bbc.myposx,bbc.myposy);
+			float ang=bbc.camang;
+
+			/*
 			float a=0;
 			for(int i=0;i<bbc.aest.length;i++)
 			{
@@ -557,29 +582,109 @@ public class Behavior
 
 			}
 			a =a /(float)bbc.aest.length;
-
+			 */
+			float a=ang;
 			//if()
 			int w = whichBoundaryReached();
+			boolean cond1,cond2;
+			int wiggle=10;
 			switch(w)
 			{
 			case 0: 
-				if(a>Math.PI/2 && a< 3*Math.PI/2)
+
+				cond1 = a>180 && a< 270+wiggle;
+				cond2 = a>90-wiggle && a<180;
+				if(cond1)
 				{
-				  bbc.rotRight();//?
+					bbc.rotRight();//?
 				}
-				else
+
+				if(cond2)
 				{
 					bbc.rotLeft();//?
 				}
+
+				if( !(  cond1||cond2 ) )
+				{
+					this.boundOk=true;
+					this.avoidBoundTimer=System.currentTimeMillis();
+					bbc.forward();
+				}
 				break;
-			case 1: break;
-			case 2: break;
-			case 3: break;
+
+			case 1:
+
+				cond1=a>270 && ( a< 360  || a<0+wiggle);
+				cond2= a>180 -wiggle && a<270;
+				if(cond1)
+				{
+					bbc.rotRight();//?
+				}
+
+				if(cond2)
+				{
+					bbc.rotLeft();//?
+				}
+
+				if( !(  cond1||cond2 ) )
+				{
+					this.boundOk=true;
+					this.avoidBoundTimer=System.currentTimeMillis();
+					bbc.forward();
+				}
+				break;
+
+			case 2: 
+
+				cond1=a>0 && a< 90+wiggle;
+				cond2= a>270 -wiggle && a<360;
+				if(cond1)
+				{
+					bbc.rotRight();//?
+				}
+
+				if(cond2)
+				{
+					bbc.rotLeft();//?
+				}
+
+				if( !(  cond1||cond2 ) )
+				{
+					this.boundOk=true;
+					this.avoidBoundTimer=System.currentTimeMillis();
+					bbc.forward();
+				}
+				break;
+
+			case 3:
+				cond1=a>90 && a< 180 +wiggle;
+				cond2= (a>0 || a>360-wiggle) && a<90;
+				if(cond1)
+				{
+					bbc.rotRight();//?
+				}
+
+				if(cond2)
+				{
+					bbc.rotLeft();//?
+				}
+
+				if( !(  cond1||cond2 ) )
+				{
+					this.boundOk=true;
+					this.avoidBoundTimer=System.currentTimeMillis();
+					bbc.forward();
+				}
+				break;
 			default: ;
 
 			}
-			bbc.backward();
+			//bbc.backward();
 			checkFlag=true;
+
+		}
+		else
+		{
 
 		}
 
@@ -710,8 +815,8 @@ public class Behavior
 		else
 		{
 			//turn right
-			
-			
+
+
 			int m=440;
 			m = (int)bbc.map(dif,0,-180,0/*??*/,128);
 			bbc.writeR(m);
@@ -719,7 +824,7 @@ public class Behavior
 		}
 
 	}
-	
+
 	public void timedDance(long t)
 	{
 		if(System.currentTimeMillis()-danceTimer<t)
@@ -731,37 +836,37 @@ public class Behavior
 		{
 			bbc.danceSequencer=false;
 		}
-		
+
 	}
-	
+
 	public void seek(PVector target)
 	{
-		
+
 	}
-	
+
 	PVector getPointBehindLeader(Bot target)
-	  {
-	    PVector tloc= new PVector(target.x, target.y);   
-	    PVector behind = new PVector(tloc.x, tloc.y);
+	{
+		PVector tloc= new PVector(target.x, target.y);   
+		PVector behind = new PVector(tloc.x, tloc.y);
 
-	    float distBehind=50;
+		float distBehind=50;
 
-	    //float theta = target.vel.heading2D() + radians(90);
+		//float theta = target.vel.heading2D() + radians(90);
 
-	    /// how can you get this  must transmit?????
-	    //PVector nVel = new PVector(-target.vel.x, -target.vel.y);
-	    //in the meantime..
-	    PVector nVel = new PVector(0, 0);
-	    nVel.normalize();
+		/// how can you get this  must transmit?????
+		//PVector nVel = new PVector(-target.vel.x, -target.vel.y);
+		//in the meantime..
+		PVector nVel = new PVector(0, 0);
+		nVel.normalize();
 
-	    behind.x += distBehind*nVel.x;
-	    behind.y += distBehind*nVel.y;
+		behind.x += distBehind*nVel.x;
+		behind.y += distBehind*nVel.y;
 
-	    return behind;
-	  }
-	
-	
-	
+		return behind;
+	}
+
+
+
 	///////////////
 	//djemble behavior
 	//1.  
