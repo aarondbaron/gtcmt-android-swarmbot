@@ -38,7 +38,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public final byte mCommandTarget4;
 	public TextView mLabel, azimuthlabel,move2locLabel, byteLabel;
 	private Slider mSlider;
-	private DemoKitActivity mActivity;
+	public DemoKitActivity mActivity;
 
 	private Button forward, backward,rotLeft,rotRight, stop,randomiseAll, tempoUp,tempoDown, instrumentOn, instrumentOff, toggleSequencer,useSensorsButton, wanderButton;
 
@@ -103,6 +103,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private float[][] mAngles;
 
 	public float  angleAzimuth;
+	public float  angleAzimuthDiff;
 
 	Vector<Bot> otherBots;
 	Bot currentAvatar;
@@ -130,7 +131,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	int neighborBound=75;
 
-	int SEQUENCERLENGTH=16;
+	int SEQUENCERLENGTH=32;
 	
 	boolean[] djembe0,djembe1,djembe2,djembe3;
 	int dj=0;
@@ -170,74 +171,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		djembe2 = new boolean[SEQUENCERLENGTH];
 		djembe3 = new boolean[SEQUENCERLENGTH];
 		
-		////////////////////////////////////////////
-		djembe0[0] = true;
-		
-		djembe0[2] = true;
-		djembe0[3] = true;
-		
-		djembe0[5] = true;
-		
-		djembe0[7] = true;
-		djembe0[8] = true;
-		
-		djembe0[10] = true;
-		djembe0[11] = true;
-		djembe0[12] = true;
+		initializeDjembe();
 		
 		
-		//////////////////////////////////////
-		
-		djembe1[0] = true;
-		
-		
-		
-		djembe1[4] = true;
-		
-		
-		
-		djembe1[8] = true;
-		
-		djembe1[10] = true;
-		
-		djembe1[12] = true;
-		djembe1[13] = true;
-		///////////////////////////
-		
-		djembe2[0] = true;
-		
-		djembe2[2] = true;
-		djembe2[3] = true;
-		
-		
-		djembe2[6] = true;
-		
-		djembe2[8] = true;
-		
-		djembe2[10] = true;
-		djembe2[11] = true;
-		
-		
-		djembe2[14] = true;
-		
-		/////////////////////////////
-		djembe3[0] = true;
-		djembe3[1] = true;
-		
-		djembe3[3] = true;
-		djembe3[4] = true;
-		djembe3[5] = true;
-		djembe3[6] = true;
-		
-		djembe3[8] = true;
-		djembe3[9] = true;
-		
-		djembe3[11] = true;
-		djembe3[12] = true;
-		djembe3[13] = true;
-		djembe3[14] = true;
 		//////////////////////////
-		//setRhythm(djembe1);
+		//setRhythm(djembe0);
+		//this.setMapping(12);
 		
 		
 		//svthread = new Thread();
@@ -472,8 +411,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				myBehavior.m2=true;
 				//backward();
 				forward();				
-				this.myposx=200;
-				this.myposy=200;				
+				this.myposx=600;
+				this.myposy=460;				
 				mActivity.beatTimer.wander=true;
 
 
@@ -573,6 +512,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
+	
 	public void tempoUp()
 	{
 		if(mActivity.beatTimer.globalTimeInterval>25)
@@ -593,6 +533,27 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		return mActivity.beatTimer.globalTimeInterval;
 	}
+	
+	public long getDiv()
+	{
+		
+		return mActivity.beatTimer.div;
+	}
+	
+	public void divUp()
+	{
+		mActivity.beatTimer.div++;
+		
+	}
+	public void divDown()
+	{
+		if(mActivity.beatTimer.div>2)
+		{
+			mActivity.beatTimer.div--;
+		}
+		
+	}
+	
 
 	
 	
@@ -2075,6 +2036,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			if(azimuth<0) azimuth=(360+azimuth)%360;
 			//mHeadingView.setText(getString(R.string.heading)+": "+(int)azimuth+"°");
 			//azimuthlabel.setText("azimuth:" + azimuth);
+			angleAzimuthDiff=azimuth-angleAzimuth;
 			angleAzimuth=azimuth;
 		}
 
@@ -2204,6 +2166,151 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	    }
 
 	    //rebuildMusicShape();
+	  }
+	  
+	  
+	  
+	  
+	  void initializeDjembe()
+	  {
+////////////////////////////////////////////
+			int[] d0= new int[]{0,2,3,5,7,8,10,11,12};
+			if(this.SEQUENCERLENGTH==32)
+			{
+				for(int i=0;i<d0.length;i++)
+				{
+					d0[i]=d0[i]*2;
+				}
+			}
+			
+			for(int i=0;i<d0.length;i++)
+			{
+				if(d0[i]<djembe0.length)
+				{
+					djembe0[d0[i]]=true;
+				}
+			}
+			
+			/*
+			djembe0[0] = true;
+			
+			djembe0[2] = true;
+			djembe0[3] = true;
+			
+			djembe0[5] = true;
+			
+			djembe0[7] = true;
+			djembe0[8] = true;
+			
+			djembe0[10] = true;
+			djembe0[11] = true;
+			djembe0[12] = true;
+			*/
+			
+			//////////////////////////////////////
+			int[] d1= new int[]{0,4,8,10,12,13};
+			if(this.SEQUENCERLENGTH==32)
+			{
+				for(int i=0;i<d1.length;i++)
+				{
+					d1[i]=d1[i]*2;
+				}
+			}
+			
+			for(int i=0;i<d1.length;i++)
+			{
+				if(d1[i]<djembe1.length)
+				{
+					djembe1[d1[i]]=true;
+				}
+			}
+			
+			/*
+			djembe1[0] = true;
+			
+			
+			
+			djembe1[4] = true;
+			
+			
+			
+			djembe1[8] = true;
+			
+			djembe1[10] = true;
+			
+			djembe1[12] = true;
+			djembe1[13] = true;
+			*/
+			///////////////////////////
+			int[] d2= new int[]{0,2,3,6,8,10,11,14};
+			if(this.SEQUENCERLENGTH==32)
+			{
+				for(int i=0;i<d2.length;i++)
+				{
+					d2[i]=d2[i]*2;
+				}
+			}
+			
+			for(int i=0;i<d2.length;i++)
+			{
+				if(d2[i]<djembe2.length)
+				{
+					djembe2[d2[i]]=true;
+				}
+			}
+			
+			/*
+			djembe2[0] = true;
+			
+			djembe2[2] = true;
+			djembe2[3] = true;
+			
+			
+			djembe2[6] = true;
+			
+			djembe2[8] = true;
+			
+			djembe2[10] = true;
+			djembe2[11] = true;
+			
+			
+			djembe2[14] = true;
+			*/
+			/////////////////////////////
+			int[] d3= new int[]{0,1,3,4,5,6,8,9,11,12,13,14};
+			if(this.SEQUENCERLENGTH==32)
+			{
+				for(int i=0;i<d3.length;i++)
+				{
+					d3[i]=d3[i]*2;
+				}
+			}
+			
+			for(int i=0;i<d3.length;i++)
+			{
+				if(d3[i]<djembe3.length)
+				{
+					djembe3[d3[i]]=true;
+				}
+			}
+			
+			/*
+			djembe3[0] = true;
+			djembe3[1] = true;
+			
+			djembe3[3] = true;
+			djembe3[4] = true;
+			djembe3[5] = true;
+			djembe3[6] = true;
+			
+			djembe3[8] = true;
+			djembe3[9] = true;
+			
+			djembe3[11] = true;
+			djembe3[12] = true;
+			djembe3[13] = true;
+			djembe3[14] = true;
+			*/
 	  }
 
 

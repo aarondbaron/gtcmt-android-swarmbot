@@ -13,6 +13,7 @@ public class BeatTimer extends Thread{
 	long globalTimer;
 
 	long globalTimeInterval;
+	long div=2;
 
 	boolean generalTimingFlag;
 
@@ -420,6 +421,44 @@ public class BeatTimer extends Thread{
 							//bbc.av1();
 						}
 						break;
+					
+					case 11:
+						
+						int ff=(bbc.numNeighbors%4);
+						switch(ff)
+						{
+						case 0: bbc.setRhythm(bbc.djembe0);
+						break;
+						case 1: bbc.setRhythm(bbc.djembe1);
+						break;
+						case 2: bbc.setRhythm(bbc.djembe2);
+						break;
+						case 3: bbc.setRhythm(bbc.djembe3);
+						break;
+						
+						default: ;
+						
+						
+						}
+						
+						break;
+					case 12:
+						int ma=(int) (this.generalMeasure%4);
+						switch(ma)
+						{
+						case 0: bbc.setRhythm(bbc.djembe0);
+						break;
+						case 1: bbc.setRhythm(bbc.djembe1);
+						break;
+						case 2: bbc.setRhythm(bbc.djembe2);
+						break;
+						case 3: bbc.setRhythm(bbc.djembe3);
+						break;
+						
+						default: ;
+						
+						}
+						
 
 
 
@@ -513,8 +552,8 @@ public class BeatTimer extends Thread{
 		}
 		else
 		{
-			if(System.currentTimeMillis() - globalTimer> globalTimeInterval/2)
-			{
+			if(System.currentTimeMillis() - globalTimer> globalTimeInterval/div)
+			{////////////////////////////////
 				//allowedToFire=false;
 				generalTimingFlag=false;
 				if(bbc!=null)

@@ -80,6 +80,7 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 	AndroidAudioDevice aDevice;
 	ClientCode client;
 	BoeBotController bbc;
+	InputController ic;
 	
 	public SensorManager mSensorManager;
 

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ public class InputController extends AccessoryController {
 		//mJoystickView = (JoystickView) findViewById(R.id.joystickView);
 		
 		hostActivity.beatTimer.ic=this;
+		hostActivity.ic=this;
 	}
 
 	protected void onAccesssoryAttached() {
@@ -63,6 +65,7 @@ public class InputController extends AccessoryController {
 		double temperatureF = (9.0 / 5.0) * ambientTemperatureC + 32.0;
 		//mTemperature.setText(mTemperatureFormatter.format(temperatureF));
 		mTemperature.setText("" + ir0);
+		//Log.d("inputcontollr","" + ir0);
 	}
 
 	public void setLightValue(int val) {
