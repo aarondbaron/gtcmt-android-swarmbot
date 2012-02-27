@@ -1,7 +1,10 @@
 package com.google.android.DemoKit;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.android.DemoKit.RobotFaceView.Arena;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -218,6 +221,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		thread.robotTeeth = new Teeth(getWidth() / 2, getHeight() - getHeight()
 				/ 4);
 		thread.robotNose = new NoseButton();
+		
+		int hh=90;
+		int ww= (int) ((float)hh*(4.0f/3.0f));
+		thread.arena = new Arena(getWidth()/2, getHeight()/4,ww,hh);
 
 		/*
 		thread.danceButton = new MyButton(getWidth() / 8, getHeight()
@@ -229,6 +236,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		int s=20;
 		thread.tempup = new MyButton(2*s,2*s,2*s,"tempoup");
 		thread.tempdown = new MyButton(getWidth()-2*s,2*s,2*s,"tempodown");
+		
+		thread.divup = new MyButton(2*s,2*s+3*s,2*s,"divup");
+		thread.divdown = new MyButton(getWidth()-2*s,2*s+3*s,2*s,"divdown");
 		
 		
 		thread.setRunning(true);
@@ -257,7 +267,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		public Teeth robotTeeth;
 		public NoseButton robotNose, modeButton,tempoUP,tempoDOWN, danceButton;
 
-		public MyButton cameraButton, tempup,tempdown;
+		public Arena arena;
+		
+		public MyButton cameraButton, tempup,tempdown, divup,divdown;
 		public TimedMessage message;
 		boolean useCamera;
 		
@@ -297,10 +309,21 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						modeButton.run(c);
 						tempup.run(c);
 						tempdown.run(c);
+						divup.run(c);
+						divdown.run(c);
 						message.run(c);
 						
-						c.drawText("angle: " + bbc.angleAzimuth, getWidth()/2, getHeight()-getHeight()/16, blackpaintText);
+						arena.run(c);
 						
+						c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , 0, getHeight()-getHeight()/21, blackpaintText);
+						c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
+						c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , getWidth()-getWidth()/3.5f, getHeight()-getHeight()/21, blackpaintText);
+						
+						if(bbc!=null)
+						{
+							c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
+						
+						}
 						if(jiggle)
 						{
 							if(System.currentTimeMillis()-jiggleTimer>1000)
@@ -803,7 +826,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		Tooth[] t;
 		Tooth[][] rteeth;
 		
-		int toothSize = 12;
+		int toothSize = 8;
 		int startx, starty;
 
 		int state = 0;
@@ -1073,6 +1096,81 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	}
 
 	// end nose button
+	
+	
+	// start arena
+	
+	class Arena
+	{
+		
+		int x, y;
+		int w, h;
+		
+		Arena(int x, int y, int w, int h)
+		{
+			this.x=x;
+			this.y=y;
+			this.w=w;
+			this.h=h;
+		}
+		
+		void run(Canvas c)
+		{
+		 update();
+		 render(c);
+		 
+		}
+		
+		void update()
+		{
+			
+		}
+		
+		void render(Canvas c)
+		{
+			int leftx=x-w;
+			int rightx=x+w;
+			int topy=y-h;
+			int bottomy=y+h;
+			
+			RectF r = new RectF(leftx, topy, rightx, bottomy);
+			c.drawRect(r, redPaintHighlight);
+			
+			int cx=(int) map(bbc.myposx,0,640,leftx,rightx);
+			int cy=(int) map(bbc.myposy,0,480,topy,bottomy);
+			//Log.d("rfv", "myposx:"+ bbc.myposx+ "myposy:"+ bbc.myposy+  " cx" + cx + "  cy: " +cy);
+			if(cx<leftx)
+			{
+				cx=leftx;
+			}
+			if(cx>rightx)
+			{
+				cx=rightx;
+			}
+			if(cy<topy)
+			{
+				cy=topy;
+			}
+			if(cy>bottomy)
+			{
+				cy=bottomy;
+			}
+			c.drawCircle(cx, cy, 2, blackpaint);
+			
+			for(int i=0; i<bbc.otherBots.size(); i ++)
+			{
+				
+			}
+			
+			
+			
+		}
+		
+		
+	
+	}
+	
+	// end arena
 
 	// MyButton
 	class MyButton {
@@ -1387,6 +1485,18 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			{
 				bbc.tempoUp();
 				thread.message.displayMessage("tempo: " + bbc.getTempo());
+			}
+			
+			if(thread.divup.inButton(x, y))
+			{
+				bbc.divUp();
+				thread.message.displayMessage("div: " + bbc.getDiv());
+			}
+			
+			if(thread.divdown.inButton(x, y))
+			{
+				bbc.divDown();
+				thread.message.displayMessage("div: " + bbc.getDiv());
 			}
 
 			return true;

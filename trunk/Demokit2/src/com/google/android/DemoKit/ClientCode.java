@@ -53,10 +53,10 @@ public class ClientCode implements OnClickListener{
 		bbc.ID=myID;
 		this.mActivity = mActivity;
 		attachToView();
-		
-		
-	    initialConnectTimer = System.currentTimeMillis();
-	    
+
+
+		initialConnectTimer = System.currentTimeMillis();
+
 	}
 
 	public void attachToView()
@@ -140,7 +140,7 @@ public class ClientCode implements OnClickListener{
 						{						
 						}						
 					}
-					
+
 					if(line.contains("djembe"))
 					{
 						mActivity.beatTimer.generalMeasure=0;
@@ -151,10 +151,10 @@ public class ClientCode implements OnClickListener{
 						case 2: bbc.setRhythm(bbc.djembe2);break;
 						case 3: bbc.setRhythm(bbc.djembe3);break;
 						default: ;
-						
-						
+
+
 						}
-						
+
 						bbc.dj++;
 						if(bbc.dj>=4)
 						{
@@ -458,8 +458,8 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.initWander();
 						bbc.myBehavior.initWanderComplete=true;
 						bbc.setWanderDance(true);
-						
-						
+
+
 					}
 					if(line.contains("tempoup"))
 					{
@@ -506,24 +506,28 @@ public class ClientCode implements OnClickListener{
 
 						String test [] = line.split(",");
 
-						int map = (int) Float.parseFloat(test[1]);
-						bbc.setMapping(map);
-						if(map==1)
+						//check to make sure we get the mapping...
+						if(test.length>=2)
 						{
-							if(bbc.rfv.thread.message!=null)
+							int map = (int) Float.parseFloat(test[1]);
+							bbc.setMapping(map);
+							if(map==1)
 							{
-								bbc.rfv.thread.message.displayMessage("mapping: use compass" );
+								if(bbc.rfv.thread.message!=null)
+								{
+									bbc.rfv.thread.message.displayMessage("mapping: use compass" );
+								}
 							}
-						}
-						if(map==6)
-						{
-							if(bbc.rfv.thread.message!=null)
+							if(map==6)
 							{
-								bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
+								if(bbc.rfv.thread.message!=null)
+								{
+									bbc.rfv.thread.message.displayMessage("mapping: use size of your face" );
+								}
 							}
-						}
 
-						Log.d("client","   map" + map);
+							Log.d("client","   map" + map);
+						}
 					}
 
 					if(line.contains("reuc"))
@@ -553,14 +557,14 @@ public class ClientCode implements OnClickListener{
 						bbc.clearRhythm(bbc.instrumentseq);
 						bbc.clearRhythm(bbc.sfxrseq);
 					}
-					
+
 					if(line.contains("fnow"))
 					{
 						bbc.fillNow(bbc.instrumentseq);
 						bbc.fillNow(bbc.sfxrseq);
-					
+
 					}
-					
+
 
 
 					if(line.contains("wander"+myID))
@@ -595,12 +599,12 @@ public class ClientCode implements OnClickListener{
 
 
 								//bbc.moveBehavior.move2Loc(x, y);
-								
+
 								//////////////////////////////////
 								//////////////////////////////////
 								bbc.target.x=x;
 								bbc.target.y=y;
-								
+
 
 								Log.e("move","move to done x:"+x+"y:"+y);
 							}
@@ -627,20 +631,20 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
-					
+
 					if(line.contains("startMove"))
 					{
 						String test [] = line.split(",");
 						int v1 = (int) Float.parseFloat(test[1]);
 						int v2 = (int) Float.parseFloat(test[2]);
-						
+
 						bbc.writeL(v1);
 						bbc.writeR(v2);
-						
+
 					}
 					if(line.contains("stopMove"))
 					{
-						
+
 						bbc.stop();
 					}
 
@@ -684,7 +688,7 @@ public class ClientCode implements OnClickListener{
 								//angle from cam
 								float newang= Float.parseFloat(test[3]); 
 
-								
+
 								bbc.camang=newang;
 								/*
 								bbc.myvelx=bbc.myposx-newx;
@@ -700,15 +704,15 @@ public class ClientCode implements OnClickListener{
 									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
 									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
 									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
-									
+
 									bbc.e.px[bbc.e.iter]=newx;
 									bbc.e.py[bbc.e.iter]=newy;
 									bbc.e.times[bbc.e.iter]=System.currentTimeMillis();
 									//bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
 									//bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
 									//bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
-									
-									
+
+
 									int testind;
 									if(bbc.vxyindex+1 >= bbc.vxs.length)
 									{
@@ -720,23 +724,23 @@ public class ClientCode implements OnClickListener{
 									}
 									bbc.vest.x=newx-bbc.pastx[testind];
 									bbc.vest.x=newx-bbc.pastx[testind];
-									
+
 									bbc.avest=bbc.vest.heading2D();
-									
+
 									bbc.vxyindex++;
-									
+
 									if(bbc.vxyindex>=bbc.vxs.length)
 									{
 										bbc.vxyindex=0;									
 									}
-									
-									
+
+
 									handler.post(new Runnable() {
 										@Override
 										public void run() {
 											String s1 ="vel--";
 											String s2= "ang--";
-											
+
 											float a1,a2,a3;
 											a1=0;
 											a2=a1;
@@ -745,29 +749,29 @@ public class ClientCode implements OnClickListener{
 											{
 												s1 += "x:" + bbc.vxs[i] + "," + " y:" + bbc.vys[i];
 												s2 += bbc.aest[i] + ",";
-												
+
 												a1+=bbc.vxs[i];
 												a2+=bbc.vys[i];
 												a3+=bbc.aest[i];
-												
-												
+
+
 											}
-											
+
 											a1=a1/(float)bbc.vxs.length;
 											a2=a2/(float)bbc.vys.length;
 											a3=a3/(float)bbc.aest.length;
-											
-											
+
+
 											velest.setText(s1 + " -- " + a1 + " , " + a2);
 											angest.setText(s2 + " -- " + a3);
-											
+
 											Log.d("client"," bytes "+bbc.lbyte+  "," + bbc.rbyte);
 										}
 									});
-									
-									
+
+
 								}
-								
+
 								//write position
 								//bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 								//bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
@@ -797,7 +801,7 @@ public class ClientCode implements OnClickListener{
 
 							int newx=(int) Float.parseFloat(    test[1]       ) ;
 							int newy=(int) Float.parseFloat(    test[2]  )    ;
-							
+
 							float newang = Float.parseFloat( test[3]);
 
 							//bbc.targetvelx=bbc.targetx-newx;
@@ -825,7 +829,7 @@ public class ClientCode implements OnClickListener{
 								{
 									bbc.currentAvatar=newBot;
 								}
-								
+
 								double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
 								bbc.distances.add(new Float(dist));
 							}
@@ -845,12 +849,12 @@ public class ClientCode implements OnClickListener{
 									{
 										b.setPos(newx,newy);
 										b.camang=newang;
-										
-										
+
+
 										//double dist=Math.sqrt( Math.pow((bbc.myposx-b.x),2) + Math.pow((bbc.myposy-b.y),2) ) ;
 										//bbc.distances.set(ID, new Float(dist));
-										
-										
+
+
 									}
 									//b.angle=(float) Math.atan2(b.vy, b.vx);
 									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
@@ -876,10 +880,10 @@ public class ClientCode implements OnClickListener{
 									newBot.setPos(newx, newy);
 									newBot.camang=newang;
 									newBot.ID=ID;
-									
+
 									double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
 									bbc.distances.add(new Float(dist));
-									
+
 									Log.d("clientcode", "new bot position set ");
 								}
 								//newBot.setAngle(angle)
@@ -887,7 +891,7 @@ public class ClientCode implements OnClickListener{
 								//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
 								newBot.positionLost=posLost;
 								bbc.otherBots.add(newBot);
-								
+
 								if(ID==0)
 								{
 									bbc.currentAvatar=newBot;
