@@ -307,6 +307,19 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
+					
+					if(line.contains("clearRhythm"))
+					{
+						bbc.clearRhythm(bbc.instrumentseq);
+						bbc.clearRhythm(bbc.sfxrseq);
+					}
+					
+					if(line.contains("useSFXR"))
+					{
+						bbc.useSFXR=!bbc.useSFXR;
+					
+					}
+					
 
 					//[ID]position:
 					//[ID]stop

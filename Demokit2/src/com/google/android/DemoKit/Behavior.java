@@ -41,6 +41,8 @@ public class Behavior
 	boolean avBoundFwdReal;
 	boolean boundOk;
 	long avoidBoundTimer;
+	
+	PVector desiredVel;
 
 	public Behavior(BoeBotController bbc)
 	{
@@ -63,6 +65,7 @@ public class Behavior
 		m1=false;
 		m2=true;
 
+		desiredVel = new PVector();
 	}
 
 
@@ -774,7 +777,23 @@ public class Behavior
 
 	public void doSteer()
 	{
-
+		//look at current position, bearing, velocity
+		
+		float currentAngle = bbc.camang;
+		
+		//look at desired vel
+		PVector v=this.desiredVel;		
+		
+		// now start to change motor speed to adjust to new 
+		if(currentAngle<v.heading2D())
+		{
+			//increase motor speed??
+		}
+		else
+		{
+			//decrease motorspeed??
+		}
+		
 
 	}
 

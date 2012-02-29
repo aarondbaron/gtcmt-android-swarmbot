@@ -81,7 +81,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public int[] pastx,pasty;
 	public PVector vest;
 	public float avest;
-	
+
 
 	int targetx,targety, targetvelx, targetvely,myposx,myposy,myvelx, myvely;
 	float myangle, targetangle;
@@ -131,18 +131,24 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	int neighborBound=75;
 
-	int SEQUENCERLENGTH=32;
-	
+	int SEQUENCERLENGTH=48;
+
 	boolean[] djembe0,djembe1,djembe2,djembe3;
+	int[][] kuku;
+	int kid;
+	int eid;
+
 	int dj=0;
-	
+
 	OutputController oc;
-	
+
 	float camang;
-	
+
 	Estimator e;
-	
+
 	Vector distances;
+	
+	boolean useSFXR=true;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -164,21 +170,21 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		instrumentseq = new boolean[SEQUENCERLENGTH];
 
 		avatarseq = new boolean[SEQUENCERLENGTH];
-		
-		
+
+
 		djembe0 = new boolean[SEQUENCERLENGTH];
 		djembe1 = new boolean[SEQUENCERLENGTH];
 		djembe2 = new boolean[SEQUENCERLENGTH];
 		djembe3 = new boolean[SEQUENCERLENGTH];
-		
+
 		initializeDjembe();
-		
-		
+		initializeKuku();
+
 		//////////////////////////
 		//setRhythm(djembe0);
 		//this.setMapping(12);
-		
-		
+
+
 		//svthread = new Thread();
 		//svthread.start();
 
@@ -240,7 +246,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		vel = new PVector();
 
 		e = new Estimator(this);
-		
+
 		distances=new Vector();
 	}
 
@@ -261,16 +267,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		toggleSequencer = (Button) mActivity.findViewById(R.id.toggleSeq);
 		useSensorsButton = (Button) mActivity.findViewById(R.id.useSensorsButton);	
-		
+
 		wanderButton = (Button) mActivity.findViewById(R.id.wanderbutton);
-		
-	
+
+
 
 		/*
 		view1 = (RectView) mActivity.findViewById(R.id.view1);
 		view1.bbc=this;
 		view1.setVisibility(View.GONE);
-		*/
+		 */
 
 		et = (EditText) mActivity.findViewById(R.id.editText1);
 		//acctext =  (EditText) mActivity.findViewById(R.id.acctext);
@@ -278,8 +284,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//azimuthlabel = (TextView) mActivity.findViewById(R.id.az);
 		move2locLabel=(TextView)mActivity.findViewById(R.id.Mov2Loc);
 		byteLabel = (TextView) mActivity.findViewById(R.id.bytevaltextview);
-		
-		
+
+
 
 
 
@@ -319,22 +325,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.rfv.bt=mActivity.beatTimer;
 
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
-		
+
 		vest = new PVector();
-		
-		
+
+
 
 	}
-	
+
 	////???
 	public final Runnable mUpdateUITimerTask = new Runnable() {
-	    public void run() {
-	        // do whatever you want to change here, like:
-	    	byteLabel.setText("lbyte" + lbyte);
-	    }
+		public void run() {
+			// do whatever you want to change here, like:
+			byteLabel.setText("lbyte" + lbyte);
+		}
 	};
 	public final Handler mHandler = new Handler();
-	
+
 	/////??
 
 
@@ -441,20 +447,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				this.setMapping(1);
 
 			}
-			
+
 			if(arg0.getId()==wanderButton.getId())
 			{
 				if(this.myBehavior!=null)
 				{
 					this.myposx=100;
 					this.myposy=100;
-				
+
 					myBehavior.initWanderComplete=false;
 					myBehavior.initWander();
 					myBehavior.initWanderComplete=true;
 					setWander(true);	
-					
-					
+
+
 				}
 			}
 
@@ -512,7 +518,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
-	
+
 	public void tempoUp()
 	{
 		if(mActivity.beatTimer.globalTimeInterval>25)
@@ -533,17 +539,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		return mActivity.beatTimer.globalTimeInterval;
 	}
-	
+
 	public long getDiv()
 	{
-		
+
 		return mActivity.beatTimer.div;
 	}
-	
+
 	public void divUp()
 	{
 		mActivity.beatTimer.div++;
-		
+
 	}
 	public void divDown()
 	{
@@ -551,12 +557,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			mActivity.beatTimer.div--;
 		}
-		
-	}
-	
 
-	
-	
+	}
+
+
+
+
 	public void forwardReal()
 	{
 		///////////////
@@ -569,16 +575,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public void turnLeft()
 	{
 		////assuming forward real was called
-		
+
 		if(lbyte>128)
 		{
 			lbyte--;
 			writeL(lbyte);
 		}
-		
-		
+
+
 	}
-	
+
 	public void turnRight()
 	{
 		////assuming forward real was called
@@ -587,7 +593,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			rbyte++;
 			writeL(rbyte);
 		}
-		
+
 	}
 	public void slowDown()
 	{
@@ -601,7 +607,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			lbyte--;
 			writeL(lbyte);
 		}
-		
+
 	}
 	public void forward()
 	{
@@ -855,7 +861,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			mActivity.beatTimer.wander=b;
 		}
 	}
-	
+
 	public void setWanderDance(boolean b)
 	{
 		if(b)
@@ -1157,7 +1163,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 		//rebuildMusicShape();
 	}
-	
+
 	void fillNow(boolean b[])
 	{
 		b[this.currentIndex]=true;
@@ -1524,14 +1530,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	}
 
-	
-	
-	
+
+
+
 	//distance to avatar...calculate for all bots
 	//
 	void distanceToAvatar()
 	{
-		
+
 	}
 	///////////////musical mappings
 
@@ -1567,7 +1573,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 			Bot b = otherBots.get(i);
-			
+
 			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
 
 			if( dist < neighborBound )	
@@ -1594,16 +1600,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 			else
 			{
-				
+
 				float dist=0;
 				if(currentAvatar!=null)
 				{
 					PVector av=new PVector(currentAvatar.x,currentAvatar.y);
 					PVector loc = new PVector(this.myposx,this.myposy);
-					
+
 					dist = av.dist(loc);
 				}
-				
+
 				setRhythm(avatarseq);
 				int num = (int) map(dist,20,600,0,4);
 				for(int i=0;i<num;i++)
@@ -1614,7 +1620,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 			break;
 		case 1: // rhythm split based on ID-- from avatar 
-			
+
 			if(mActivity.client.myID==0)
 			{
 
@@ -1646,8 +1652,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 					}
 				}
 			}
-			
-			
+
+
 			break;
 		case 2: 
 			if(mActivity.client.myID==0)
@@ -1656,16 +1662,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 			else
 			{
-				
+
 				float dist=0;
 				if(currentAvatar!=null)
 				{
 					PVector av=new PVector(currentAvatar.x,currentAvatar.y);
 					PVector loc = new PVector(this.myposx,this.myposy);
-					
+
 					dist = av.dist(loc);
 				}
-				
+
 				setRhythm(avatarseq);
 				int num = (int) map(dist,20,600,0,4);
 				for(int i=0;i<num;i++)
@@ -1675,8 +1681,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				}
 			}
 			break;
-			
-			
+
+
 		case 5: 
 			// different sets of rhythsms between avatar and others.  either avatar  changes as get closer, or the others do.
 			// change by index modification..addition or removing..
@@ -2119,199 +2125,214 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}   
 
 	}
+
+
+	int[] randomRangeList(int n, int mi, int ma)
+	{
+		int[] result = new int[n];
+		int r = ma-mi;
+
+		Vector v = new Vector();
+		for (int i=0; i< r;i++)
+		{
+			v.add(new Integer(mi+i));
+		}
+
+		for (int i=0;i<n;i++)
+		{
+			int c = (int)(Math.random()* (double)v.size());
+			Integer ii= (Integer) v.get(c);
+			result[i]= ii.intValue();
+		}
+
+
+		return result;
+	}
+
+	void fillRhythmDist(Bot b)
+	{
+		//copyFromMusicShape(b);//until we can...copy avatarpat
+		setRhythm(avatarseq);
+
+		PVector p1 = new PVector(b.x,b.y);
+		PVector p2= new PVector(this.myposx,this.myposy);
+
+		float d = map(PVector.dist(p1, p2), neighborBound, 500, 0, instrumentseq.length);
+		if (d<0)
+		{
+			d=0;
+		}
+
+		int nums[] = randomRangeList((int)d, 0, instrumentseq.length);
+
+		for (int i=0; i<nums.length; i++)
+		{
+			sfxrseq[nums[i]]=!sfxrseq[nums[i]];
+			instrumentseq[nums[i]]=!instrumentseq[nums[i]];
+		}
+
+		//rebuildMusicShape();
+	}
+
+
+
 	
+	void initializeKuku()
+	{
+		int[] d0= new int[] {      
+				0, 2, 3, 5, 7, 8, 10, 11, 12
+		};
+		int[] d1= new int[] {
+				0, 4, 8, 10, 12, 13
+		};
+		int[] d2= new int[] {
+				0, 2, 3, 6, 8, 10, 11, 14
+		};
+		int[] d3= new int[] {
+				0, 1, 3, 4, 5, 6, 8, 9, 11, 12, 13, 14
+		};
 
-	  int[] randomRangeList(int n, int mi, int ma)
-	  {
-	    int[] result = new int[n];
-	    int r = ma-mi;
-
-	    Vector v = new Vector();
-	    for (int i=0; i< r;i++)
-	    {
-	      v.add(new Integer(mi+i));
-	    }
-
-	    for (int i=0;i<n;i++)
-	    {
-	      int c = (int)(Math.random()* (double)v.size());
-	      Integer ii= (Integer) v.get(c);
-	      result[i]= ii.intValue();
-	    }
-
-
-	    return result;
-	  }
-	  
-	  void fillRhythmDist(Bot b)
-	  {
-	    //copyFromMusicShape(b);//until we can...copy avatarpat
-		 setRhythm(avatarseq);
-		  
-		 PVector p1 = new PVector(b.x,b.y);
-		 PVector p2= new PVector(this.myposx,this.myposy);
-
-	    float d = map(PVector.dist(p1, p2), neighborBound, 500, 0, instrumentseq.length);
-	    if (d<0)
-	    {
-	      d=0;
-	    }
-
-	    int nums[] = randomRangeList((int)d, 0, instrumentseq.length);
-
-	    for (int i=0; i<nums.length; i++)
-	    {
-	      sfxrseq[nums[i]]=!sfxrseq[nums[i]];
-	      instrumentseq[nums[i]]=!instrumentseq[nums[i]];
-	    }
-
-	    //rebuildMusicShape();
-	  }
-	  
-	  
-	  
-	  
-	  void initializeDjembe()
-	  {
-////////////////////////////////////////////
-			int[] d0= new int[]{0,2,3,5,7,8,10,11,12};
-			if(this.SEQUENCERLENGTH==32)
+		kuku = new int[4][];
+		kuku[0]=d0;
+		kuku[1]=d1;
+		kuku[2]=d2;
+		kuku[3]=d3;
+		
+		dchoice();
+	}
+	
+	boolean[] getKuku(int k)
+	{
+		boolean[] b = new boolean[this.SEQUENCERLENGTH];;
+		if(k<0|| k>=kuku.length)
+		{
+			return b;
+		}
+		
+		for(int i=0;i<kuku[k].length;i++)
+		{
+			if(kuku[k][i]<b.length)
 			{
-				for(int i=0;i<d0.length;i++)
-				{
-					d0[i]=d0[i]*2;
-				}
+				b[kuku[k][i]]=true;
 			}
-			
+		}
+		
+		
+		return b;
+		
+	}
+	void initializeDjembe()
+	{
+
+		
+		int[] d0= new int[] {      
+				0, 2, 3, 5, 7, 8, 10, 11, 12
+		};
+		int[] d1= new int[] {
+				0, 4, 8, 10, 12, 13
+		};
+		int[] d2= new int[] {
+				0, 2, 3, 6, 8, 10, 11, 14
+		};
+		int[] d3= new int[] {
+				0, 1, 3, 4, 5, 6, 8, 9, 11, 12, 13, 14
+		};
+
+		////////////////////////////////////////////
+		//int[] d0= new int[]{0,2,3,5,7,8,10,11,12};
+		if(this.SEQUENCERLENGTH==32)
+		{
 			for(int i=0;i<d0.length;i++)
 			{
-				if(d0[i]<djembe0.length)
-				{
-					djembe0[d0[i]]=true;
-				}
+				d0[i]=d0[i]*2;
 			}
-			
-			/*
-			djembe0[0] = true;
-			
-			djembe0[2] = true;
-			djembe0[3] = true;
-			
-			djembe0[5] = true;
-			
-			djembe0[7] = true;
-			djembe0[8] = true;
-			
-			djembe0[10] = true;
-			djembe0[11] = true;
-			djembe0[12] = true;
-			*/
-			
-			//////////////////////////////////////
-			int[] d1= new int[]{0,4,8,10,12,13};
-			if(this.SEQUENCERLENGTH==32)
+		}
+
+		for(int i=0;i<d0.length;i++)
+		{
+			if(d0[i]<djembe0.length)
 			{
-				for(int i=0;i<d1.length;i++)
-				{
-					d1[i]=d1[i]*2;
-				}
+				djembe0[d0[i]]=true;
 			}
-			
+		}
+
+
+		//////////////////////////////////////
+		//int[] d1= new int[]{0,4,8,10,12,13};
+		if(this.SEQUENCERLENGTH==32)
+		{
 			for(int i=0;i<d1.length;i++)
 			{
-				if(d1[i]<djembe1.length)
-				{
-					djembe1[d1[i]]=true;
-				}
+				d1[i]=d1[i]*2;
 			}
-			
-			/*
-			djembe1[0] = true;
-			
-			
-			
-			djembe1[4] = true;
-			
-			
-			
-			djembe1[8] = true;
-			
-			djembe1[10] = true;
-			
-			djembe1[12] = true;
-			djembe1[13] = true;
-			*/
-			///////////////////////////
-			int[] d2= new int[]{0,2,3,6,8,10,11,14};
-			if(this.SEQUENCERLENGTH==32)
+		}
+
+		for(int i=0;i<d1.length;i++)
+		{
+			if(d1[i]<djembe1.length)
 			{
-				for(int i=0;i<d2.length;i++)
-				{
-					d2[i]=d2[i]*2;
-				}
+				djembe1[d1[i]]=true;
 			}
-			
+		}
+
+
+		///////////////////////////
+		//int[] d2= new int[]{0,2,3,6,8,10,11,14};
+		if(this.SEQUENCERLENGTH==32)
+		{
 			for(int i=0;i<d2.length;i++)
 			{
-				if(d2[i]<djembe2.length)
-				{
-					djembe2[d2[i]]=true;
-				}
+				d2[i]=d2[i]*2;
 			}
-			
-			/*
-			djembe2[0] = true;
-			
-			djembe2[2] = true;
-			djembe2[3] = true;
-			
-			
-			djembe2[6] = true;
-			
-			djembe2[8] = true;
-			
-			djembe2[10] = true;
-			djembe2[11] = true;
-			
-			
-			djembe2[14] = true;
-			*/
-			/////////////////////////////
-			int[] d3= new int[]{0,1,3,4,5,6,8,9,11,12,13,14};
-			if(this.SEQUENCERLENGTH==32)
+		}
+
+		for(int i=0;i<d2.length;i++)
+		{
+			if(d2[i]<djembe2.length)
 			{
-				for(int i=0;i<d3.length;i++)
-				{
-					d3[i]=d3[i]*2;
-				}
+				djembe2[d2[i]]=true;
 			}
-			
+		}
+
+
+		/////////////////////////////
+		//int[] d3= new int[]{0,1,3,4,5,6,8,9,11,12,13,14};
+		if(this.SEQUENCERLENGTH==32)
+		{
 			for(int i=0;i<d3.length;i++)
 			{
-				if(d3[i]<djembe3.length)
-				{
-					djembe3[d3[i]]=true;
-				}
+				d3[i]=d3[i]*2;
 			}
-			
-			/*
-			djembe3[0] = true;
-			djembe3[1] = true;
-			
-			djembe3[3] = true;
-			djembe3[4] = true;
-			djembe3[5] = true;
-			djembe3[6] = true;
-			
-			djembe3[8] = true;
-			djembe3[9] = true;
-			
-			djembe3[11] = true;
-			djembe3[12] = true;
-			djembe3[13] = true;
-			djembe3[14] = true;
-			*/
+		}
+
+		for(int i=0;i<d3.length;i++)
+		{
+			if(d3[i]<djembe3.length)
+			{
+				djembe3[d3[i]]=true;
+			}
+		}
+
+
+	}
+	
+	void dchoice()
+	{
+	  int d=this.SEQUENCERLENGTH/16;
+
+
+	  for (int k=0;k<kuku.length;k++)
+	  {
+	    for (int i=0;i<kuku[k].length;i++)
+	    {
+	      kuku[k][i]=kuku[k][i]*d;
+	    }
 	  }
+	}
+	
+	
+	//if 48, what euclid works?  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+	// 1, 2, 3, 4, 6, 8, 12, 16
 
 
 }
