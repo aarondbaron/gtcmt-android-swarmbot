@@ -65,7 +65,7 @@ public class Behavior
 		m1=false;
 		m2=true;
 
-		desiredVel = new PVector();
+		desiredVel = new PVector(0,0);
 	}
 
 
@@ -701,6 +701,34 @@ public class Behavior
 		}
 
 	}
+	
+	public void avoidBoudary2()
+	{
+		int d=whichBoundaryReached();
+		
+		switch(d)
+		{
+		case 0:
+			this.desiredVel.add(new PVector(1,0));
+			break;
+		case 1:
+			this.desiredVel.add(new PVector(0,1));
+			break;
+		case 2:
+			this.desiredVel.add(new PVector(-1,0));
+			break;
+		case 3:
+			this.desiredVel.add(new PVector(0,-1));
+			break;
+			
+			default:
+				;
+				
+		
+		
+		}
+		
+	}
 
 
 
@@ -779,21 +807,33 @@ public class Behavior
 	{
 		//look at current position, bearing, velocity
 		
-		float currentAngle = bbc.camang;
+		//one way to do this...estimate what future x shoudl be based on velocity ....
+		int x= (int) (bbc.myposx+this.desiredVel.x);
+		int y = (int) (bbc.myposy+this.desiredVel.y);
+			
+		int diffx=x-bbc.myposx;
+		int diffy=y-bbc.myposy;
+		//this is the angle we want to rotate to.
+		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
+		
+		float currentangle = bbc.camang;
+		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
+		int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
 		
 		//look at desired vel
 		PVector v=this.desiredVel;		
 		
 		// now start to change motor speed to adjust to new 
-		if(currentAngle<v.heading2D())
+		if(result==-1)
 		{
-			//increase motor speed??
+			bbc.writeL((int) (128+20*v.mag()));//Right
+			bbc.writeR((int) (128+20*v.mag()));
 		}
 		else
 		{
-			//decrease motorspeed??
+			bbc.writeL((int) (128-20*v.mag()));//Left
+			bbc.writeR((int) (128-20*v.mag()));
 		}
-		
 
 	}
 
