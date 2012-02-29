@@ -254,7 +254,12 @@ public class BeatTimer extends Thread{
 		{
 			if(bbc.myBehavior!=null)
 			{
+				
+				/*
+				bbc.myBehavior.avoidBoudary2();
 				bbc.myBehavior.doSteer();
+				bbc.myBehavior.desiredVel.mult(0f);
+				*/
 			}
 		}
 		////////////////////////////////////////////
