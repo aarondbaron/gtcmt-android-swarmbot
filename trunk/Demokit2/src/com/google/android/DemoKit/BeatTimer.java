@@ -87,8 +87,13 @@ public class BeatTimer extends Thread{
 	{
 
 
-
-
+		//behaviors -- these will add values to intended vectors.. for all intents, practically parallel.
+		///////////////////
+		if(orient2Loc)
+		{
+		  //bbc.myBehavior.desiredVelocity.add(orient??);
+		}
+		
 		if(orient2Loc)
 		{
 			if(bbc.myBehavior!=null)
@@ -242,6 +247,17 @@ public class BeatTimer extends Thread{
 			});
 
 		}
+		
+		//finally act on velocity
+		//bbc.myBehavior.doMove();
+		if(bbc!=null)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.doSteer();
+			}
+		}
+		////////////////////////////////////////////
 		if(bbc!=null)
 		{
 
@@ -319,7 +335,8 @@ public class BeatTimer extends Thread{
 					case 1: //angle
 
 						//int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
-						int f = (int) bbc.map((float)(bbc.avest + Math.PI), 0, (float)(2*Math.PI), 1, bbc.sfxrseq.length/2);
+						//int f = (int) bbc.map((float)(bbc.avest + Math.PI), 0, (float)(2*Math.PI), 1, bbc.sfxrseq.length/2);
+						int f = (int) bbc.map((float)bbc.camang, 0, 360, 1, bbc.sfxrseq.length/2);
 						//bbc.fillRhythm(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.instrumentseq);
@@ -425,6 +442,9 @@ public class BeatTimer extends Thread{
 					case 11:
 						
 						int ff=(bbc.numNeighbors%4);
+						bbc.setRhythm(bbc.getKuku(ff));
+						break;//
+						/*
 						switch(ff)
 						{
 						case 0: bbc.setRhythm(bbc.djembe0);
@@ -440,10 +460,14 @@ public class BeatTimer extends Thread{
 						
 						
 						}
+						*/
 						
-						break;
+						
 					case 12:
 						int ma=(int) (this.generalMeasure%4);
+						bbc.setRhythm(bbc.getKuku(ma));//
+						break;
+						/*
 						switch(ma)
 						{
 						case 0: bbc.setRhythm(bbc.djembe0);
@@ -458,6 +482,12 @@ public class BeatTimer extends Thread{
 						default: ;
 						
 						}
+						*/
+						
+					case 13:
+						int ma2=(int) ((this.generalMeasure+bbc.ID)%4);
+						bbc.setRhythm(bbc.getKuku(ma2));//
+						break;
 						
 
 
@@ -502,9 +532,14 @@ public class BeatTimer extends Thread{
 
 					if(bbc.sfxrseq[bbc.currentIndex])
 					{
+						
 						test=false;
-						mActivity.aTest.soundType(7);
-						mActivity.aTest.replay();
+						
+						if(bbc.useSFXR)
+						{
+							mActivity.aTest.soundType(7);
+							mActivity.aTest.replay();
+						}
 					}
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
