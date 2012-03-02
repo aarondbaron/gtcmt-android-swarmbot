@@ -45,6 +45,12 @@ public class BeatTimer extends Thread{
 	boolean wanderDance;
 	long wanderDanceTimer;
 	boolean wanderDanceOnce;
+
+	boolean separation;
+	boolean alignment;
+	boolean cohesion;
+	
+	boolean followInLine;
 	
 	
 
@@ -234,7 +240,8 @@ public class BeatTimer extends Thread{
 		{
 			if(bbc.myBehavior!=null)
 			{
-				bbc.myBehavior.move();
+				//bbc.myBehavior.move();
+				bbc.myBehavior.moveTo(new PVector(bbc.targetx,bbc.targety));
 			}
 			handler.post(new Runnable() {
 				@Override
@@ -248,6 +255,40 @@ public class BeatTimer extends Thread{
 
 		}
 		
+		if(separation)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.desiredVel.add(bbc.myBehavior.separate());
+			}
+		}
+		
+		if(alignment)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.desiredVel.add(bbc.myBehavior.align());
+			}
+		}
+		
+		if(cohesion)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.desiredVel.add(bbc.myBehavior.cohesion());
+			}
+		}
+		
+		if(followInLine)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.followInLine();
+			}
+		}
+		
+		
+		
 		//finally act on velocity
 		//bbc.myBehavior.doMove();
 		if(bbc!=null)
@@ -255,11 +296,13 @@ public class BeatTimer extends Thread{
 			if(bbc.myBehavior!=null)
 			{
 				
-				/*
-				bbc.myBehavior.avoidBoudary2();
-				bbc.myBehavior.doSteer();
-				bbc.myBehavior.desiredVel.mult(0f);
-				*/
+				if(!bbc.directControl)
+				{
+					bbc.myBehavior.avoidBoundary3();
+					bbc.myBehavior.doSteer();
+					bbc.myBehavior.desiredVel.mult(0f);
+				}
+				
 			}
 		}
 		////////////////////////////////////////////

@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+import java.text.DecimalFormat;
+
 import android.util.Log;
 
 public class Behavior
@@ -41,9 +43,14 @@ public class Behavior
 	boolean avBoundFwdReal;
 	boolean boundOk;
 	long avoidBoundTimer;
-	
+
 	PVector desiredVel;
 
+	float desiredseparation=50;
+
+	long vmtimer;
+	long vmInterval=150;
+	
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
@@ -56,7 +63,7 @@ public class Behavior
 		//highm1= 255-off;
 		highm1=128+off;
 
-		lowm2 = 128-off2;  //iteresting to see what happens if these values were randomized
+		lowm2 = 128-off2;  //interesting to see what happens if these values were randomized
 		//highm2 =  0+off;
 		highm2=128-off;
 
@@ -66,6 +73,8 @@ public class Behavior
 		m2=true;
 
 		desiredVel = new PVector(0,0);
+		
+		vmtimer=System.currentTimeMillis();
 	}
 
 
@@ -195,12 +204,31 @@ public class Behavior
 			}
 		}	
 	}
+	
+	
+	
+	void setFollowInLine(boolean b)
+	{
+		bbc.mActivity.beatTimer.followInLine=b;
+	
+	}
+	void followInLine()
+	{
+		for(int i=0;i<bbc.otherBots.size();i++)
+		{
+			Bot b = (Bot) bbc.otherBots.get(i);
+			if(b.ID==bbc.ID-1)
+			{
+				follow(b);
+			}
+		}
+	}
+	
 	void follow(Bot bot)
 	{
-
+		PVector p =this.getPointBehindLeader(bot);		
+		this.moveTo(p);
 	}
-
-
 
 
 	void fullWander()
@@ -701,33 +729,63 @@ public class Behavior
 		}
 
 	}
-	
-	public void avoidBoudary2()
+
+	public void avoidBoundary2()
 	{
 		int d=whichBoundaryReached();
-		
+
 		switch(d)
 		{
 		case 0:
-			this.desiredVel.add(new PVector(1,0));
+			this.desiredVel.add(new PVector(2,0));
 			break;
 		case 1:
-			this.desiredVel.add(new PVector(0,1));
+			this.desiredVel.add(new PVector(0,2));
 			break;
 		case 2:
-			this.desiredVel.add(new PVector(-1,0));
+			this.desiredVel.add(new PVector(-2,0));
 			break;
 		case 3:
-			this.desiredVel.add(new PVector(0,-1));
+			this.desiredVel.add(new PVector(0,-2));
 			break;
-			
-			default:
-				;
-				
-		
-		
+
+		default:
+			;
+
+
+
 		}
-		
+
+	}
+
+	public void avoidBoundary3()
+	{
+		int maxh,maxw;
+		maxh=480;
+		maxw=640;
+		int buff=50;
+
+		boolean bound =false;
+		if(bbc.myposx <0 + buff )
+		{
+			bound=true;
+			this.desiredVel.add(new PVector(2,0));
+		}
+		if(bbc.myposy<0 + buff)
+		{
+			bound=true;
+			this.desiredVel.add(new PVector(0,2));
+		}
+		if(bbc.myposx>maxw- buff)
+		{
+			bound=true;
+			this.desiredVel.add(new PVector(-2,0));
+		}
+		if(bbc.myposy>maxh - buff)
+		{
+			bound=true;
+			this.desiredVel.add(new PVector(0,-2));
+		}
 	}
 
 
@@ -803,36 +861,76 @@ public class Behavior
 
 	}
 
+
+
+	public void moveTo(PVector p)
+	{
+		PVector d = new PVector(p.x-bbc.myposx,p.y-bbc.myposy);
+		d.limit(1.0f);
+		this.desiredVel.add(d);
+	}
+
+
+
 	public void doSteer()
 	{
 		//look at current position, bearing, velocity
-		
+		PVector pos = new PVector(bbc.myposx,bbc.myposy);
+		float currentangle = bbc.camang;
+		int rbyte=bbc.rbyte;
+		int lbyte=bbc.lbyte;
+
+		PVector currentVel = new PVector();
+
 		//one way to do this...estimate what future x shoudl be based on velocity ....
 		int x= (int) (bbc.myposx+this.desiredVel.x);
 		int y = (int) (bbc.myposy+this.desiredVel.y);
-			
+
 		int diffx=x-bbc.myposx;
 		int diffy=y-bbc.myposy;
 		//this is the angle we want to rotate to.
 		float ang = (float)Math.toDegrees(Math.atan2(diffy,diffx));
-		
-		float currentangle = bbc.camang;
-		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang + bbc.calibrationAngle),360);
-		int result=ModularDistance2((int)currentangle,(int)( ang + bbc.calibrationAngle),360);
-		
+
+
+		bbc.modDistance=ModularDistance((int) currentangle,(int)( ang ),360);
+		int result=ModularDistance2((int)currentangle,(int)( ang ),360);
+
 		//look at desired vel
-		PVector v=this.desiredVel;		
-		
+		PVector v=new PVector(this.desiredVel.x,this.desiredVel.y);	
+		v.normalize();
+
 		// now start to change motor speed to adjust to new 
-		if(result==-1)
+		// -1 means need to turn right
+		// 1 means need to turn left
+		/*
+		 * ///////////////
+		rbyte= 128-20;
+		writeR(rbyte);
+		lbyte= 128+20;
+		writeL(lbyte);
+		/////////////
+		 */
+		if(System.currentTimeMillis()-vmtimer>vmInterval)
 		{
-			bbc.writeL((int) (128+20*v.mag()));//Right
-			bbc.writeR((int) (128+20*v.mag()));
+			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
+			vmtimer=System.currentTimeMillis();
+		}
+		if(bbc.modDistance>10)
+		{
+			if(result==-1)
+			{
+				bbc.writeL((int) (128+20*v.mag()));
+				bbc.writeR((int) (128-20*v.mag()*.1f));
+			}
+			else
+			{
+				bbc.writeL((int) (128+20*v.mag()*.1f));
+				bbc.writeR((int) (128-20*v.mag()));
+			}
 		}
 		else
 		{
-			bbc.writeL((int) (128-20*v.mag()));//Left
-			bbc.writeR((int) (128-20*v.mag()));
+			bbc.forwardReal();
 		}
 
 	}
@@ -925,9 +1023,173 @@ public class Behavior
 	}
 
 
+	public void setSeparation(boolean b)
+	{
+		bbc.mActivity.beatTimer.separation=b;		
+	}
+	public void setAlignment(boolean b)
+	{
+		bbc.mActivity.beatTimer.alignment=b;
+	}
+	public void setCohesion(boolean b)
+	{
+		bbc.mActivity.beatTimer.cohesion=b;
+	}
+	
+	public void toggleSeparation()
+	{
+		bbc.mActivity.beatTimer.separation=!bbc.mActivity.beatTimer.separation;		
+	}
+	public void toggleAlignment()
+	{
+		bbc.mActivity.beatTimer.alignment=!bbc.mActivity.beatTimer.alignment;
+	}
+	public void toggleCohesion()
+	{
+		bbc.mActivity.beatTimer.cohesion=!bbc.mActivity.beatTimer.cohesion;
+	}
 
 	///////////////
 	//djemble behavior
 	//1.  
+	////////////////////////
+	
+	
+
+	PVector separate (/*Vector boids*/) 
+	{
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+
+		//float desiredseparation = 25.0f;
+		//desiredseparation = 22.0f;  //22 is good minimum
+		//float desiredseparation = 60.0f;
+		desiredseparation=bbc.neighborBound;
+		if (desiredseparation<22.0f)
+		{
+			desiredseparation=22.0f;
+		}
+		PVector steerVec = new PVector(0, 0, 0);
+		int count = 0;
+		// For every boid in the system, check if it's too close
+		for (int i = 0 ; i < bbc.otherBots.size(); i++) {
+			Bot other = (Bot) bbc.otherBots.get(i);
+			PVector otherloc =new PVector (other.x,other.y ) ;
+			float d = PVector.dist(loc, otherloc );
+			// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
+			if ((d > 0) && (d < desiredseparation)) {
+				// Calculate vector pointing away from neighbor
+				PVector diff = PVector.sub(loc, otherloc);
+				diff.normalize();
+				diff.div(d);        // Weight by distance
+				steerVec.add(diff);
+				count++;            // Keep track of how many        
+			}
+		}
+		// Average -- divide by how many
+		if (count > 0) {
+			steerVec.div((float)count);
+		}
+
+		// As long as the vector is greater than 0
+		if (steerVec.mag() > 0) {
+			// Implement Reynolds: Steering = Desired - Velocity
+			steerVec.normalize();
+			//steer.mult(maxspeed);
+			//steer.sub(vel);
+			//steer.limit(maxforce);
+		}
+		return steerVec;
+	}
+
+	// Alignment
+	// For every nearby boid in the system, calculate the average velocity
+	PVector align (/*Vector boids*/) {
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		
+		//float neighbordist = 50.0f;
+		float neighbordist = bbc.neighborBound;
+		PVector steer = new PVector(0, 0, 0);
+		int count = 0;
+		for (int i = 0 ; i < bbc.otherBots.size(); i++) {
+			Bot other = (Bot) bbc.otherBots.get(i);
+			PVector otherloc =new PVector (other.x,other.y ) ;
+			float d = PVector.dist(loc, otherloc);
+			if ((d > 0) && (d < neighbordist)) {
+				steer.add(otherloc);
+				count++;
+			}
+		}
+		if (count > 0) {
+			steer.div((float)count);
+		}
+
+		// As long as the vector is greater than 0
+		if (steer.mag() > 0) {
+			// Implement Reynolds: Steering = Desired - Velocity
+			steer.normalize();
+			//steer.mult(maxspeed);
+			//steer.sub(vel);
+			//steer.limit(maxforce);
+		}
+		return steer;
+	}
+
+	// Cohesion
+	// For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
+	PVector cohesion (/*Vector boids*/) {
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		//float neighbordist = 50.0f;
+		float neighbordist = bbc.neighborBound;
+		PVector sum = new PVector(0, 0, 0);   // Start with empty vector to accumulate all locations
+		int count = 0;
+		for (int i = 0 ; i < bbc.otherBots.size(); i++) {
+			Bot other = (Bot) bbc.otherBots.get(i);
+			PVector otherloc=new PVector (other.x,other.y ) ;
+			float d = PVector.dist(loc, otherloc);
+			if ((d > 0) && (d < neighbordist)) {
+				sum.add(otherloc); // Add location
+				count++;
+			}
+		}
+		if (count > 0) {
+			sum.div((float)count);
+			return steer(sum, false);  // Steer towards the location
+		}
+		return sum;
+	}
+	
+	// A method that calculates a steering vector towards a target
+	  // Takes a second argument, if true, it slows down as it approaches the target
+	  PVector steer(PVector target, boolean slowdown) {
+		  PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		  PVector vel = new PVector(0,0);
+		  
+	    PVector steer;  // The steering vector
+	    PVector desired = PVector.sub(target, loc);  // A vector pointing from the location to the target
+	    float d = desired.mag(); // Distance from the target is the magnitude of the vector
+	    // If the distance is greater than 0, calc steering (otherwise return zero vector)
+	    if (d > 0) {  
+	      // Normalize desired
+	      desired.normalize();
+	      
+	      
+	      /*
+	      // Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
+	      if ((slowdown) && (d < 100.0f)) desired.mult(maxspeed*(d/100.0f)); // This damping is somewhat arbitrary
+	      else desired.mult(maxspeed);
+	      */
+	      
+	      
+	      // Steering = Desired minus Velocity
+	      
+	      steer = PVector.sub(desired, vel);
+	      //steer.limit(maxforce);  // Limit to maximum steering force
+	      
+	    } 
+	    else {
+	      steer = new PVector(0, 0);
+	    }
+	    return steer;
+	  }
 
 }

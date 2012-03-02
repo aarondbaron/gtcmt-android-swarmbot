@@ -149,6 +149,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	Vector distances;
 	
 	boolean useSFXR=true;
+	
+	boolean directControl=false;
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -417,8 +419,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				myBehavior.m2=true;
 				//backward();
 				forward();				
-				this.myposx=600;
-				this.myposy=460;				
+				this.myposx=200;
+				this.myposy=200;				
 				mActivity.beatTimer.wander=true;
 
 
