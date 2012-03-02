@@ -47,6 +47,9 @@ public class ClientCode implements OnClickListener{
 
 	long initialConnectTimer;
 	boolean initialConnect=false;
+	
+	boolean messageFlag = false;
+	String message;
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
 		bbc=BBC;
@@ -132,6 +135,13 @@ public class ClientCode implements OnClickListener{
 						bbc.resetIndex();
 						syncFlag=false;
 					}
+					
+					if(messageFlag)
+					{
+						out.println(message);
+						messageFlag=false;
+						//Log.d("client","sending message "  + message);
+					}
 
 					if(line.contains("mode"))
 					{
@@ -168,10 +178,24 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						myID= Integer.parseInt(test[1]);
 						bbc.ID=myID;
+						
+						////check other bots
+						for(int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot)bbc.otherBots.get(i);
+							if(b.ID==myID)
+							{
+								bbc.otherBots.remove(b);
+								
+							}
+						}
+						
+						
+						///
 						handler.post(new Runnable() {
 							@Override
 							public void run() {
-								Toast.makeText(mActivity.getApplicationContext(), "ID set to -- " +  myID + " -- by server", Toast.LENGTH_LONG).show();
+								Toast.makeText(mActivity.getApplicationContext(), "ID set -- " +  myID + " -- by server--" + bbc.otherBots.size(), Toast.LENGTH_LONG).show();
 							}
 						});
 
@@ -185,6 +209,7 @@ public class ClientCode implements OnClickListener{
 						out.println(s);
 					}
 
+					/*
 					if(line.contains("mapping"))
 					{
 						String test [] = line.split(",");
@@ -215,6 +240,7 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
+					*/
 
 					if(line.contains("pattern"))
 					{
@@ -320,17 +346,63 @@ public class ClientCode implements OnClickListener{
 					
 					}
 					
+					if(line.contains("directControl"))
+					{
+						bbc.directControl=!bbc.directControl;
+					}
+					
+					if(line.contains("separation"))
+					{
+						bbc.myBehavior.toggleSeparation();
+					}
+					if(line.contains("alignment"))
+					{
+						bbc.myBehavior.toggleAlignment();
+					}
+					if(line.contains("cohesion"))
+					{
+						bbc.myBehavior.toggleCohesion();
+					}
+					
+					if(line.contains("followInLine"))
+					{
+						bbc.myBehavior.followInLine();
+					}
+					
+					if(line.contains("vmInterval"))
+					{
+						String test [] = line.split(",");
+						
+						bbc.myBehavior.vmInterval=Long.parseLong(test[1]);
+						Log.d("client","vmInterval" + bbc.myBehavior.vmInterval);
+						
+						
+					}
 
 					//[ID]position:
 					//[ID]stop
 					//[ID]forward
 					//[ID]backward
+					if(line.contains("stopAll"))
+					{
+						bbc.stop();
+						bbc.moveToLoc(false);
+						bbc.setWander(false);
+						bbc.setWanderDance(false);
+						bbc.myBehavior.setFollowInLine(false);
+						Log.d("LINE","stop");
+						bbc.danceSequencer=false;
+						
+						bbc.directControl=true;
+						
+					}
 					if(line.contains("stop"+myID))
 					{
 						bbc.stop();
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
 						bbc.setWanderDance(false);
+						bbc.myBehavior.setFollowInLine(false);
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
 					}
@@ -514,9 +586,6 @@ public class ClientCode implements OnClickListener{
 
 					if(line.contains("mapping"))
 					{
-
-
-
 						String test [] = line.split(",");
 
 						//check to make sure we get the mapping...
@@ -540,7 +609,16 @@ public class ClientCode implements OnClickListener{
 							}
 
 							Log.d("client","   map" + map);
+							handler.post(new Runnable() {
+								@Override
+								public void run() {
+									Toast.makeText(mActivity.getApplicationContext(), "mapping set -- " +  bbc.mActivity.beatTimer.mapping + " -- by server--" + bbc.otherBots.size() + "-nn-" + bbc.numNeighbors, Toast.LENGTH_LONG).show();
+								}
+							});
+							
+							
 						}
+						
 					}
 
 					if(line.contains("reuc"))
@@ -683,7 +761,7 @@ public class ClientCode implements OnClickListener{
 
 						if(ID==myID)
 						{
-							Log.i("clientcode","mypos: " + "x:"+test[1]);
+							//Log.i("clientcode","mypos: " + "x:"+test[1]);
 							boolean posLost=false;
 							if(test[1]=="x" || test[2]=="x")
 							{
@@ -778,7 +856,7 @@ public class ClientCode implements OnClickListener{
 											velest.setText(s1 + " -- " + a1 + " , " + a2);
 											angest.setText(s2 + " -- " + a3);
 
-											Log.d("client"," bytes "+bbc.lbyte+  "," + bbc.rbyte);
+											//Log.d("client"," bytes "+bbc.lbyte+  "," + bbc.rbyte);
 										}
 									});
 
@@ -930,6 +1008,12 @@ public class ClientCode implements OnClickListener{
 	}
 
 	/////////////
+	
+	public void sendMessage(String s)
+	{
+		message=s;
+		this.messageFlag=true;
+	}
 
 	public void doStuff()
 	{
