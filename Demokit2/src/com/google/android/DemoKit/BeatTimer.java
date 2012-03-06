@@ -51,6 +51,8 @@ public class BeatTimer extends Thread{
 	boolean cohesion;
 	
 	boolean followInLine;
+
+	boolean wanderVector;
 	
 	
 
@@ -235,6 +237,15 @@ public class BeatTimer extends Thread{
 
 
 		}
+		
+		if(wanderVector)
+		{
+			if(bbc.myBehavior!=null)
+			{
+				bbc.myBehavior.wanderVector();
+			
+			}
+		}
 
 		if(move2Loc)
 		{
@@ -299,7 +310,7 @@ public class BeatTimer extends Thread{
 				if(!bbc.directControl)
 				{
 					bbc.myBehavior.avoidBoundary3();
-					bbc.myBehavior.doSteer();
+					bbc.myBehavior.doSteer2();
 					bbc.myBehavior.desiredVel.mult(0f);
 				}
 				

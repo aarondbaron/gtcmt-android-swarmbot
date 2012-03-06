@@ -849,7 +849,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		sequencerMode=false;
 		mActivity.beatTimer.wander=false;
 		this.setWanderDance(false);
+		this.setWanderVector(false);
+		
 		mActivity.beatTimer.move2Loc=false;
+		
 	}
 
 	public void setWander(boolean b)
@@ -875,6 +878,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			mActivity.beatTimer.wanderDance=b;
 			mActivity.beatTimer.wanderDanceOnce=false;
+		}
+	}
+	
+	public void setWanderVector(boolean b)
+	{
+		if(b)
+		{
+			mActivity.beatTimer.wanderVector=b;
+		}
+		else
+		{
+			mActivity.beatTimer.wanderVector=b;
 		}
 	}
 

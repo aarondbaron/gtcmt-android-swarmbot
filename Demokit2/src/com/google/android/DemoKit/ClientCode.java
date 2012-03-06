@@ -389,6 +389,7 @@ public class ClientCode implements OnClickListener{
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
 						bbc.setWanderDance(false);
+						bbc.setWanderVector(false);
 						bbc.myBehavior.setFollowInLine(false);
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
@@ -402,6 +403,7 @@ public class ClientCode implements OnClickListener{
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
 						bbc.setWanderDance(false);
+						bbc.setWanderVector(false);
 						bbc.myBehavior.setFollowInLine(false);
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
@@ -660,9 +662,12 @@ public class ClientCode implements OnClickListener{
 
 					if(line.contains("wander"+myID))
 					{
+						/*
 						bbc.myBehavior.initWander();
 						bbc.myBehavior.initWanderComplete=true;
 						bbc.setWander(true);					
+						*/
+						bbc.setWanderVector(true);
 					}
 					if(line.contains("move"))
 					{

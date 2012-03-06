@@ -51,6 +51,9 @@ public class Behavior
 	long vmtimer;
 	long vmInterval=150;
 	
+	long wanderVectorTimer;
+	PVector wanderVectorTemp;
+	
 	public Behavior(BoeBotController bbc)
 	{
 		step = (byte) 10;
@@ -75,6 +78,8 @@ public class Behavior
 		desiredVel = new PVector(0,0);
 		
 		vmtimer=System.currentTimeMillis();
+		wanderVectorTimer =vmtimer;
+		wanderVectorTemp = new PVector();
 	}
 
 
@@ -934,6 +939,67 @@ public class Behavior
 		}
 
 	}
+	
+	
+	public void doSteer2()
+	{
+		float currentangle = bbc.camang;
+		float ang = (float)Math.toDegrees(Math.atan2(this.desiredVel.y,this.desiredVel.x));
+		
+		int angle1=(int)currentangle;
+		int angle2=(int)ang;
+		
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+		if(angle2<0)
+		{
+			angle2=360+angle2;
+		}	
+
+		bbc.modDistance=ModularDistance(angle1,angle2,360);
+		int result=ModularDistance2(angle1,angle2,360);
+
+		//look at desired vel
+		PVector v=new PVector(this.desiredVel.x,this.desiredVel.y);	
+		v.normalize();
+
+		// now start to change motor speed to adjust to new 
+		// -1 means need to turn right
+		// 1 means need to turn left
+		/*
+		 * ///////////////
+		rbyte= 128-20;
+		writeR(rbyte);
+		lbyte= 128+20;
+		writeL(lbyte);
+		/////////////
+		 */
+		if(System.currentTimeMillis()-vmtimer>vmInterval)
+		{
+			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
+			vmtimer=System.currentTimeMillis();
+		}
+		if(bbc.modDistance>10)
+		{
+			if(result==-1)
+			{
+				bbc.writeL((int) (128+20*v.mag()));
+				bbc.writeR((int) (128-20*v.mag()*.1f));
+			}
+			else
+			{
+				bbc.writeL((int) (128+20*v.mag()*.1f));
+				bbc.writeR((int) (128-20*v.mag()));
+			}
+		}
+		else
+		{
+			bbc.forwardReal();
+		}
+
+	}
 
 	public void doMove()
 	{
@@ -1054,7 +1120,33 @@ public class Behavior
 	//1.  
 	////////////////////////
 	
-	
+	void wanderVector()
+	{
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		float angle = (float) (bbc.camang *Math.PI/180.0f);
+		float m=1.0f;
+		
+		if(System.currentTimeMillis()-wanderVectorTimer>1000)
+		{
+			float random = (float) (Math.random()*2 -1 ) * .1f *(float)Math.PI;			
+			//float random = 0;			
+			wanderVectorTemp = new PVector((float) (m*loc.x*Math.cos(angle+random) ),  (float) (m*loc.y*Math.sin(angle+random) ) );
+			
+			//PVector wanderVector = PVector.sub(pt2, loc);
+			wanderVectorTemp.limit(1.0f);
+			
+			desiredVel.add(wanderVectorTemp);
+			
+			wanderVectorTimer = System.currentTimeMillis();
+			
+		}
+		else
+		{
+			desiredVel.add(wanderVectorTemp);
+		}
+		
+		
+	}
 
 	PVector separate (/*Vector boids*/) 
 	{
