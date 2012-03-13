@@ -366,7 +366,8 @@ public class ClientCode implements OnClickListener{
 					
 					if(line.contains("followInLine"))
 					{
-						bbc.myBehavior.followInLine();
+						bbc.myBehavior.setFollowInLine(true);
+						//bbc.myBehavior.followInLine();
 					}
 					
 					if(line.contains("vmInterval"))
@@ -574,7 +575,7 @@ public class ClientCode implements OnClickListener{
 						bbc.rfv.thread.message.displayMessage("temporary wander");
 						bbc.danceSequencer=false;
 						bbc.clearAllMovement();
-						bbc.myBehavior  = new Behavior(bbc);
+						//bbc.myBehavior  = new Behavior(bbc);
 						bbc.myBehavior.m1=false;
 						bbc.myBehavior.m2=true;
 						//backward();
@@ -659,6 +660,15 @@ public class ClientCode implements OnClickListener{
 					}
 
 
+					if(line.contains("wanderAll"))
+					{
+						/*
+						bbc.myBehavior.initWander();
+						bbc.myBehavior.initWanderComplete=true;
+						bbc.setWander(true);					
+						*/
+						bbc.setWanderVector(true);
+					}
 
 					if(line.contains("wander"+myID))
 					{

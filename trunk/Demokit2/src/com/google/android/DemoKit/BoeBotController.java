@@ -189,6 +189,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		//svthread = new Thread();
 		//svthread.start();
+		
+		myBehavior = mActivity.behavior;
 
 		mActivity.beatTimer.bbc=this;
 		sequencerMode=true;
@@ -315,7 +317,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		mActivity.client = new ClientCode(mActivity,this);
 
-		myBehavior= new Behavior(this);
+		//myBehavior= new Behavior(this);
+		myBehavior=mActivity.behavior;
+		myBehavior.bbc=this;
+		myBehavior.start();
 
 		/*
 		DemoKitPhone d= (DemoKitPhone)mActivity;
@@ -414,7 +419,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 
-				myBehavior  = new Behavior(this);
+				//myBehavior  = new Behavior(this);
 				myBehavior.m1=false;
 				myBehavior.m2=true;
 				//backward();
@@ -674,12 +679,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 
 		mActivity.beatTimer.move2Loc=b;
+		myBehavior.move2Loc=b;
 	}
 
 	public void orientToLoc(boolean b)
 	{
 		//set value
 		mActivity.beatTimer.orient2Loc=b;
+		myBehavior.orient2Loc=b;
 	}
 
 	PVector steer(PVector target, boolean slowdown) {
@@ -848,6 +855,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//mActivity.aTest.replayRandom();
 		sequencerMode=false;
 		mActivity.beatTimer.wander=false;
+		myBehavior.wander=false;
+		myBehavior.wanderDance=false;
+		myBehavior.wanderVector=false;
+		myBehavior.move2Loc=false;
+		
 		this.setWanderDance(false);
 		this.setWanderVector(false);
 		
@@ -860,10 +872,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		if(b)
 		{
 			mActivity.beatTimer.wander=b;
+			myBehavior.wander=b;
 		}
 		else
 		{
 			mActivity.beatTimer.wander=b;
+			myBehavior.wander=b;
 		}
 	}
 
@@ -873,11 +887,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			mActivity.beatTimer.wanderDance=b;
 			mActivity.beatTimer.wanderDanceOnce=false;
+			
+			myBehavior.wanderDance=b;
+			myBehavior.wanderDanceOnce=false;
 		}
 		else
 		{
 			mActivity.beatTimer.wanderDance=b;
 			mActivity.beatTimer.wanderDanceOnce=false;
+			
+			myBehavior.wanderDance=b;
+			myBehavior.wanderDanceOnce=false;
 		}
 	}
 	
@@ -886,10 +906,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		if(b)
 		{
 			mActivity.beatTimer.wanderVector=b;
+			
+			myBehavior.wanderVector=b;
 		}
 		else
 		{
 			mActivity.beatTimer.wanderVector=b;
+			
+			myBehavior.wanderVector=b;
 		}
 	}
 
@@ -1185,7 +1209,60 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		b[this.currentIndex]=true;
 	}
-
+	
+	
+	int[] getHits(boolean[] b)
+	{
+	  Vector h= new Vector();
+	  for(int i=0;i< b.length;i++)
+	  {
+	    if(b[i])
+	    {
+	      h.add(new Integer(i));
+	    } 
+	    
+	  }
+	  
+	  int [] hits = new int[h.size()];
+	  for(int i=0;i<hits.length;i++)
+	  {
+	    Integer dd=(Integer)h.get(i);
+	   hits[i]=(int) dd.intValue(); 
+	  }
+	  
+	  
+	  return hits;
+	  
+	}
+	void embellish1(boolean[] b)
+	{
+		int[] hits = getHits( b );
+	    
+	    int c1 = (int) (Math.random()*hits.length);
+	    
+	    int choice = hits[c1];	
+	    
+	    if(choice==0)
+	    {
+	      b[choice]=true;
+	      b[choice+1]=true;
+	      b[b.length-1]=true;
+	      return;
+	    }
+	    
+	    if(choice==b.length-1)
+	    {
+	      b[choice]=true;
+	      b[0]=true;
+	      b[choice-1]=true;
+	      return;
+	    }
+	    
+	    b[choice]=true;
+	    b[choice+1]=true;
+	    b[choice-1]=true;
+		
+	}
 	boolean isCompletelySilent()
 	{
 		boolean f=false;
