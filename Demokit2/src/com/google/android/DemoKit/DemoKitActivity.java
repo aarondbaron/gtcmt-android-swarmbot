@@ -75,6 +75,7 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 	 * 
 	 */
 	
+	Behavior behavior;
 	BeatTimer beatTimer;
 	AudioTest aTest;
 	AndroidAudioDevice aDevice;
@@ -203,6 +204,10 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 		/*
 		 * 
 		 */
+		
+		behavior = new Behavior(this);
+		//behavior.start();
+		
 		beatTimer= new BeatTimer();		
 		beatTimer.mActivity = this;	
 		beatTimer.setRunning(true);

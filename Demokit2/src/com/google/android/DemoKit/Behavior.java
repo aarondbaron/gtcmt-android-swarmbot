@@ -2,9 +2,10 @@ package com.google.android.DemoKit;
 
 import java.text.DecimalFormat;
 
+import android.os.Handler;
 import android.util.Log;
 
-public class Behavior
+public class Behavior extends Thread
 {
 	private boolean LRMotorSweep;
 	private boolean incDec;
@@ -50,12 +51,35 @@ public class Behavior
 
 	long vmtimer;
 	long vmInterval=150;
-	
+
 	long wanderVectorTimer;
 	PVector wanderVectorTemp;
-	
-	public Behavior(BoeBotController bbc)
+
+	boolean behaviorRunning=true;
+
+
+	//////flags for behaviors
+	public boolean orient2Loc;
+	public boolean wander;
+	public boolean wanderDance;
+	public boolean wanderDanceOnce;
+	public long wanderDanceTimer;
+	public boolean wanderVector;
+	public boolean moveVector;
+	public boolean move2Loc;
+	public boolean separation;
+	public boolean alignment;
+	public boolean cohesion;
+	public boolean followInLine;
+
+	public Handler handler;
+
+	public DemoKitActivity mActivity;
+
+	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
+		this.mActivity=mActivity;
+		
 		step = (byte) 10;
 		interval=interval/16;
 		this.bbc=bbc;		
@@ -76,10 +100,188 @@ public class Behavior
 		m2=true;
 
 		desiredVel = new PVector(0,0);
-		
+
 		vmtimer=System.currentTimeMillis();
 		wanderVectorTimer =vmtimer;
 		wanderVectorTemp = new PVector();
+	}
+
+	public void run()
+	{
+		//behaviorRunning=true;
+		while(behaviorRunning)
+		{
+			//Log.d("behavior","running");
+			if(orient2Loc)
+			{
+				//bbc.myBehavior.desiredVelocity.add(orient??);
+			}
+
+			if(orient2Loc)
+			{
+				orient();
+			}
+			if(wander)
+			{
+
+				//Log.d("beatTimer", "wander");
+				if(boundaryReached())
+				{
+					//bbc.myBehavior.fullWander();
+
+					//if they get near a neigbhor?
+					if(!initWanderComplete)
+					{
+						initWander();
+						initWanderComplete=true;
+					}
+					wander();
+				}
+				else
+				{						
+					/*
+						////////////////////////////////////////
+						bbc.stop();
+						bbc.myBehavior.initWanderComplete=false;
+						//////////////////////////////////////////
+					 */
+
+					//slow down
+					//do forwardreal once
+					if(!bbc.myBehavior.avBoundFwdReal)
+					{
+						bbc.forwardReal();
+						avBoundFwdReal=!avBoundFwdReal;							
+					}
+
+					avoidBoundary();	
+
+				}
+
+			}
+
+			if(wanderDance)
+			{
+
+				if(!boundaryReached())
+				{
+					Log.d("behavior", "wanderDance ");
+					if(bbc.numNeighbors==0 && !wanderDanceOnce)
+					{
+						if(!initWanderComplete)
+						{
+							initWander();
+							initWanderComplete=true;
+
+						}
+						wander();
+						wanderDanceOnce=false;
+						bbc.danceSequencer=false;
+					}
+					else
+					{
+						Log.d("behavior", "wanderDance " + bbc.numNeighbors);
+						initWanderComplete=false;
+
+						if(!wanderDanceOnce)
+						{
+							bbc.euclidDance();
+							wanderDanceOnce=true;
+							bbc.danceSequencer=true;
+							wanderDanceTimer=System.currentTimeMillis();
+						}
+
+						//dance for x seconds
+						if(System.currentTimeMillis()-wanderDanceTimer> 1000*10)
+						{
+
+							//bbc.euclidDance();//eudance();
+							//transtion to next stage of wandering to escape--meaning ignore for a couple seconds
+							//for now just stop
+							bbc.danceSequencer=false;
+							bbc.stop();
+
+						}
+						else
+						{
+
+						}
+
+
+					}
+
+				}
+				else
+				{
+					bbc.stop();
+					initWanderComplete=false;
+				}
+
+
+
+
+			}
+
+			if(wanderVector)
+			{
+				wanderVector();
+			}
+
+			if(move2Loc)
+			{
+
+				moveTo(new PVector(bbc.targetx,bbc.targety));
+
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						bbc.move2locLabel.setText("angle: "+bbc.modDistance+
+								"\ncalibrate ang="+bbc.calibrationAngle+
+								"\ntargetx="+bbc.targetx+
+								"\ntargetx="+bbc.targety);
+					}
+				});
+
+			}
+
+			if(separation)
+			{
+				Log.d("behavior","separation " + desiredVel);
+				desiredVel.add(bbc.myBehavior.separate());
+
+			}
+
+			if(alignment)
+			{
+
+				desiredVel.add(bbc.myBehavior.align());
+
+			}
+
+			if(cohesion)
+			{
+				desiredVel.add(bbc.myBehavior.cohesion());
+			}
+
+			if(followInLine)
+			{
+				followInLine();				
+			}
+
+
+			//Log.d("behavior","" + desiredVel);
+			//finally act on velocity
+			//bbc.myBehavior.doMove();
+			if(bbc!=null)
+			{
+				if(!bbc.directControl)
+				{
+					avoidBoundary3();
+					doSteer2();
+					desiredVel.mult(0f);
+				}
+			}
+		}
 	}
 
 
@@ -209,13 +411,15 @@ public class Behavior
 			}
 		}	
 	}
-	
-	
-	
+
+
+
 	void setFollowInLine(boolean b)
 	{
 		bbc.mActivity.beatTimer.followInLine=b;
-	
+		
+		this.followInLine=true;
+
 	}
 	void followInLine()
 	{
@@ -228,7 +432,7 @@ public class Behavior
 			}
 		}
 	}
-	
+
 	void follow(Bot bot)
 	{
 		PVector p =this.getPointBehindLeader(bot);		
@@ -875,6 +1079,94 @@ public class Behavior
 		this.desiredVel.add(d);
 	}
 
+	public void orbit(PVector p)
+	{
+
+
+	}
+
+	void orbit(PVector target, float desiredDistance, boolean clockwise)
+	{
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		//float tempA=alignment;
+		//float tempC=cohesion;
+		//alignment=0;
+		//cohesion=0;
+
+		//should there be a movementTimer
+		//say clockwise
+		//if(System.currentTimeMillis()-movementTimer>50)
+		if (true)
+		{
+
+			PVector toTarget = steer(target, true);//whether true false i dont know
+			float distToTarget=loc.dist(target);
+			//now do perpendicular.  
+			//a.b=0  or swap x y and negate one
+
+			PVector perpToTarget;
+			if (clockwise)
+			{
+				perpToTarget=new PVector(toTarget.y, -toTarget.x);
+			}
+			else
+			{
+				perpToTarget=new PVector(-toTarget.y, toTarget.x);
+			}
+			perpToTarget.mult(.5f);
+
+			if (distToTarget<desiredDistance)
+			{
+				PVector ev= evade(target, false);
+				perpToTarget.add(ev);
+			}
+
+			else
+			{
+				//perpToTarget.mult(2);
+
+				PVector t=  steer( target, false) ;
+				t.mult(.2f);
+				perpToTarget.add(t);
+			}
+
+
+			//acc.add(perpToTarget);
+			this.desiredVel.add(perpToTarget);
+			//flock(totalFlock.boids);
+		}
+
+		//alignment=tempA;
+		//cohesion=tempC;
+	}
+
+	//evade 
+	PVector evade(PVector target, boolean slowdown) {
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+
+		float maxspeed=1;
+		float maxforce=1;
+
+		PVector steer = new PVector();  // The steering vector
+		PVector desired = PVector.sub(target, loc);  // A vector pointing from the location to the target
+		float d = desired.mag(); // Distance from the target is the magnitude of the vector
+		// If the distance is greater than 0, calc steering (otherwise return zero vector)
+		if (d > 0) {
+			// Normalize desired
+			desired.normalize();
+			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
+			if ((slowdown) && (d < 200.0f)) desired.mult(maxspeed*((200-d)/200.0f)); // This damping is somewhat arbitrary
+			else desired.mult(maxspeed);
+			// Steering = Desired minus Velocity
+			//steer = PVector.sub(desired, vel);
+			steer.limit(maxforce);  // Limit to maximum steering force
+		} 
+		else {
+			steer = new PVector(0, 0);
+		}
+		steer.mult(-1);
+		return steer;
+	}
 
 
 	public void doSteer()
@@ -939,16 +1231,16 @@ public class Behavior
 		}
 
 	}
-	
-	
+
+
 	public void doSteer2()
 	{
 		float currentangle = bbc.camang;
 		float ang = (float)Math.toDegrees(Math.atan2(this.desiredVel.y,this.desiredVel.x));
-		
+
 		int angle1=(int)currentangle;
 		int angle2=(int)ang;
-		
+
 		if(angle1<0)
 		{
 			angle1=360+angle1;
@@ -1092,60 +1384,66 @@ public class Behavior
 	public void setSeparation(boolean b)
 	{
 		bbc.mActivity.beatTimer.separation=b;		
+		this.separation=b;
 	}
 	public void setAlignment(boolean b)
 	{
 		bbc.mActivity.beatTimer.alignment=b;
+		this.alignment=b;
 	}
 	public void setCohesion(boolean b)
 	{
 		bbc.mActivity.beatTimer.cohesion=b;
+		this.cohesion=b;
 	}
-	
+
 	public void toggleSeparation()
 	{
 		bbc.mActivity.beatTimer.separation=!bbc.mActivity.beatTimer.separation;		
+		this.separation=!this.separation;
 	}
 	public void toggleAlignment()
 	{
 		bbc.mActivity.beatTimer.alignment=!bbc.mActivity.beatTimer.alignment;
+		this.alignment=!this.alignment;
 	}
 	public void toggleCohesion()
 	{
 		bbc.mActivity.beatTimer.cohesion=!bbc.mActivity.beatTimer.cohesion;
+		this.cohesion=!this.cohesion;
 	}
 
 	///////////////
 	//djemble behavior
 	//1.  
 	////////////////////////
-	
+
 	void wanderVector()
 	{
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
 		float angle = (float) (bbc.camang *Math.PI/180.0f);
 		float m=1.0f;
-		
+
 		if(System.currentTimeMillis()-wanderVectorTimer>1000)
 		{
 			float random = (float) (Math.random()*2 -1 ) * .1f *(float)Math.PI;			
 			//float random = 0;			
 			wanderVectorTemp = new PVector((float) (m*loc.x*Math.cos(angle+random) ),  (float) (m*loc.y*Math.sin(angle+random) ) );
-			
+
 			//PVector wanderVector = PVector.sub(pt2, loc);
 			wanderVectorTemp.limit(1.0f);
-			
+
 			desiredVel.add(wanderVectorTemp);
-			
+
 			wanderVectorTimer = System.currentTimeMillis();
-			
+
 		}
 		else
 		{
 			desiredVel.add(wanderVectorTemp);
 		}
-		
-		
+
+
 	}
 
 	PVector separate (/*Vector boids*/) 
@@ -1197,7 +1495,7 @@ public class Behavior
 	// For every nearby boid in the system, calculate the average velocity
 	PVector align (/*Vector boids*/) {
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
-		
+
 		//float neighbordist = 50.0f;
 		float neighbordist = bbc.neighborBound;
 		PVector steer = new PVector(0, 0, 0);
@@ -1249,39 +1547,39 @@ public class Behavior
 		}
 		return sum;
 	}
-	
+
 	// A method that calculates a steering vector towards a target
-	  // Takes a second argument, if true, it slows down as it approaches the target
-	  PVector steer(PVector target, boolean slowdown) {
-		  PVector loc = new PVector(bbc.myposx,bbc.myposy);
-		  PVector vel = new PVector(0,0);
-		  
-	    PVector steer;  // The steering vector
-	    PVector desired = PVector.sub(target, loc);  // A vector pointing from the location to the target
-	    float d = desired.mag(); // Distance from the target is the magnitude of the vector
-	    // If the distance is greater than 0, calc steering (otherwise return zero vector)
-	    if (d > 0) {  
-	      // Normalize desired
-	      desired.normalize();
-	      
-	      
-	      /*
+	// Takes a second argument, if true, it slows down as it approaches the target
+	PVector steer(PVector target, boolean slowdown) {
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		PVector vel = new PVector(0,0);
+
+		PVector steer;  // The steering vector
+		PVector desired = PVector.sub(target, loc);  // A vector pointing from the location to the target
+		float d = desired.mag(); // Distance from the target is the magnitude of the vector
+		// If the distance is greater than 0, calc steering (otherwise return zero vector)
+		if (d > 0) {  
+			// Normalize desired
+			desired.normalize();
+
+
+			/*
 	      // Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
 	      if ((slowdown) && (d < 100.0f)) desired.mult(maxspeed*(d/100.0f)); // This damping is somewhat arbitrary
 	      else desired.mult(maxspeed);
-	      */
-	      
-	      
-	      // Steering = Desired minus Velocity
-	      
-	      steer = PVector.sub(desired, vel);
-	      //steer.limit(maxforce);  // Limit to maximum steering force
-	      
-	    } 
-	    else {
-	      steer = new PVector(0, 0);
-	    }
-	    return steer;
-	  }
+			 */
+
+
+			// Steering = Desired minus Velocity
+
+			steer = PVector.sub(desired, vel);
+			//steer.limit(maxforce);  // Limit to maximum steering force
+
+		} 
+		else {
+			steer = new PVector(0, 0);
+		}
+		return steer;
+	}
 
 }

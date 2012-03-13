@@ -93,229 +93,8 @@ public class BeatTimer extends Thread{
 
 	void update()
 	{
-
-
-		//behaviors -- these will add values to intended vectors.. for all intents, practically parallel.
-		///////////////////
-		if(orient2Loc)
-		{
-		  //bbc.myBehavior.desiredVelocity.add(orient??);
-		}
-		
-		if(orient2Loc)
-		{
-			if(bbc.myBehavior!=null)
-			{			
-				bbc.myBehavior.orient();
-			}
-
-			/*
-			handler.post(new Runnable() {
-				@Override	
-				public void run() {
-					bbc.move2locLabel.setText("targetX: "+bbc.targetx+
-							"\ntargetY="+bbc.targety+
-							"\ntargetAngle:"+bbc.targetangle+
-							"\norientCmpleted:"+bbc.myBehavior.orientComplete		
-
-					);
-
-					//mActivity.bbc.byteLabel.setText("lbyte" + bbc.lbyte + "rbyte" );
-					//TextView t = (TextView) mActivity.findViewById(R.id.slidertextView1);
-					//t.setText(bbc.oc.s)
-				}
-			});
-			 */
-		}
-		if(wander)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				//Log.d("beatTimer", "wander");
-				if(!bbc.myBehavior.boundaryReached())
-				{
-					//bbc.myBehavior.fullWander();
-
-
-
-					//if they get near a neigbhor?
-
-
-					if(!bbc.myBehavior.initWanderComplete)
-					{
-						bbc.myBehavior.initWander();
-						bbc.myBehavior.initWanderComplete=true;
-					}
-					bbc.myBehavior.wander();
-				}
-				else
-				{
-					
-					/*
-					////////////////////////////////////////
-					bbc.stop();
-					bbc.myBehavior.initWanderComplete=false;
-					//////////////////////////////////////////
-					*/
-					
-					//slow down
-					//do forwardreal once
-					if(!bbc.myBehavior.avBoundFwdReal)
-					{
-						bbc.forwardReal();
-						bbc.myBehavior.avBoundFwdReal=!bbc.myBehavior.avBoundFwdReal;
-						
-					}
-					
-					bbc.myBehavior.avoidBoundary();
-					
-					
-					
-				}
-			}
-		}
-
-		if(wanderDance)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				if(!bbc.myBehavior.boundaryReached())
-				{
-					Log.d("beatTimer", "wanderDance ");
-					if(bbc.numNeighbors==0 && !wanderDanceOnce)
-					{
-						if(!bbc.myBehavior.initWanderComplete)
-						{
-							bbc.myBehavior.initWander();
-							bbc.myBehavior.initWanderComplete=true;
-
-						}
-						bbc.myBehavior.wander();
-						wanderDanceOnce=false;
-						bbc.danceSequencer=false;
-					}
-					else
-					{
-						Log.d("beatTimer", "wanderDance " + bbc.numNeighbors);
-						bbc.myBehavior.initWanderComplete=false;
-
-						if(!wanderDanceOnce)
-						{
-							bbc.euclidDance();
-							wanderDanceOnce=true;
-							bbc.danceSequencer=true;
-							wanderDanceTimer=System.currentTimeMillis();
-						}
-
-						//dance for x seconds
-						if(System.currentTimeMillis()-wanderDanceTimer> 1000*10)
-						{
-
-							//bbc.euclidDance();//eudance();
-							//transtion to next stage of wandering to escape--meaning ignore for a couple seconds
-							//for now just stop
-							bbc.danceSequencer=false;
-							bbc.stop();
-
-						}
-						else
-						{
-
-						}
-
-
-					}
-
-				}
-				else
-				{
-					bbc.stop();
-					bbc.myBehavior.initWanderComplete=false;
-				}
-
-			}
-
-
-		}
-		
-		if(wanderVector)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				bbc.myBehavior.wanderVector();
-			
-			}
-		}
-
-		if(move2Loc)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				//bbc.myBehavior.move();
-				bbc.myBehavior.moveTo(new PVector(bbc.targetx,bbc.targety));
-			}
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					bbc.move2locLabel.setText("angle: "+bbc.modDistance+
-							"\ncalibrate ang="+bbc.calibrationAngle+
-							"\ntargetx="+bbc.targetx+
-							"\ntargetx="+bbc.targety);
-				}
-			});
-
-		}
-		
-		if(separation)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				bbc.myBehavior.desiredVel.add(bbc.myBehavior.separate());
-			}
-		}
-		
-		if(alignment)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				bbc.myBehavior.desiredVel.add(bbc.myBehavior.align());
-			}
-		}
-		
-		if(cohesion)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				bbc.myBehavior.desiredVel.add(bbc.myBehavior.cohesion());
-			}
-		}
-		
-		if(followInLine)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				bbc.myBehavior.followInLine();
-			}
-		}
-		
-		
-		
-		//finally act on velocity
-		//bbc.myBehavior.doMove();
-		if(bbc!=null)
-		{
-			if(bbc.myBehavior!=null)
-			{
-				
-				if(!bbc.directControl)
-				{
-					bbc.myBehavior.avoidBoundary3();
-					bbc.myBehavior.doSteer2();
-					bbc.myBehavior.desiredVel.mult(0f);
-				}
-				
-			}
-		}
+		///////////////////////////////////////
+		//behaviors taken out
 		////////////////////////////////////////////
 		if(bbc!=null)
 		{
@@ -335,18 +114,7 @@ public class BeatTimer extends Thread{
 			});
 			 */
 
-			if(bbc.myBehavior!=null)
-			{ 
-				if(bbc.myBehavior.boundaryReached()&& this.mActivity.client.connected)
-				{
-					///NOTE NOTE NOTE TEMPORARY TEMPORARY..WHAT IS THIS???
-					/*
-					bbc.stopAll();
-					move2Loc=false;
-					wander=false;
-					 */
-				}
-			}
+
 		}
 		//Log.d("in update", "timefromStart - globalTimer" + (timeFromStart() - globalTimer) );
 		if(System.currentTimeMillis() - globalTimer> globalTimeInterval)
@@ -547,6 +315,11 @@ public class BeatTimer extends Thread{
 						int ma2=(int) ((this.generalMeasure+bbc.ID)%4);
 						bbc.setRhythm(bbc.getKuku(ma2));//
 						break;
+						
+					case 14:
+						int ffff=( Math.abs(4-bbc.numNeighbors)%4);
+						bbc.setRhythm(bbc.getKuku(ffff));
+						break;//
 						
 
 
