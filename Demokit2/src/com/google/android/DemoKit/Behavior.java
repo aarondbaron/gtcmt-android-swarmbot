@@ -75,6 +75,10 @@ public class Behavior extends Thread
 	public Handler handler;
 
 	public DemoKitActivity mActivity;
+	public boolean followMouse;
+	public boolean orbitCenter;	
+	float orbitDist=75;
+	public boolean orbitAvatar;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -267,6 +271,21 @@ public class Behavior extends Thread
 			{
 				followInLine();				
 			}
+			
+			if(followMouse)
+			{
+				followMouse();
+			}
+			
+			if(orbitCenter)
+			{
+				orbitCenter();
+			}
+			if(orbitAvatar)
+			{
+				
+				orbitAvatar();
+			}
 
 
 			//Log.d("behavior","" + desiredVel);
@@ -284,6 +303,46 @@ public class Behavior extends Thread
 		}
 	}
 
+
+	public void orbitAvatar() {
+		// TODO Auto-generated method stub
+		if(bbc.ID!=0)
+		{
+			if(bbc.currentAvatar!=null)
+			{
+				
+				this.orbit2(new PVector(bbc.currentAvatar.x, bbc.currentAvatar.y), this.orbitDist, true);
+			}
+			else
+			{
+				
+				for(int i=0;i<bbc.otherBots.size();i++)
+				{
+					Bot b= (Bot) bbc.otherBots.get(i);
+					if(b.ID==0)
+					{
+						bbc.currentAvatar=b;
+					}
+				}
+			}
+			
+		}
+		
+	}
+
+	public void orbitCenter() {
+		// TODO Auto-generated method stub
+		
+		PVector target=new PVector(640/2,480/2);
+		orbit2(target,orbitDist,true);
+		
+		
+	}
+
+	public void followMouse() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	void move()
 	{
@@ -1084,6 +1143,69 @@ public class Behavior extends Thread
 
 
 	}
+	
+	
+	public void orbit2(PVector target, float desiredDistance, boolean clockwise)
+	{
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		//PVector toTarget = steer(target, true);//whether true false i dont know
+		PVector toTarget = new PVector(target.x-loc.x,target.y-loc.y);
+		float distToTarget=loc.dist(target);
+		
+		//now do perpendicular.  
+		//a.b=0  or swap x y and negate one
+
+		PVector perpToTarget;
+		if (clockwise)
+		{
+			perpToTarget=new PVector(toTarget.y, -toTarget.x);
+		}
+		else
+		{
+			perpToTarget=new PVector(-toTarget.y, toTarget.x);
+		}
+		perpToTarget.mult(.5f);
+		
+		float offset=.2f;
+		if (distToTarget<desiredDistance)
+		{
+			//PVector ev= evade(target, false);
+			//perpToTarget.add(ev);
+			
+			float h=perpToTarget.heading2D();			
+			PVector v2 = new PVector();			
+			v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
+			v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
+			
+			perpToTarget=v2;
+			
+			
+		}
+		else
+		{
+			//PVector t=  steer( target, false) ;
+			//t.mult(.2f);
+			//perpToTarget.add(t);
+			
+			float h=perpToTarget.heading2D();			
+			PVector v2 = new PVector();			
+			v2.x= (float) (perpToTarget.mag()*Math.cos(h+offset));
+			v2.y=(float) (perpToTarget.mag()*Math.sin(h+offset));
+			
+			perpToTarget=v2;
+			
+			
+			
+		}
+
+
+		//acc.add(perpToTarget);
+		perpToTarget.limit(1.0f);
+		this.desiredVel.add(perpToTarget);
+		
+		
+	}
+	
 
 	void orbit(PVector target, float desiredDistance, boolean clockwise)
 	{
@@ -1096,8 +1218,7 @@ public class Behavior extends Thread
 		//should there be a movementTimer
 		//say clockwise
 		//if(System.currentTimeMillis()-movementTimer>50)
-		if (true)
-		{
+		
 
 			PVector toTarget = steer(target, true);//whether true false i dont know
 			float distToTarget=loc.dist(target);
@@ -1134,7 +1255,7 @@ public class Behavior extends Thread
 			//acc.add(perpToTarget);
 			this.desiredVel.add(perpToTarget);
 			//flock(totalFlock.boids);
-		}
+		
 
 		//alignment=tempA;
 		//cohesion=tempC;
@@ -1364,7 +1485,8 @@ public class Behavior extends Thread
 		PVector tloc= new PVector(target.x, target.y);   
 		PVector behind = new PVector(tloc.x, tloc.y);
 
-		float distBehind=50;
+		int extra=5;
+		float distBehind=bbc.neighborBound+extra;//was 50
 
 		//float theta = target.vel.heading2D() + radians(90);
 
@@ -1518,7 +1640,7 @@ public class Behavior extends Thread
 			// Implement Reynolds: Steering = Desired - Velocity
 			steer.normalize();
 			//steer.mult(maxspeed);
-			//steer.sub(vel);
+			steer.sub(desiredVel);
 			//steer.limit(maxforce);
 		}
 		return steer;
@@ -1552,7 +1674,7 @@ public class Behavior extends Thread
 	// Takes a second argument, if true, it slows down as it approaches the target
 	PVector steer(PVector target, boolean slowdown) {
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
-		PVector vel = new PVector(0,0);
+		//PVector vel = new PVector(0,0);
 
 		PVector steer;  // The steering vector
 		PVector desired = PVector.sub(target, loc);  // A vector pointing from the location to the target
@@ -1572,7 +1694,7 @@ public class Behavior extends Thread
 
 			// Steering = Desired minus Velocity
 
-			steer = PVector.sub(desired, vel);
+			steer = PVector.sub(desired, desiredVel); //really shoudln't be desiredVel, but rather your actual vel
 			//steer.limit(maxforce);  // Limit to maximum steering force
 
 		} 
@@ -1580,6 +1702,25 @@ public class Behavior extends Thread
 			steer = new PVector(0, 0);
 		}
 		return steer;
+	}
+
+	public void setFollowMouse(boolean b) {
+		// TODO Auto-generated method stub
+		
+		followMouse=b;
+		
+	}
+
+	public void setOrbitCenter(boolean b) {
+		// TODO Auto-generated method stub
+		
+		orbitCenter=b;
+		
+	}
+
+	public void setOrbitAvatar(boolean b) {
+		// TODO Auto-generated method stub
+		orbitAvatar=b;
 	}
 
 }

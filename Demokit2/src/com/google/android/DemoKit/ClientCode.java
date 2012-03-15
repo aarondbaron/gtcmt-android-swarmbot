@@ -363,11 +363,40 @@ public class ClientCode implements OnClickListener{
 					{
 						bbc.myBehavior.toggleCohesion();
 					}
+					////////////////////////
+					
+					if(line.contains("orbitCenter"))
+					{
+						String test [] = line.split(",");
+						int dist=(int) Float.parseFloat(test[1]);
+						
+						bbc.myBehavior.orbitDist=dist;
+						bbc.myBehavior.setOrbitCenter(true);
+						
+						Log.d("client","orbit center: " + dist);
+						
+					}
+					if(line.contains("orbitAvatar"))
+					{
+						String test [] = line.split(",");
+						int dist=(int) Float.parseFloat(test[1]);
+						
+						bbc.myBehavior.orbitDist=dist;
+						bbc.myBehavior.setOrbitAvatar(true);
+						
+						Log.d("client","orbit avatar: " + dist);
+					}
 					
 					if(line.contains("followInLine"))
 					{
 						bbc.myBehavior.setFollowInLine(true);
 						//bbc.myBehavior.followInLine();
+					}
+					if(line.contains("followMouse"))
+					{
+						String test [] = line.split(",");
+						
+						bbc.myBehavior.setFollowMouse(true);
 					}
 					
 					if(line.contains("vmInterval"))
@@ -392,10 +421,22 @@ public class ClientCode implements OnClickListener{
 						bbc.setWanderDance(false);
 						bbc.setWanderVector(false);
 						bbc.myBehavior.setFollowInLine(false);
+						bbc.myBehavior.setOrbitAvatar(false);
+						bbc.myBehavior.setOrbitCenter(false);
+						bbc.myBehavior.setFollowMouse(false);
+						
+						//bbc.myBehavior.setSeparation(false);
+						//bbc.myBehavior.setAlignment(false);
+						//bbc.myBehavior.setCohesion(false);
+						
+						
+						bbc.directControl=true;
+						
+						
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
 						
-						bbc.directControl=true;
+						
 						
 					}
 					if(line.contains("stop"+myID))
@@ -406,8 +447,18 @@ public class ClientCode implements OnClickListener{
 						bbc.setWanderDance(false);
 						bbc.setWanderVector(false);
 						bbc.myBehavior.setFollowInLine(false);
+						bbc.myBehavior.setOrbitAvatar(false);
+						bbc.myBehavior.setOrbitCenter(false);
+						bbc.myBehavior.setFollowMouse(false);
+						
+						
+						bbc.directControl=false;
+						
+						
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
+						
+						
 					}
 					if(line.contains("forward"+myID))
 					{
@@ -763,6 +814,23 @@ public class ClientCode implements OnClickListener{
 							fromServer.setText("position: "+line);
 						}
 					});
+					
+					
+					//beacons
+					if(line.contains("beacon"))
+					{
+						String test [] = line.split(",");
+						int ID,type,x,y,rad;
+						
+						ID=(int) Float.parseFloat(test[1]);
+						type=(int) Float.parseFloat(test[2]);
+						x=(int) Float.parseFloat(test[3]);
+						y=(int) Float.parseFloat(test[4]);
+						rad=(int) Float.parseFloat(test[5]);
+						
+						
+						
+					}
 
 					//if it has myID
 					if(line.contains("position"))
