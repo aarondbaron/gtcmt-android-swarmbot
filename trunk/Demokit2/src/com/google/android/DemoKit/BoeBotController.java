@@ -1663,6 +1663,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			fillRhythm(5, sfxrseq); 
 		}
 		 */
+		
+		//distances
 
 		for(int i =0 ; i < otherBots.size();i++)
 		{

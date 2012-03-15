@@ -163,19 +163,19 @@ public class BeatTimer extends Thread{
 
 						//int f = (int) bbc.map((float)bbc.angleAzimuth, 0, 360, 1, bbc.sfxrseq.length/2);
 						//int f = (int) bbc.map((float)(bbc.avest + Math.PI), 0, (float)(2*Math.PI), 1, bbc.sfxrseq.length/2);
-						int f = (int) bbc.map((float)bbc.camang, 0, 360, 1, bbc.sfxrseq.length/2);
+						int f = (int) bbc.map((float)bbc.camang, 0, 360, 1, bbc.instrumentseq.length/2);
 						//bbc.fillRhythm(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.sfxrseq);
 						bbc.fillEuclid(f, bbc.instrumentseq);
 						break;
 					case 2: //neighbor
-						bbc.fillEuclid(bbc.numNeighbors*2+2, bbc.sfxrseq);
-						bbc.fillEuclid(bbc.numNeighbors*2+2, bbc.instrumentseq);
+						bbc.fillEuclid(bbc.numNeighbors*2+4, bbc.sfxrseq);
+						bbc.fillEuclid(bbc.numNeighbors*2+4, bbc.instrumentseq);
 						break;
 					case 3: //speed 
 						break;
 					case 4: //ID fill position using euclid
-						boolean[] t=bbc.euclidArray(bbc.otherBots.size()+1, bbc.sfxrseq.length);
+						boolean[] t=bbc.euclidArray(bbc.otherBots.size()+1, bbc.instrumentseq.length);
 
 						break;
 					case 5: //ID fill position
