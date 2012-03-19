@@ -16,8 +16,10 @@ public class BeatTimer extends Thread{
 	long div=2;
 
 	boolean generalTimingFlag;
+	boolean generalMeasureFlag;
 
 	long generalMeasure;
+	long previousMeasure;
 
 	long appStartTimeMillis;
 	Handler handler=new Handler();
@@ -321,7 +323,39 @@ public class BeatTimer extends Thread{
 						bbc.setRhythm(bbc.getKuku(ffff));
 						break;//
 						
+						
+					case 15: //angle embellish
+						
+						
+						
+						break;
 
+					case 16: //neighbor embellish
+						
+						
+						break;
+						
+					case 17: //speed embellish
+						
+						break;
+						
+					case 18: //flee embellish
+						
+						if(bbc.myBehavior.fleeBeacon)
+						{
+							if(!bbc.embellishOnce && bbc.embellishCounter>=1)
+							{
+								bbc.embellish2(bbc.instrumentseq, (int)(Math.random()* bbc.instrumentseq.length), 4);
+						    	bbc.embellish(bbc.instrumentseq, 4, 0);
+						    	bbc.embellishOnce=true;
+						    	bbc.embellishCounter=0;
+							}
+						}
+						else
+						{
+							bbc.setRhythm(bbc.getReggaeton());
+						}
+						break;
 
 
 
@@ -461,8 +495,13 @@ public class BeatTimer extends Thread{
 
 			if(bbc.currentIndex==0)
 			{
-
+				
 				generalMeasure++;
+				
+				
+				///////////////other stuff
+				bbc.embellishOnce=false;
+				bbc.embellishCounter++;
 			}
 
 		}

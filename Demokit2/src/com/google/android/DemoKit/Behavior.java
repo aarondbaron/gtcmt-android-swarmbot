@@ -79,6 +79,8 @@ public class Behavior extends Thread
 	public boolean orbitCenter;	
 	float orbitDist=75;
 	public boolean orbitAvatar;
+	public boolean useBeacon;
+	public boolean fleeBeacon;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -248,12 +250,19 @@ public class Behavior extends Thread
 
 			}
 
+			
+			if(useBeacon)
+			{
+				desiredVel.add(bbc.myBehavior.separateBeacon());
+			}
+			
 			if(separation)
 			{
-				Log.d("behavior","separation " + desiredVel);
+				//Log.d("behavior","separation " + desiredVel);
 				desiredVel.add(bbc.myBehavior.separate());
 
 			}
+			
 
 			if(alignment)
 			{
@@ -379,7 +388,7 @@ public class Behavior extends Thread
 		if(bbc.modDistance < 10)
 		{
 			bbc.stop();
-			Log.d("move","reach target:"+bbc.calibrationAngle);
+			//Log.d("move","reach target:"+bbc.calibrationAngle);
 			return true;
 		}
 		else
@@ -394,7 +403,7 @@ public class Behavior extends Thread
 				bbc.writeL(128-7);//Left
 				bbc.writeR(128-7);
 			}
-			Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+			//Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
 			return false;
 		}		
 
@@ -428,7 +437,7 @@ public class Behavior extends Thread
 				phase1move=false;
 				phase2move=true;
 				bbc.stop();
-				Log.d("move","reach target:"+bbc.calibrationAngle);
+				//Log.d("move","reach target:"+bbc.calibrationAngle);
 			}
 			else
 			{
@@ -442,7 +451,7 @@ public class Behavior extends Thread
 					bbc.writeL(128-7);//Left
 					bbc.writeR(128-7);
 				}
-				Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
+				//Log.d("Behavior","rotating" + currentangle+","+bbc.calibrationAngle);
 			}		
 		}
 		//phase 2
@@ -1568,6 +1577,59 @@ public class Behavior extends Thread
 
 	}
 
+	
+	PVector separateBeacon()
+	{
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+
+		/*
+		desiredseparation=bbc.neighborBound;
+		if (desiredseparation<22.0f)
+		{
+			desiredseparation=22.0f;
+		}
+		*/
+		PVector steerVec = new PVector(0, 0, 0);
+		int count = 0;
+		// For every boid in the system, check if it's too close
+		for (int i = 0 ; i < bbc.beacons.size(); i++) {
+			Beacon b = (Beacon) bbc.beacons.get(i);
+			int desiredSep= b.radius;
+			PVector otherloc =new PVector (b.x,b.y ) ;
+			float d = PVector.dist(loc, otherloc );
+			// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
+			if ((d > 0) && (d < desiredSep)) {//might need to modify this to take into account the radius of the bot
+				// Calculate vector pointing away from neighbor
+				
+				this.fleeBeacon=true;
+				PVector diff = PVector.sub(loc, otherloc);
+				diff.normalize();
+				diff.div(d);        // Weight by distance
+				steerVec.add(diff);
+				count++;            // Keep track of how many        
+			}
+			else
+			{
+				this.fleeBeacon=false;
+			}
+		}
+		// Average -- divide by how many
+		if (count > 0) {
+			steerVec.div((float)count);
+		}
+
+		// As long as the vector is greater than 0
+		if (steerVec.mag() > 0) {
+			// Implement Reynolds: Steering = Desired - Velocity
+			steerVec.normalize();
+			//steer.mult(maxspeed);
+			//steer.sub(vel);
+			//steer.limit(maxforce);
+		}
+		return steerVec;
+	
+	}
+	
 	PVector separate (/*Vector boids*/) 
 	{
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
@@ -1612,6 +1674,8 @@ public class Behavior extends Thread
 		}
 		return steerVec;
 	}
+	
+	
 
 	// Alignment
 	// For every nearby boid in the system, calculate the average velocity
@@ -1721,6 +1785,13 @@ public class Behavior extends Thread
 	public void setOrbitAvatar(boolean b) {
 		// TODO Auto-generated method stub
 		orbitAvatar=b;
+	}
+
+	public void toggleUseBeacon() {
+		// TODO Auto-generated method stub
+		
+		useBeacon=!useBeacon;
+		
 	}
 
 }
