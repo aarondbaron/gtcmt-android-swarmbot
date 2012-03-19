@@ -11,6 +11,10 @@ public class Beacon
 	int ID;
 	
 	boolean positionLost;
+	
+	int radius=100;
+
+	public int type;
 
 	Beacon()
 	{

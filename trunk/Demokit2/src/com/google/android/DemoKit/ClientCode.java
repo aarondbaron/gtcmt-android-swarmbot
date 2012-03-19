@@ -817,6 +817,22 @@ public class ClientCode implements OnClickListener{
 					
 					
 					//beacons
+					if(line.contains("toggleBeacon"))
+					{						
+						bbc.myBehavior.toggleUseBeacon();									
+					}
+					if(line.contains("setBeaconRadius"))
+					{
+						String test [] = line.split(",");
+						
+						int rad=(int) Float.parseFloat(test[1]);
+						
+						for(int i=0;i<bbc.beacons.size();i++)
+						{
+							Beacon b = new Beacon();
+							b.radius=rad;							
+						}						
+					}
 					if(line.contains("beacon"))
 					{
 						String test [] = line.split(",");
@@ -827,6 +843,31 @@ public class ClientCode implements OnClickListener{
 						x=(int) Float.parseFloat(test[3]);
 						y=(int) Float.parseFloat(test[4]);
 						rad=(int) Float.parseFloat(test[5]);
+						
+						if(bbc.beacons.size()==0)
+						{
+							Beacon b = new Beacon();
+							b.ID=ID;
+							b.type=type;
+							b.x=x;
+							b.y=y;
+							b.radius=rad;
+							bbc.beacons.add(b);
+						}
+						for(int i=0;i<bbc.beacons.size();i++)
+						{
+							Beacon b = (Beacon)bbc.beacons.get(i);
+							if(b.ID==ID)
+							{
+								b.type=type;
+								b.x=x;
+								b.y=y;
+								b.radius=rad;
+							}					
+							
+							//Log.d("client","beacon," + ID+","+type+","+ x+","+y+"," +rad);
+							
+						}
 						
 						
 						
