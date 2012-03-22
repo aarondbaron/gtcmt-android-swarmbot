@@ -58,6 +58,7 @@ public class Behavior extends Thread
 	boolean behaviorRunning=true;
 
 
+	boolean logger=false;
 	//////flags for behaviors
 	public boolean orient2Loc;
 	public boolean wander;
@@ -72,7 +73,7 @@ public class Behavior extends Thread
 	public boolean cohesion;
 	public boolean followInLine;
 
-	public Handler handler;
+	public Handler handler =new Handler();
 
 	public DemoKitActivity mActivity;
 	public boolean followMouse;
@@ -81,11 +82,13 @@ public class Behavior extends Thread
 	public boolean orbitAvatar;
 	public boolean useBeacon;
 	public boolean fleeBeacon;
+	public boolean orbitInLine;
+	public boolean orbitClockwise;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
 		this.mActivity=mActivity;
-		
+
 		step = (byte) 10;
 		interval=interval/16;
 		this.bbc=bbc;		
@@ -121,6 +124,8 @@ public class Behavior extends Thread
 			if(orient2Loc)
 			{
 				//bbc.myBehavior.desiredVelocity.add(orient??);
+				
+				
 			}
 
 			if(orient2Loc)
@@ -130,7 +135,7 @@ public class Behavior extends Thread
 			if(wander)
 			{
 
-				//Log.d("beatTimer", "wander");
+				Log.d("behavior", "wander");
 				if(boundaryReached())
 				{
 					//bbc.myBehavior.fullWander();
@@ -235,9 +240,10 @@ public class Behavior extends Thread
 
 			if(move2Loc)
 			{
-
+				Log.d("behavior", "move2Loc ");
 				moveTo(new PVector(bbc.targetx,bbc.targety));
 
+				/*
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -247,52 +253,63 @@ public class Behavior extends Thread
 								"\ntargetx="+bbc.targety);
 					}
 				});
+				*/
 
 			}
 
-			
+
 			if(useBeacon)
 			{
+				Log.d("behavior", "useBeacon ");
 				desiredVel.add(bbc.myBehavior.separateBeacon());
 			}
-			
+
 			if(separation)
 			{
-				//Log.d("behavior","separation " + desiredVel);
+				Log.d("behavior","separation " + desiredVel);
 				desiredVel.add(bbc.myBehavior.separate());
 
 			}
-			
+
 
 			if(alignment)
 			{
-
+				Log.d("behavior","alignment " + desiredVel);
 				desiredVel.add(bbc.myBehavior.align());
 
 			}
 
 			if(cohesion)
 			{
+				Log.d("behavior","cohesion " + desiredVel);
 				desiredVel.add(bbc.myBehavior.cohesion());
 			}
 
 			if(followInLine)
 			{
+				Log.d("behavior","followInLine " + desiredVel);
 				followInLine();				
 			}
-			
+			if(orbitInLine)
+			{
+				Log.d("behavior","orbitInLine " + desiredVel);
+				orbitInLine();
+			}
+
 			if(followMouse)
 			{
+				Log.d("behavior","followMouse " + desiredVel);
 				followMouse();
 			}
-			
+
 			if(orbitCenter)
 			{
+				Log.d("behavior","orbitCenter " + desiredVel);
 				orbitCenter();
 			}
 			if(orbitAvatar)
 			{
-				
+				Log.d("behavior","orbitAvatar " + desiredVel);
 				orbitAvatar();
 			}
 
@@ -313,18 +330,37 @@ public class Behavior extends Thread
 	}
 
 
+	private void orbitInLine() {
+		// TODO Auto-generated method stub
+
+		for(int i=0;i<bbc.otherBots.size();i++)
+		{
+			Bot b = (Bot) bbc.otherBots.get(i);
+			if(b.ID==bbc.ID-1)
+			{
+				follow(b);
+			}
+		}
+
+		if(bbc.ID==0)
+		{
+			orbitCenter();
+		}
+
+	}
+
 	public void orbitAvatar() {
 		// TODO Auto-generated method stub
 		if(bbc.ID!=0)
 		{
 			if(bbc.currentAvatar!=null)
 			{
-				
+
 				this.orbit2(new PVector(bbc.currentAvatar.x, bbc.currentAvatar.y), this.orbitDist, true);
 			}
 			else
 			{
-				
+
 				for(int i=0;i<bbc.otherBots.size();i++)
 				{
 					Bot b= (Bot) bbc.otherBots.get(i);
@@ -334,23 +370,23 @@ public class Behavior extends Thread
 					}
 				}
 			}
-			
+
 		}
-		
+
 	}
 
 	public void orbitCenter() {
 		// TODO Auto-generated method stub
-		
+
 		PVector target=new PVector(640/2,480/2);
-		orbit2(target,orbitDist,true);
-		
-		
+		orbit2(target,orbitDist,orbitClockwise);
+
+
 	}
 
 	public void followMouse() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	void move()
@@ -485,8 +521,8 @@ public class Behavior extends Thread
 	void setFollowInLine(boolean b)
 	{
 		bbc.mActivity.beatTimer.followInLine=b;
-		
-		this.followInLine=true;
+
+		this.followInLine=b;
 
 	}
 	void followInLine()
@@ -1152,15 +1188,15 @@ public class Behavior extends Thread
 
 
 	}
-	
-	
+
+
 	public void orbit2(PVector target, float desiredDistance, boolean clockwise)
 	{
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
 		//PVector toTarget = steer(target, true);//whether true false i dont know
 		PVector toTarget = new PVector(target.x-loc.x,target.y-loc.y);
 		float distToTarget=loc.dist(target);
-		
+
 		//now do perpendicular.  
 		//a.b=0  or swap x y and negate one
 
@@ -1174,47 +1210,64 @@ public class Behavior extends Thread
 			perpToTarget=new PVector(-toTarget.y, toTarget.x);
 		}
 		perpToTarget.mult(.5f);
-		
+
 		float offset=.2f;
 		if (distToTarget<desiredDistance)
 		{
 			//PVector ev= evade(target, false);
 			//perpToTarget.add(ev);
-			
+
 			float h=perpToTarget.heading2D();			
 			PVector v2 = new PVector();			
-			v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
-			v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
-			
+
+			if(clockwise)
+			{
+				v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
+				v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
+			}
+			else
+			{
+				v2.x= (float) (perpToTarget.mag()*Math.cos(h+offset));
+				v2.y=(float) (perpToTarget.mag()*Math.sin(h+offset));
+			}
+
 			perpToTarget=v2;
-			
-			
+
+
 		}
 		else
 		{
 			//PVector t=  steer( target, false) ;
 			//t.mult(.2f);
 			//perpToTarget.add(t);
-			
+
 			float h=perpToTarget.heading2D();			
-			PVector v2 = new PVector();			
-			v2.x= (float) (perpToTarget.mag()*Math.cos(h+offset));
-			v2.y=(float) (perpToTarget.mag()*Math.sin(h+offset));
-			
+			PVector v2 = new PVector();		
+			if(clockwise)
+			{
+				v2.x= (float) (perpToTarget.mag()*Math.cos(h+offset));
+				v2.y=(float) (perpToTarget.mag()*Math.sin(h+offset));
+			}
+			else
+			{
+				v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
+				v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
+			}
+
 			perpToTarget=v2;
-			
-			
-			
+
+
+
 		}
 
 
 		//acc.add(perpToTarget);
 		perpToTarget.limit(1.0f);
 		this.desiredVel.add(perpToTarget);
-		
-		
+
+
 	}
-	
+
 
 	void orbit(PVector target, float desiredDistance, boolean clockwise)
 	{
@@ -1227,44 +1280,44 @@ public class Behavior extends Thread
 		//should there be a movementTimer
 		//say clockwise
 		//if(System.currentTimeMillis()-movementTimer>50)
-		
-
-			PVector toTarget = steer(target, true);//whether true false i dont know
-			float distToTarget=loc.dist(target);
-			//now do perpendicular.  
-			//a.b=0  or swap x y and negate one
-
-			PVector perpToTarget;
-			if (clockwise)
-			{
-				perpToTarget=new PVector(toTarget.y, -toTarget.x);
-			}
-			else
-			{
-				perpToTarget=new PVector(-toTarget.y, toTarget.x);
-			}
-			perpToTarget.mult(.5f);
-
-			if (distToTarget<desiredDistance)
-			{
-				PVector ev= evade(target, false);
-				perpToTarget.add(ev);
-			}
-
-			else
-			{
-				//perpToTarget.mult(2);
-
-				PVector t=  steer( target, false) ;
-				t.mult(.2f);
-				perpToTarget.add(t);
-			}
 
 
-			//acc.add(perpToTarget);
-			this.desiredVel.add(perpToTarget);
-			//flock(totalFlock.boids);
-		
+		PVector toTarget = steer(target, true);//whether true false i dont know
+		float distToTarget=loc.dist(target);
+		//now do perpendicular.  
+		//a.b=0  or swap x y and negate one
+
+		PVector perpToTarget;
+		if (clockwise)
+		{
+			perpToTarget=new PVector(toTarget.y, -toTarget.x);
+		}
+		else
+		{
+			perpToTarget=new PVector(-toTarget.y, toTarget.x);
+		}
+		perpToTarget.mult(.5f);
+
+		if (distToTarget<desiredDistance)
+		{
+			PVector ev= evade(target, false);
+			perpToTarget.add(ev);
+		}
+
+		else
+		{
+			//perpToTarget.mult(2);
+
+			PVector t=  steer( target, false) ;
+			t.mult(.2f);
+			perpToTarget.add(t);
+		}
+
+
+		//acc.add(perpToTarget);
+		this.desiredVel.add(perpToTarget);
+		//flock(totalFlock.boids);
+
 
 		//alignment=tempA;
 		//cohesion=tempC;
@@ -1577,7 +1630,7 @@ public class Behavior extends Thread
 
 	}
 
-	
+
 	PVector separateBeacon()
 	{
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
@@ -1588,7 +1641,7 @@ public class Behavior extends Thread
 		{
 			desiredseparation=22.0f;
 		}
-		*/
+		 */
 		PVector steerVec = new PVector(0, 0, 0);
 		int count = 0;
 		// For every boid in the system, check if it's too close
@@ -1600,7 +1653,7 @@ public class Behavior extends Thread
 			// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
 			if ((d > 0) && (d < desiredSep)) {//might need to modify this to take into account the radius of the bot
 				// Calculate vector pointing away from neighbor
-				
+
 				this.fleeBeacon=true;
 				PVector diff = PVector.sub(loc, otherloc);
 				diff.normalize();
@@ -1627,9 +1680,9 @@ public class Behavior extends Thread
 			//steer.limit(maxforce);
 		}
 		return steerVec;
-	
+
 	}
-	
+
 	PVector separate (/*Vector boids*/) 
 	{
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
@@ -1674,8 +1727,8 @@ public class Behavior extends Thread
 		}
 		return steerVec;
 	}
-	
-	
+
+
 
 	// Alignment
 	// For every nearby boid in the system, calculate the average velocity
@@ -1770,16 +1823,16 @@ public class Behavior extends Thread
 
 	public void setFollowMouse(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		followMouse=b;
-		
+
 	}
 
 	public void setOrbitCenter(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		orbitCenter=b;
-		
+
 	}
 
 	public void setOrbitAvatar(boolean b) {
@@ -1789,9 +1842,15 @@ public class Behavior extends Thread
 
 	public void toggleUseBeacon() {
 		// TODO Auto-generated method stub
-		
+
 		useBeacon=!useBeacon;
-		
+
+	}
+
+	public void setOrbitInLine(boolean b) {
+		// TODO Auto-generated method stub
+		orbitInLine=b;
+
 	}
 
 }

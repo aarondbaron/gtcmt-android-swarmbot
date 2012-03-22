@@ -370,8 +370,21 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						int dist=(int) Float.parseFloat(test[1]);
 						
+						int clockwise=(int) Float.parseFloat(test[2]);
+						if(clockwise==0)
+						{
+							bbc.myBehavior.orbitClockwise=false;
+						}
+						else
+						{
+							bbc.myBehavior.orbitClockwise=true;
+						}
+						
+						
 						bbc.myBehavior.orbitDist=dist;
 						bbc.myBehavior.setOrbitCenter(true);
+						
+						
 						
 						Log.d("client","orbit center: " + dist);
 						
@@ -385,6 +398,13 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setOrbitAvatar(true);
 						
 						Log.d("client","orbit avatar: " + dist);
+					}
+					
+					//orbitInLine
+					if(line.contains("orbitInLine"))
+					{
+						bbc.myBehavior.setOrbitInLine(true);
+						//bbc.myBehavior.followInLine();
 					}
 					
 					if(line.contains("followInLine"))
@@ -424,13 +444,14 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setOrbitAvatar(false);
 						bbc.myBehavior.setOrbitCenter(false);
 						bbc.myBehavior.setFollowMouse(false);
+						bbc.myBehavior.setOrbitInLine(false);
 						
-						//bbc.myBehavior.setSeparation(false);
-						//bbc.myBehavior.setAlignment(false);
-						//bbc.myBehavior.setCohesion(false);
+						bbc.myBehavior.setSeparation(false);
+						bbc.myBehavior.setAlignment(false);
+						bbc.myBehavior.setCohesion(false);
 						
 						
-						bbc.directControl=true;
+						bbc.directControl=false;
 						
 						
 						Log.d("LINE","stop");
@@ -450,7 +471,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setOrbitAvatar(false);
 						bbc.myBehavior.setOrbitCenter(false);
 						bbc.myBehavior.setFollowMouse(false);
-						
+						bbc.myBehavior.setOrbitInLine(false);
 						
 						bbc.directControl=false;
 						
