@@ -886,52 +886,32 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	public void setWander(boolean b)
 	{
-		if(b)
-		{
+		
 			mActivity.beatTimer.wander=b;
 			myBehavior.wander=b;
-		}
-		else
-		{
-			mActivity.beatTimer.wander=b;
-			myBehavior.wander=b;
-		}
+
+		
 	}
 
 	public void setWanderDance(boolean b)
 	{
-		if(b)
-		{
+
 			mActivity.beatTimer.wanderDance=b;
 			mActivity.beatTimer.wanderDanceOnce=false;
 
 			myBehavior.wanderDance=b;
 			myBehavior.wanderDanceOnce=false;
-		}
-		else
-		{
-			mActivity.beatTimer.wanderDance=b;
-			mActivity.beatTimer.wanderDanceOnce=false;
-
-			myBehavior.wanderDance=b;
-			myBehavior.wanderDanceOnce=false;
-		}
+		
 	}
 
 	public void setWanderVector(boolean b)
 	{
-		if(b)
-		{
+		
 			mActivity.beatTimer.wanderVector=b;
 
 			myBehavior.wanderVector=b;
-		}
-		else
-		{
-			mActivity.beatTimer.wanderVector=b;
+		
 
-			myBehavior.wanderVector=b;
-		}
 	}
 
 	public void randomiseSequence(boolean[] b)
@@ -1044,7 +1024,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		if(k<0||m<0)
 		{
-			return new boolean[0];
+			return new boolean[k];
 		}
 		if(k<m||m==0)
 			return new boolean[k];
@@ -1130,6 +1110,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			sfxrseq[i]=b[i];
 			instrumentseq[i]=b[i];
 
+		}
+	}
+	
+	void copyRhythm(boolean[] src, boolean[] dst)
+	{
+		for(int i=0;i<dst.length;i++)
+		{
+			if(i<src.length-1)
+			{
+				dst[i]=src[i];
+			}
 		}
 	}
 
