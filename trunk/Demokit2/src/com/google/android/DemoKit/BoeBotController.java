@@ -1826,7 +1826,15 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			if( dist < neighborBound )	
 			{
 				numNeighbors++;
+				
+				b.isNeighbor=true;
+				//communicate to neighbor
+				//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "state" + "," + "orbit");
 
+			}
+			else
+			{
+				b.isNeighbor=false;
 			}
 
 		}

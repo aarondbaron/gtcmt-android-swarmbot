@@ -10,8 +10,9 @@ public class AndroidAudioDevice
    short[] buffer = new short[2048];
    int sr =44100;
  
-   public AndroidAudioDevice( )
+   public AndroidAudioDevice( int fs)
    {
+	   sr=fs;
       int minSize =AudioTrack.getMinBufferSize( sr, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT );        
       track = new AudioTrack( AudioManager.STREAM_MUSIC, sr, 
                                         AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 

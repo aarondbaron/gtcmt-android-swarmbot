@@ -213,7 +213,9 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 		beatTimer.setRunning(true);
 		beatTimer.start();
 		
-		aDevice= new AndroidAudioDevice();
+		int fs=44100;
+		
+		aDevice= new AndroidAudioDevice(fs);
 		aTest= new AudioTest();
 		
 		
