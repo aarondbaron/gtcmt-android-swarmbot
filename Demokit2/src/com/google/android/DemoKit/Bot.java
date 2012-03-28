@@ -11,6 +11,7 @@ public class Bot
 
 	int ID;
 	
+	boolean isNeighbor;
 	boolean positionLost;
 
 	Bot()

@@ -55,6 +55,12 @@ public class Behavior extends Thread
 	long wanderVectorTimer;
 	PVector wanderVectorTemp;
 
+	long breath1Timer1;
+	long breath1Timer2;
+	
+
+	public long breath2Timer1;
+
 	boolean behaviorRunning=true;
 
 
@@ -84,6 +90,9 @@ public class Behavior extends Thread
 	public boolean fleeBeacon;
 	public boolean orbitInLine;
 	public boolean orbitClockwise;
+	public String formationType;
+	public boolean formation;
+	private boolean wto1;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -124,8 +133,8 @@ public class Behavior extends Thread
 			if(orient2Loc)
 			{
 				//bbc.myBehavior.desiredVelocity.add(orient??);
-				
-				
+
+
 			}
 
 			if(orient2Loc)
@@ -253,7 +262,7 @@ public class Behavior extends Thread
 								"\ntargetx="+bbc.targety);
 					}
 				});
-				*/
+				 */
 
 			}
 
@@ -285,6 +294,10 @@ public class Behavior extends Thread
 				desiredVel.add(bbc.myBehavior.cohesion());
 			}
 
+			if(formation)
+			{
+				doFormation();
+			}
 			if(followInLine)
 			{
 				Log.d("behavior","followInLine " + desiredVel);
@@ -330,7 +343,181 @@ public class Behavior extends Thread
 	}
 
 
-	private void orbitInLine() {
+	public void breath1()
+	{
+		int w=640/2;
+		int h=480/2;
+
+		//stage 1 move in
+		if(System.currentTimeMillis()-breath1Timer1<10*1000)
+		{
+			moveTo(new PVector(w,h));
+		}		
+		else
+		{
+			//stage2 move out
+			if(System.currentTimeMillis()-breath1Timer1<20*1000)
+			{
+				this.wanderVector();
+			}	
+			else
+			{
+				breath1Timer1=System.currentTimeMillis();
+			}
+		}
+
+	}
+
+	public void breath2()
+	{
+		int w=640/2;
+		int h=480/2;
+
+		//stage 1 move in
+		if(System.currentTimeMillis()-breath2Timer1<10*1000)
+		{
+			this.orbitDist=300;
+			this.orbit(new PVector(w,h),orbitDist,true);
+			
+		}		
+		else
+		{
+			//stage2 move out
+			if(System.currentTimeMillis()-breath2Timer1<20*1000)
+			{
+				 orbitDist-=.5;
+				 
+				 this.orbit(new PVector(w,h),orbitDist,true);
+			}	
+			else
+			{
+				orbitDist=300; 
+				this.orbit(new PVector(w,h),orbitDist,true);
+				breath2Timer1=System.currentTimeMillis();
+			}
+		}
+
+	}
+	
+	public void wanderThenOrbit()
+	{
+		
+		if(wto1)
+		{
+			this.wanderVector();
+			if(bbc.numNeighbors!=0)
+			{
+				wto1=false;
+			}
+		}
+		else
+		{
+
+			for(int i=0;i<bbc.otherBots.size();i++)
+			{
+				Bot b = (Bot) bbc.otherBots.get(i);
+				if(b.isNeighbor)
+				{
+					
+				}
+				
+			}
+		}
+		
+		
+	}
+
+
+
+	public void doFormation() {
+		// TODO Auto-generated method stub
+
+		int w=640/2;
+		int h=480/2;
+
+		if(formationType=="circle")
+		{
+			//get position to go to
+
+			//parameters for circle equispaced
+			PVector start = new PVector(w, h);
+			float r=200;
+
+			float frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+
+			float x = (float) (r*Math.sin( (float)(bbc.ID)*frac  ));
+			float y= (float) (-r*Math.cos( (float)(bbc.ID)*frac  ));
+			PVector targ = new PVector(start.x+x, start.y+y);
+
+			this.moveTo(targ);
+			return;
+
+
+
+
+		}
+		if(formationType=="square")
+		{
+			//parameters for a grid
+			int s = bbc.otherBots.size()+1;
+			s= (int) Math.round(Math.sqrt(s));
+
+			//PVector start = new PVector(width/4,height/4);
+
+			PVector start = new PVector(w, h);
+			int row = bbc.ID/s;
+			int col= bbc.ID%s;
+			PVector targ= new PVector(start.x+40*row, start.y+40*col);  
+			this.moveTo(targ);
+			return;
+
+		}
+		if(formationType=="horizontal")
+		{
+			PVector start = new PVector(w, h);
+			PVector targ = new PVector(start.x+40*bbc.ID, start.y);
+
+			this.moveTo(targ);
+			return;
+		}
+		if(formationType=="vertical")
+		{
+			PVector start = new PVector(w, h);
+			PVector targ = new PVector(start.x, start.y+40*bbc.ID);
+
+			this.moveTo(targ);
+			return;
+
+		}
+		if(formationType=="diagonal")
+		{
+			PVector start = new PVector(w, h);
+			PVector targ = new PVector(start.x+40*bbc.ID, start.y+40*bbc.ID);
+
+			this.moveTo(targ);
+			return;
+
+		}
+		if(formationType=="partialCircle")
+		{
+			PVector start = new PVector(w, h);
+			float r=200;
+			float x = (float) (r*Math.sin( (float)bbc.ID/ (float)(2*Math.PI) ));
+			float y= (float) (-r*Math.cos( (float)bbc.ID/(float)(2*Math.PI) ));
+			PVector targ = new PVector(start.x+x, start.y+y);
+
+			this.moveTo(targ);
+			return;
+
+
+		}
+
+
+	}
+
+
+
+	public void orbitInLine() {
 		// TODO Auto-generated method stub
 
 		for(int i=0;i<bbc.otherBots.size();i++)
@@ -1352,6 +1539,7 @@ public class Behavior extends Thread
 	}
 
 
+	//this did not work exaclty right...
 	public void doSteer()
 	{
 		//look at current position, bearing, velocity
@@ -1416,6 +1604,7 @@ public class Behavior extends Thread
 	}
 
 
+	//currently working do steer.  it's hacky..but its alright. 
 	public void doSteer2()
 	{
 		float currentangle = bbc.camang;
@@ -1608,8 +1797,9 @@ public class Behavior extends Thread
 		float angle = (float) (bbc.camang *Math.PI/180.0f);
 		float m=1.0f;
 
-		if(System.currentTimeMillis()-wanderVectorTimer>1000)
+		if(System.currentTimeMillis()-wanderVectorTimer>2*1000)
 		{
+			//
 			float random = (float) (Math.random()*2 -1 ) * .1f *(float)Math.PI;			
 			//float random = 0;			
 			wanderVectorTemp = new PVector((float) (m*loc.x*Math.cos(angle+random) ),  (float) (m*loc.y*Math.sin(angle+random) ) );
@@ -1851,6 +2041,12 @@ public class Behavior extends Thread
 		// TODO Auto-generated method stub
 		orbitInLine=b;
 
+	}
+
+	public void setFormation(boolean b) {
+		// TODO Auto-generated method stub
+
+		formation=b;
 	}
 
 }

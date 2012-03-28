@@ -34,10 +34,13 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	public BeatTimer bt;
 	
 	public long jiggleTimer;
+	public long jiggleTimerBigger;
 	public boolean jiggle;
 
 	RobotFaceViewThread thread;
 	int cnt;
+
+	public boolean jiggleBigger;
 
 	public RobotFaceView(Context context) {
 		super(context);
@@ -329,7 +332,14 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 							if(System.currentTimeMillis()-jiggleTimer>1000)
 							{
 								jiggle=false;
+								
 							}
+							if(System.currentTimeMillis()-jiggleTimerBigger>bt.globalTimeInterval*2)
+							{
+								
+								jiggleBigger=false;
+							}
+							
 						}
 					}
 				} finally {
@@ -602,12 +612,29 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				// eyelid//always drawn
 				// fill(0);
 				// ellipse(x,y,sz,sz);
+				
+				float f1,f2,f3,f4;
+				float m=13;
+				f1=m*(float)(2*Math.random()-1);
+				f2=m*(float)(2*Math.random()-1);
+				f3=m*(float)(2*Math.random()-1);
+				f4=m*(float)(2*Math.random()-1);
+				
 
 				float leftx = x - sz;
 				float topy = y - sz;
 				float rightx = x + sz;
 				float bottomy = y + sz;
-				RectF ovalBounds = new RectF(leftx, topy, rightx, bottomy);
+				RectF ovalBounds;
+				
+				if(jiggleBigger)
+				{
+					ovalBounds = new RectF(leftx+f1, topy+f2, rightx+f3, bottomy+f4);
+				}
+				else
+				{
+					ovalBounds = new RectF(leftx, topy, rightx, bottomy);
+				}
 				
 				/*
 				if(bbc.danceSequencer)
@@ -630,7 +657,17 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				float topy2 = y - (sz - tsz);
 				float rightx2 = x + sz;
 				float bottomy2 = y + (sz - tsz);
-				RectF ovalBounds2 = new RectF(leftx2, topy2, rightx2, bottomy2);
+				RectF ovalBounds2 ;
+				
+				if(jiggleBigger)
+				{
+					 ovalBounds2 = new RectF(leftx2, topy2, rightx2, bottomy2);
+				}
+				else
+				{
+					 ovalBounds2 = new RectF(leftx2, topy2, rightx2, bottomy2);
+				}
+				//RectF ovalBounds2 = new RectF(leftx2, topy2, rightx2, bottomy2);
 				
 				/*
 				if (bbc.getMapping()==6) {
@@ -1020,8 +1057,17 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				// rectMode(CENTER);
 				// fill(255);
 				// rect(this.x,this.y,sz,sz);
-
-				c.drawRect(x - sz, y - sz, x + sz, y + sz, paint1);
+				float m=1;
+				float f1=m*(float)(2*Math.random()-1);
+				
+				if(jiggleBigger)
+				{
+					c.drawRect(x - sz+f1, y - sz+f1, x + sz+f1, y + sz+f1, paint1);
+				}
+				else
+				{
+					c.drawRect(x - sz, y - sz, x + sz, y + sz, paint1);
+				}
 
 				if (bbc != null) {
 
@@ -1523,10 +1569,26 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		return false;
 	}
 
+	
+	public void doJiggle()
+	{
+		jiggleTimer=System.currentTimeMillis();
+		jiggle=true;
+		
+	}
+	
+	public void doJiggleBigger()
+	{
+		jiggleTimerBigger=System.currentTimeMillis();
+		jiggleBigger=true;
+		
+	}
 	public float map(float value, float istart, float istop, float ostart,
 			float ostop) {
 		return ostart + (ostop - ostart)
 				* ((value - istart) / (istop - istart));
 	}
+	
+	
 
 }

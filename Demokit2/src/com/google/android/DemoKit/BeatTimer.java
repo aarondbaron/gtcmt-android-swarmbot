@@ -571,6 +571,8 @@ public class BeatTimer extends Thread{
 					{
 						test=false;
 						bbc.playInstrument();
+						bbc.rfv.doJiggle();
+						bbc.rfv.doJiggleBigger();
 					}
 
 					/*

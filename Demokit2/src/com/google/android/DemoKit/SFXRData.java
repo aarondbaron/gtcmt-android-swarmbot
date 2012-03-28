@@ -84,12 +84,13 @@ public class SFXRData extends Thread {
 
   Random rnd;
   
+ int fs;
 
-
-  public SFXRData(int seed) {
+  public SFXRData(int seed, int fs) {
     rnd = new Random(seed);
     resetParams();
     playing_sample = true;
+    this.fs=fs;
   }
 
   public int clampInt(double x, int a, int b) {
