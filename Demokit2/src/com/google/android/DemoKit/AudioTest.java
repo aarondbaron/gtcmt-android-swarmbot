@@ -18,6 +18,8 @@ public class AudioTest
 	int base =72;
 	int[] pSet;
 	int fs=44100;
+	
+	float frequency=440;
 
 	public boolean useSFXR=true;
 
@@ -37,7 +39,7 @@ public class AudioTest
 
 			public void run( )
 			{        		
-				float frequency = 440;
+				frequency = 440;
 				float increment = (float)(2*Math.PI) * frequency / fs; // angular increment for each sample
 				float angle = 0;
 				device = new AndroidAudioDevice( fs );
