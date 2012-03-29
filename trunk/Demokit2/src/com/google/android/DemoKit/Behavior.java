@@ -57,7 +57,7 @@ public class Behavior extends Thread
 
 	long breath1Timer1;
 	long breath1Timer2;
-	
+
 
 	public long breath2Timer1;
 
@@ -93,6 +93,18 @@ public class Behavior extends Thread
 	public String formationType;
 	public boolean formation;
 	private boolean wto1;
+	private boolean wtf1;
+	public boolean wanderThenFollow;
+	public boolean wanderThenOrbit;
+	Bot botTarget;
+	Bot wtfilTarget;
+	Bot wtoilTarget;
+	public boolean wanderThenFollowInLine;
+	public boolean wanderThenOrbitInLine;
+	public boolean wtfilInitial;
+	public boolean wtfilFinalTargetReached;
+	public boolean wtoilInitial;
+	public boolean wtoilFinalTargetReached;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -247,6 +259,24 @@ public class Behavior extends Thread
 				wanderVector();
 			}
 
+			if(wanderThenFollow)
+			{
+				this.wanderThenFollow();
+			}
+			if(wanderThenOrbit)
+			{
+				this.wanderThenOrbit();
+			}
+			if(wanderThenFollowInLine)
+			{
+				this.wanderThenFollowInLine();
+			}
+			if(wanderThenOrbitInLine)
+			{
+				this.wanderThenOrbitInLine();
+			}
+
+
 			if(move2Loc)
 			{
 				Log.d("behavior", "move2Loc ");
@@ -378,16 +408,16 @@ public class Behavior extends Thread
 		{
 			this.orbitDist=300;
 			this.orbit(new PVector(w,h),orbitDist,true);
-			
+
 		}		
 		else
 		{
 			//stage2 move out
 			if(System.currentTimeMillis()-breath2Timer1<20*1000)
 			{
-				 orbitDist-=.5;
-				 
-				 this.orbit(new PVector(w,h),orbitDist,true);
+				orbitDist-=.5;
+
+				this.orbit(new PVector(w,h),orbitDist,true);
 			}	
 			else
 			{
@@ -398,32 +428,286 @@ public class Behavior extends Thread
 		}
 
 	}
-	
-	public void wanderThenOrbit()
+
+
+	///the end result could possibly have one robot being followed by all
+	public void wanderThenFollow()
 	{
-		
-		if(wto1)
+		int w=640/2;
+		int h=480/2;
+
+		boolean followBot;
+		Bot botToFollow=null;
+		if(!wtf1)
 		{
-			this.wanderVector();
+
+			//this.wanderVector();
 			if(bbc.numNeighbors!=0)
 			{
-				wto1=false;
+				wtf1=true;
 			}
+
 		}
 		else
 		{
+
 
 			for(int i=0;i<bbc.otherBots.size();i++)
 			{
 				Bot b = (Bot) bbc.otherBots.get(i);
 				if(b.isNeighbor)
 				{
-					
+					if(botToFollow==null)
+					{
+
+						if(b.ID<bbc.ID)
+						{
+							botToFollow=b;
+						}
+					}
+					else
+					{
+						if(b.ID<botToFollow.ID)
+						{
+							botToFollow=b;
+						}
+					}					
+
+				}	
+			}
+
+		}
+
+		if(botToFollow!=null)
+		{
+
+			this.follow(botToFollow);				
+		}
+		else
+		{
+			this.wanderVector();
+		}
+
+
+
+	}
+
+	//idea is that it will follow a robot with an id less than itself,
+	//but if another robot comes with an id less than itself, but higher than the prev one, then it'll follow that instead.
+	public void wanderThenFollowInLine()
+	{
+		if(bbc.numNeighbors!=0)
+		{
+			this.wtfilInitial=false;
+
+			if(!wtfilFinalTargetReached)
+			{
+				for(int i=0;i<bbc.otherBots.size();i++)
+				{
+					Bot b = (Bot) bbc.otherBots.get(i);
+					if(b.isNeighbor)
+					{
+						if(wtfilTarget==null)
+						{
+							if(b.ID<bbc.ID)
+							{
+								wtfilTarget=b;
+								
+								if(wtfilTarget.ID==bbc.ID-1)
+								{
+									wtfilFinalTargetReached=true;
+									break;
+								}
+								
+							}
+
+							
+						}
+						else
+						{
+							if( b.ID<bbc.ID && b.ID>wtfilTarget.ID )
+							{
+								wtfilTarget=b;
+							}
+
+							if(wtfilTarget.ID==bbc.ID-1)
+							{
+								wtfilFinalTargetReached=true;
+								break;
+							}
+						}					
+					}	
+				}
+			}
+
+		}
+
+
+		if(this.wtfilInitial)
+		{
+			this.wanderVector();
+		}
+		else
+		{
+			if(this.wtfilTarget!=null)
+			{
+				this.follow(wtfilTarget);
+			}
+			else
+			{
+				this.wanderVector();
+			}
+		}
+
+	}
+
+	//end result would be everyone following one orbiting robot
+	public void wanderThenOrbit()
+	{
+		int w=640/2;
+		int h=480/2;
+		boolean followBot;
+		Bot botToFollow=null;
+
+		if(bbc.ID!=0)
+		{
+			if(!wto1)
+			{
+				//this.wanderVector();
+				if(bbc.numNeighbors!=0)
+				{
+					wto1=true;
+				}
+			}
+			else
+			{
+				for(int i=0;i<bbc.otherBots.size();i++)
+				{
+					Bot b = (Bot) bbc.otherBots.get(i);
+					if(b.isNeighbor)
+					{
+						if(botToFollow==null)
+						{
+
+							if(b.ID<bbc.ID)
+							{
+								botToFollow=b;
+							}
+						}
+						else
+						{
+							if(b.ID<botToFollow.ID)
+							{
+								botToFollow=b;
+							}
+						}
+					}	
+				}
+
+
+
+			}
+
+			if(botToFollow!=null)
+			{
+				this.follow(botToFollow);				
+			}
+			else
+			{
+				this.wanderVector();
+			}
+
+		}
+		else
+		{
+			// one robot will be orbitting at all times???
+			this.orbit(new PVector(w,h));
+		}
+
+
+	}
+	
+	//idea is that robot ID 0 orbits. and then everyone else will follow it if they come in contact
+	// if ID comes along that is less than ID..it will try to follow the correct id.
+	public void wanderThenOrbitInLine()
+	{
+		int w=640/2;
+		int h=480/2;
+		
+		if(bbc.ID==0)
+		{
+			this.orbit(new PVector(w,h));
+		}
+		else
+		{
+			if(bbc.numNeighbors!=0)
+			{
+				this.wtoilInitial=false;
+			}
+			
+			
+			if(!wtoilFinalTargetReached)
+			{
+				
+				for(int i=0;i<bbc.otherBots.size();i++)
+				{
+					Bot b = (Bot) bbc.otherBots.get(i);
+					if(b.isNeighbor)
+					{
+						if(wtoilTarget==null)
+						{
+							if(b.ID<bbc.ID)
+							{
+								wtoilTarget=b;
+								
+								if(wtoilTarget.ID==bbc.ID-1)
+								{
+									wtoilFinalTargetReached=true;
+									break;
+								}
+							}
+
+							
+						}
+						else
+						{
+							if( b.ID<bbc.ID && b.ID>wtoilTarget.ID )
+							{
+								wtoilTarget=b;
+							}
+
+							if(wtoilTarget.ID==bbc.ID-1)
+							{
+								wtoilFinalTargetReached=true;
+								break;
+							}
+						}					
+					}	
 				}
 				
 			}
+			
+			
+			
+			if(this.wtoilInitial)
+			{
+				this.wanderVector();
+			}
+			else
+			{
+				if(this.wtoilTarget!=null)
+				{
+					this.follow(wtoilTarget);
+				}
+				else
+				{
+					this.wanderVector();
+				}
+			}
+			
+			
+			
 		}
-		
 		
 	}
 
@@ -2047,6 +2331,45 @@ public class Behavior extends Thread
 		// TODO Auto-generated method stub
 
 		formation=b;
+	}
+
+	public void setWanderThenFollow(boolean b) {
+		// TODO Auto-generated method stub
+		this.wanderThenFollow=b;
+		//this.botTarget=null;
+	}
+
+	public void setWanderThenOrbit(boolean b) {
+		// TODO Auto-generated method stub
+		this.wanderThenOrbit=b;
+
+	}
+
+	public void setWanderThenFollowInLine(boolean b) {
+		// TODO Auto-generated method stub
+		this.wanderThenFollowInLine=b;
+		//this.wtfilTarget=null;
+		this.wtfilInitial=true;
+		this.wtfilFinalTargetReached=false;
+		
+		if(b==false)
+		{
+			this.wtfilTarget=null;
+		}
+	}
+
+	public void setWanderThenOrbitInLine(boolean b) {
+		// TODO Auto-generated method stub
+		this.wanderThenOrbitInLine=b;
+		//this.wtoilTarget=null;
+		this.wtoilInitial=true;
+		this.wtoilFinalTargetReached=false;
+		
+		if(b==false)
+		{
+			this.wtoilTarget=null;
+		}
+
 	}
 
 }

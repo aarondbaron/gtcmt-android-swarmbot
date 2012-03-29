@@ -1823,6 +1823,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
 
+			b.distToMe=(float) dist;
 			if( dist < neighborBound )	
 			{
 				numNeighbors++;
@@ -2427,6 +2428,30 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 
 		//rebuildMusicShape();
+	}
+	
+	float distanceFromAvatar()
+	{
+		float f=0;
+		
+		if(ID!=0)
+		{
+			for(int i = 0; i<otherBots.size();i++)
+			{
+				Bot b= otherBots.get(i);
+				if(b.ID==0)
+				{
+					f=PVector.dist(new PVector(this.myposx,this.myposy), new PVector (b.x,b.y));
+					break;
+				}
+				
+			}
+		}
+		
+		
+		
+		return f;
+		
 	}
 
 

@@ -160,7 +160,7 @@ public class BeatTimer extends Thread{
 					{
 						angle1=360+angle1;
 					}
-					
+
 
 					// this shoudl be in boebotcontroller.
 					switch(mapping)
@@ -181,34 +181,34 @@ public class BeatTimer extends Thread{
 						bbc.fillEuclid(bbc.numNeighbors*2+4, bbc.instrumentseq);
 						break;
 					case 3: //speed 
-						
+
 						//temporary solution
 						if(bbc.lbyte==128&&bbc.rbyte==128)
 						{
 							bbc.fillEuclid(1, bbc.instrumentseq);
 							bbc.fillEuclid(1, bbc.sfxrseq);
 						}
-						
+
 						if(bbc.rbyte==128-20 && bbc.lbyte==128+20)
 						{
 							bbc.fillEuclid(bbc.instrumentseq.length/2, bbc.instrumentseq);
 							bbc.fillEuclid(bbc.sfxrseq.length/2, bbc.sfxrseq);
 						}
-						
+
 						if(bbc.rbyte>128-20 && bbc.lbyte==128+20)
 						{
 							bbc.fillEuclid(6, bbc.instrumentseq);
 							bbc.fillEuclid(6, bbc.sfxrseq);
 						}
-						
+
 						if(bbc.rbyte==128-20 && bbc.lbyte<128+20)
 						{
 							bbc.fillEuclid(10, bbc.instrumentseq);
 							bbc.fillEuclid(10, bbc.sfxrseq);
 						}
-						
-						
-						
+
+
+
 						break;
 					case 4: //ID fill position using euclid
 						//boolean[] t=bbc.euclidArray(bbc.otherBots.size()+1, bbc.instrumentseq.length);
@@ -287,9 +287,11 @@ public class BeatTimer extends Thread{
 						//bbc.clearRhythm(bbc.instrumentseq);
 						//bbc.clearRhythm(bbc.sfxrseq);
 
-						bbc.setRhythm(bbc.avatarseq);;
+						bbc.setRhythm(bbc.avatarseq);
 
-						for(int i=0; i <bbc.ID; i++)
+						int step=4;
+
+						for(int i=0; i <bbc.ID*step; i++)
 						{
 							bbc.shiftRhythmLeft(bbc.instrumentseq);
 							bbc.shiftRhythmLeft(bbc.sfxrseq);
@@ -304,7 +306,7 @@ public class BeatTimer extends Thread{
 							//bbc.av1();
 						}
 						break;
-						
+
 					case 11:
 						int frmang=(int) bbc.map(angle1, 0, 360, 1, bbc.instrumentseq.length/3);
 						if(frmang<0)
@@ -340,33 +342,33 @@ public class BeatTimer extends Thread{
 
 						}
 						 */
-						
+
 					case 13:
-						
+
 						int frmang2=0;
 						//temporary solution
 						if(bbc.lbyte==128&&bbc.rbyte==128)
 						{
 							frmang2=0;
 						}
-						
+
 						if(bbc.rbyte==128-20 && bbc.lbyte==128+20)
 						{
 							frmang2=1;
 						}
-						
+
 						if(bbc.rbyte>128-20 && bbc.lbyte==128+20)
 						{
 							frmang2=2;
 						}
-						
+
 						if(bbc.rbyte==128-20 && bbc.lbyte<128+20)
 						{
 							frmang2=3;
 						}
-						
+
 						bbc.setRhythm(bbc.getKuku(frmang2));
-						
+
 						break;
 
 
@@ -400,38 +402,38 @@ public class BeatTimer extends Thread{
 						int ffff=( Math.abs(4-bbc.numNeighbors)%4);
 						bbc.setRhythm(bbc.getKuku(ffff));
 						break;//
-						
-						
+
+
 
 
 					case 17: //angle embellish
 
-						
-							if(!bbc.embellishOnce && bbc.embellishCounter>=1)
-							{
-								//int ae2 = (int) bbc.map((float)bbc.camang, 0, 360, 1, bbc.instrumentseq.length/2);
-								//int ae = (int) bbc.map((float)bbc.camang, 0, 360, 1, 10);
-								
-								int ae2 = (int) bbc.map(angle1, 0, 360, 1, bbc.instrumentseq.length/2);
-								int ae = (int) bbc.map(angle1, 0, 360, 1, 10);
-								
-								bbc.embellish2(bbc.instrumentseq, ae2, 4);
-								bbc.embellish(bbc.instrumentseq, ae, 0);
-								bbc.embellishOnce=true;
-								bbc.embellishCounter=0;
-								
-								bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
-								
-							}
-							else
-							{
-								//this is the base rhythm
-								bbc.setRhythm(bbc.getReggaeton());
-							}
-						
-						
-						
-						
+
+						if(!bbc.embellishOnce && bbc.embellishCounter>=1)
+						{
+							//int ae2 = (int) bbc.map((float)bbc.camang, 0, 360, 1, bbc.instrumentseq.length/2);
+							//int ae = (int) bbc.map((float)bbc.camang, 0, 360, 1, 10);
+
+							int ae2 = (int) bbc.map(angle1, 0, 360, 1, bbc.instrumentseq.length/2);
+							int ae = (int) bbc.map(angle1, 0, 360, 1, 10);
+
+							bbc.embellish2(bbc.instrumentseq, ae2, 4);
+							bbc.embellish(bbc.instrumentseq, ae, 0);
+							bbc.embellishOnce=true;
+							bbc.embellishCounter=0;
+
+							bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
+
+						}
+						else
+						{
+							//this is the base rhythm
+							bbc.setRhythm(bbc.getReggaeton());
+						}
+
+
+
+
 
 						break;
 
@@ -450,7 +452,7 @@ public class BeatTimer extends Thread{
 										bbc.embellish(bbc.instrumentseq, 4, 0);
 										bbc.embellishOnce=true;
 										bbc.embellishCounter=0;
-										
+
 										bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
 									}
 									else
@@ -459,24 +461,24 @@ public class BeatTimer extends Thread{
 										//bbc.embellish(bbc.instrumentseq, 4, 0);
 										bbc.embellishOnce=true;
 										bbc.embellishCounter=0;
-										
+
 										bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
 									}
 								}
 								else
 								{
-									
+
 									bbc.embellish2(bbc.instrumentseq, (int)(Math.random()* bbc.instrumentseq.length), 4);
 									bbc.embellish(bbc.instrumentseq, 4, 0);
 									bbc.embellishOnce=true;
 									bbc.embellishCounter=0;
-									
+
 									bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
-									
-									
+
+
 									//bbc.setRhythm(bbc.getReggaeton());
 								}
-								
+
 							}
 						}
 						else
@@ -501,7 +503,7 @@ public class BeatTimer extends Thread{
 								bbc.embellish(bbc.instrumentseq, 4, 0);
 								bbc.embellishOnce=true;
 								bbc.embellishCounter=0;
-								
+
 								bbc.copyRhythm(bbc.instrumentseq, bbc.sfxrseq);
 							}
 						}
@@ -510,14 +512,44 @@ public class BeatTimer extends Thread{
 							bbc.setRhythm(bbc.getReggaeton());
 						}
 						break;
-						
+
 					case 21: // follow in line behaviors 
-						
-						
-						
+
+
+
 						break;
 
 
+					case 22: //shift based on avatar  dist
+
+						if(bbc.ID!=0)
+						{
+							if(bbc.isSilent(bbc.avatarseq))
+							{
+								boolean[] tt= bbc.getKuku(0);
+								bbc.avatarseq=tt.clone();
+								
+							}
+							bbc.setRhythm(bbc.avatarseq);
+
+
+							float d=bbc.distanceFromAvatar();
+
+							int numS=(int) bbc.map(d,0,500,1,bbc.instrumentseq.length/2);
+							int stepp=4;
+
+							for(int i=0; i <numS*stepp; i++)
+							{
+								bbc.shiftRhythmLeft(bbc.instrumentseq);
+								bbc.shiftRhythmLeft(bbc.sfxrseq);
+							}
+						}
+
+						break;
+						
+					case 23: 
+						
+						break;
 
 					default: ; break;
 

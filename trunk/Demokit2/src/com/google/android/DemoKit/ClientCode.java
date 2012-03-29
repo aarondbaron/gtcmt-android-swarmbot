@@ -142,6 +142,17 @@ public class ClientCode implements OnClickListener{
 						messageFlag=false;
 						//Log.d("client","sending message "  + message);
 					}
+					
+					if(line.contains("com,"))
+					{
+						String test [] = line.split(",");
+						int i= Integer.parseInt(test[1]);
+						if(i==bbc.ID)
+						{
+							String whatToDo = test[2];
+							String data = test[3];
+						}
+					}
 
 					if(line.contains("mode"))
 					{
@@ -407,6 +418,17 @@ public class ClientCode implements OnClickListener{
 						//bbc.myBehavior.followInLine();
 					}
 					
+					if(line.contains("formation,"))
+					{
+						String test [] = line.split(",");
+						if(test[1].equals("circle"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+						
+					}
+					
 					if(line.contains("followInLine"))
 					{
 						bbc.myBehavior.setFollowInLine(true);
@@ -445,6 +467,10 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setOrbitCenter(false);
 						bbc.myBehavior.setFollowMouse(false);
 						bbc.myBehavior.setOrbitInLine(false);
+						bbc.myBehavior.setWanderThenFollow(false);
+						bbc.myBehavior.setWanderThenOrbit(false);
+						bbc.myBehavior.setWanderThenFollowInLine(false);
+						bbc.myBehavior.setWanderThenOrbitInLine(false);
 						
 						bbc.myBehavior.setSeparation(false);
 						bbc.myBehavior.setAlignment(false);
@@ -472,6 +498,10 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setOrbitCenter(false);
 						bbc.myBehavior.setFollowMouse(false);
 						bbc.myBehavior.setOrbitInLine(false);
+						bbc.myBehavior.setWanderThenFollow(false);
+						bbc.myBehavior.setWanderThenOrbit(false);
+						bbc.myBehavior.setWanderThenFollowInLine(false);
+						bbc.myBehavior.setWanderThenOrbitInLine(false);
 						
 						bbc.directControl=false;
 						
@@ -730,7 +760,32 @@ public class ClientCode implements OnClickListener{
 						bbc.fillNow(bbc.sfxrseq);
 
 					}
-
+					
+					
+					
+					if(line.contains("wanderThenFollow"))
+					{
+						bbc.myBehavior.setWanderThenFollow(true);						
+					}
+					
+					if(line.contains("wanderThenOrbit"))
+					{
+						bbc.myBehavior.setWanderThenOrbit(true);						
+						
+					}
+					
+					if(line.contains("wtfil"))
+					{
+						bbc.myBehavior.setWanderThenFollowInLine(true);						
+					}
+					
+					if(line.contains("wtoil"))
+					{
+						bbc.myBehavior.setWanderThenOrbitInLine(true);						
+						
+					}
+					
+				
 
 					if(line.contains("wanderAll"))
 					{

@@ -13,6 +13,8 @@ public class Bot
 	
 	boolean isNeighbor;
 	boolean positionLost;
+	
+	float distToMe;
 
 	Bot()
 	{
