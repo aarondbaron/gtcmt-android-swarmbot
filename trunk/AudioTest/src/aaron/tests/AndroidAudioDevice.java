@@ -9,11 +9,21 @@ public class AndroidAudioDevice
    AudioTrack track;
    short[] buffer = new short[1024];
    
+   short[] buffer2;
+   
    int fs;
  
    public AndroidAudioDevice(int fs )
    {
 	   this.fs=fs;
+	   buffer2=new short[fs];
+	   
+	   //sine
+	   for(int i=0;i<buffer2.length;i++)
+	   {
+		   buffer2[i]=(short) Math.sin(i);
+	   }
+	   
       int minSize =AudioTrack.getMinBufferSize( fs, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT );        
       track = new AudioTrack( AudioManager.STREAM_MUSIC, fs, 
                                         AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 
