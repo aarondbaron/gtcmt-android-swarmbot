@@ -14,9 +14,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class AudioTest extends Activity implements SensorEventListener
+public class AudioTest extends Activity implements SensorEventListener, OnClickListener
 {	    
 	Thread t;
 	SFXRData sdata;
@@ -60,8 +63,12 @@ public class AudioTest extends Activity implements SensorEventListener
 	public float azimuth1;
 	public float pitch1;
 	public float roll1;
+	public boolean useAz=true;
 
 	/////////////////
+
+	Button b1,b2,b3,b4;
+	int choice=0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -112,10 +119,22 @@ public class AudioTest extends Activity implements SensorEventListener
 
 		seq = euclidArray(48,seqlength);
 
+		
+		b1= (Button) findViewById(R.id.sineButton);
+		b2= (Button) findViewById(R.id.squareButton);
+		b3= (Button) findViewById(R.id.triangleButton);
+		b4 = (Button) findViewById(R.id.dunnoButton);
+		
+		b1.setOnClickListener(this);
+		b2.setOnClickListener(this);
+		b3.setOnClickListener(this);
+		b4.setOnClickListener(this);
 
 
 		t= new Thread( new Runnable( ) 
 		{
+
+
 			public void run( )
 			{        		
 				float frequency = 440;
@@ -146,7 +165,7 @@ public class AudioTest extends Activity implements SensorEventListener
 							{
 
 								int rr = (int) (Math.random()*(pset.length/4) + pset.length/4);
-								
+
 								int ind= (int) map(azimuth1,0,360,pset.length/4,pset.length-pset.length/4);
 								if(ind<0)
 								{
@@ -156,7 +175,7 @@ public class AudioTest extends Activity implements SensorEventListener
 								{
 									ind=pset.length-1;
 								}
-								
+
 								int noteNum=(int) (   (pset[rr])  );
 								frequency=midiToFreq(noteNum);
 								//Log.d("pset rr","pset" + pset[rr]);
@@ -173,13 +192,52 @@ public class AudioTest extends Activity implements SensorEventListener
 						}
 						else
 						{
+							//int choice=1;
+							switch(choice)
+							{
+							case 0: //sine
+								samples[i] = (float)Math.sin( angle );
+								break;
+							case 1: //square
+								samples[i] = (float) Math.signum(Math.sin( angle ));
+								break;
+							case 2: //triangle?
+								samples[i] = (float) Math.asin(Math.sin(angle));
+								break;
+							case 3: //dunno
+								samples[i] = (float) Math.sin(angle*angle);
+								break;
+
+							default: ;
+							}
+
 							//this is for sine
 							//samples[i] = (float)Math.sin( angle );
+							//square
 							//samples[i] = (float) Math.signum(Math.sin( angle ));
-							samples[i] = (float) Math.asin(Math.sin(angle));
-							
-							angle += increment;
-							inc++;
+							//triangle?
+							//samples[i] = (float) Math.asin(Math.sin(angle));
+							//dunno
+							//samples[i] = (float) Math.sin(angle*angle);
+
+							if(useSequencer)
+							{
+								angle += increment;
+								inc++; 
+							}
+							else
+							{
+								angle += (float) (2*Math.PI*frequency/(float)fs);
+								samples[i] = (float) Math.sin(angle);
+							}
+
+							if(useSequencer)
+							{
+
+							}
+
+
+
 
 							if(useSequencer)
 							{
@@ -187,18 +245,40 @@ public class AudioTest extends Activity implements SensorEventListener
 								if(inc>secondsToInc(dur))
 								{
 
+
+									////////////////////////
+									if(useAz)
+									{
+										int mmx=48;
+										int mmn=4;
+
+										int indm= (int) map(azimuth1,0,360,mmn,mmx);
+										if(indm<mmn)
+										{
+											indm=mmn;
+										}
+										if(indm>mmx)
+										{
+											indm=mmx;
+										}
+										seq = euclidArray(indm,seqlength);
+									}
+
+
+									//////////////////////////
+
 									if(seq[seqID])
 									{
-										
+
 										int mx=(int) (pset.length-pset.length/2);
 										int mn=pset.length/7;
-										
+
 										int rr = (int) ( ( Math.random()*(mx-mn) )+mn );
-										
+
 										//int ind= (int) map(azimuth1,0,360,mn,mx);
 										int ind= (int) map(pitch1,90,-90,mn,mx);
-										
-										
+
+
 										if(ind<0)
 										{
 											ind=0;
@@ -207,7 +287,7 @@ public class AudioTest extends Activity implements SensorEventListener
 										{
 											ind=pset.length-1;
 										}
-										
+
 										int noteNum=(int) (   (pset[ind])  );
 
 										frequency=midiToFreq(noteNum+48);
@@ -215,7 +295,7 @@ public class AudioTest extends Activity implements SensorEventListener
 
 
 										angle*=0;
-										increment = (float)(2*Math.PI) * frequency / fs;
+										increment = (float)(2*Math.PI) * frequency / (float)fs;
 										inc=0;
 										//Log.d("seq on","seq"+seqID);
 									}
@@ -238,9 +318,31 @@ public class AudioTest extends Activity implements SensorEventListener
 							}
 							else
 							{
-								int rr=pset.length/2;
-								int noteNum=(int) (   (pset[rr])  );
+
+								int mx=(int) (pset.length-pset.length/2);
+								int mn=pset.length/7;
+
+								int rr = (int) ( ( Math.random()*(mx-mn) )+mn );
+
+								//int ind= (int) map(azimuth1,0,360,mn,mx);
+								int ind= (int) map(pitch1,90,-90,mn,mx);
+								if(ind<0)
+								{
+									ind=0;
+								}
+								if(ind>=pset.length)
+								{
+									ind=pset.length-1;
+								}
+
+
+								//int rr=pset.length/2;
+								int noteNum=(int) (   (pset[ind])  );
 								frequency=midiToFreq(noteNum+48);
+
+								increment = (float)(2*Math.PI) * frequency / fs;
+								//angle*=0;
+
 
 							}
 
@@ -257,7 +359,7 @@ public class AudioTest extends Activity implements SensorEventListener
 		t.start();
 
 
-
+ 
 
 	}
 
@@ -268,7 +370,7 @@ public class AudioTest extends Activity implements SensorEventListener
 		device.track.flush();
 		device.track.release();
 		device.track.stop();
-		
+
 		//t.stop();
 
 	}
@@ -649,7 +751,7 @@ public class AudioTest extends Activity implements SensorEventListener
 				public void run() {
 					if(myText!=null)
 					{
-						myText.setText("az: " + azimuth1 + "\n pitch:" + pitch1 + "\n roll" + roll1);
+						myText.setText("az: " + azimuth1 + "\n pitch:" + pitch1 + "\n roll" + roll1+"\n choice " + choice);
 					}
 				}
 			});
@@ -659,10 +761,36 @@ public class AudioTest extends Activity implements SensorEventListener
 		}
 
 	}
-	
-	
+
+
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+
+		if(v.getId()== b1.getId())
+		{
+			choice=0;
+		}
+
+		if(v.getId()== b2.getId())
+		{
+			choice=1;
+		}
+
+		if(v.getId()== b3.getId())
+		{
+			choice=2;
+		}
+
+		if(v.getId()== b4.getId())
+		{
+			choice=3;
+		}
+
 	}
 
 
