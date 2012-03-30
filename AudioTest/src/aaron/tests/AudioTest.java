@@ -67,7 +67,7 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 
 	/////////////////
 
-	Button b1,b2,b3,b4;
+	Button b0,b1,b2,b3,b4,b5,b6;
 	int choice=0;
 
 	@Override
@@ -120,15 +120,21 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		seq = euclidArray(48,seqlength);
 
 		
-		b1= (Button) findViewById(R.id.sineButton);
-		b2= (Button) findViewById(R.id.squareButton);
-		b3= (Button) findViewById(R.id.triangleButton);
-		b4 = (Button) findViewById(R.id.dunnoButton);
+		b0= (Button) findViewById(R.id.sineButton);
+		b1= (Button) findViewById(R.id.squareButton);
+		b2= (Button) findViewById(R.id.triangleButton);
+		b3 = (Button) findViewById(R.id.dunnoButton);
+		b4 = (Button) findViewById(R.id.choice4);
+		b5 = (Button) findViewById(R.id.choice5);
+		b6 = (Button) findViewById(R.id.choice6);
 		
+		b0.setOnClickListener(this);
 		b1.setOnClickListener(this);
 		b2.setOnClickListener(this);
 		b3.setOnClickListener(this);
 		b4.setOnClickListener(this);
+		b5.setOnClickListener(this);
+		b6.setOnClickListener(this);
 
 
 		t= new Thread( new Runnable( ) 
@@ -192,7 +198,7 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 						}
 						else
 						{
-							//int choice=1;
+							//choice=6;
 							switch(choice)
 							{
 							case 0: //sine
@@ -205,7 +211,22 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 								samples[i] = (float) Math.asin(Math.sin(angle));
 								break;
 							case 3: //dunno
-								samples[i] = (float) Math.sin(angle*angle);
+								samples[i] = (float) Math.sin(Math.pow(angle, 2));
+								break;
+							case 4: //dunno
+								samples[i] = (float) (Math.sin(angle+Math.sin(angle)));
+								break;
+							case 5: //dunno
+								samples[i] = (float) (Math.sin(angle+frequency*Math.sin(angle)));
+								break;
+							case 6: //dunno
+								float fd=frequency/map(roll1,-90,90,-1,1);
+								float fm=frequency;
+								float thing=fd/fm;
+								samples[i] = (float) (Math.sin(angle+(thing)*Math.sin(angle)));
+								break;
+							case 7: //dunno
+								samples[i] = (float) (Math.sin(angle+frequency*Math.sin(angle)));
 								break;
 
 							default: ;
@@ -771,25 +792,42 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 
-		if(v.getId()== b1.getId())
+		if(v.getId()== b0.getId())
 		{
 			choice=0;
 		}
 
-		if(v.getId()== b2.getId())
+		if(v.getId()== b1.getId())
 		{
 			choice=1;
 		}
 
-		if(v.getId()== b3.getId())
+		if(v.getId()== b2.getId())
 		{
 			choice=2;
+		}
+		
+		if(v.getId()== b3.getId())
+		{
+			choice=3;
 		}
 
 		if(v.getId()== b4.getId())
 		{
-			choice=3;
+			choice=4;
 		}
+		
+		if(v.getId()== b5.getId())
+		{
+			choice=5;
+		}
+		
+		if(v.getId()== b6.getId())
+		{
+			choice=6;
+		}
+		
+		
 
 	}
 
