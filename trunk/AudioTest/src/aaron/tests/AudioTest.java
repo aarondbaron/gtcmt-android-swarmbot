@@ -17,9 +17,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class AudioTest extends Activity implements SensorEventListener, OnClickListener
+public class AudioTest extends Activity implements SensorEventListener, OnClickListener, OnSeekBarChangeListener
 {	    
 	Thread t;
 	SFXRData sdata;
@@ -67,8 +69,11 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 
 	/////////////////
 
-	Button b0,b1,b2,b3,b4,b5,b6;
+	Button b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10;
 	int choice=0;
+	
+	SeekBar bar;
+	float bval;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -127,6 +132,10 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		b4 = (Button) findViewById(R.id.choice4);
 		b5 = (Button) findViewById(R.id.choice5);
 		b6 = (Button) findViewById(R.id.choice6);
+		b7 = (Button) findViewById(R.id.choice7);
+		b8= (Button) findViewById(R.id.choice8);
+		b9= (Button) findViewById(R.id.choice9);
+		b10= (Button) findViewById(R.id.choice10);
 		
 		b0.setOnClickListener(this);
 		b1.setOnClickListener(this);
@@ -135,7 +144,17 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		b4.setOnClickListener(this);
 		b5.setOnClickListener(this);
 		b6.setOnClickListener(this);
-
+		b7.setOnClickListener(this);
+		b8.setOnClickListener(this);
+		b9.setOnClickListener(this);
+		b10.setOnClickListener(this);
+		
+		bar =(SeekBar) findViewById(R.id.seekBar1);
+		bar.setOnSeekBarChangeListener(this);
+		bar.setMax(100);
+		
+		Log.d("","");
+		
 
 		t= new Thread( new Runnable( ) 
 		{
@@ -223,10 +242,39 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 								float fd=frequency/map(roll1,-90,90,-1,1);
 								float fm=frequency;
 								float thing=fd/fm;
-								samples[i] = (float) (Math.sin(angle+(thing)*Math.sin(angle)));
+								samples[i] = (float) (Math.sin(angle+(thing)*Math.sin(angle))) ;
 								break;
 							case 7: //dunno
-								samples[i] = (float) (Math.sin(angle+frequency*Math.sin(angle)));
+								float fd3=frequency/map(roll1,-90,90,-1,1);
+								float fm3=frequency;
+								float thing3=fd3/fm3;
+								samples[i] = (float) (Math.signum( Math.sin(angle+(thing3)*Math.sin(angle)))  );
+								break;
+							case 8: //dunno
+								float fd4=frequency/map(roll1,-90,90,-1,1);
+								float fm4=frequency;
+								float thing4=fd4/fm4;
+								samples[i] = (float) (Math.asin( Math.sin(angle+(thing4)*Math.sin(angle)))  );
+								//samples[i] = (float) (  ( Math.sin(angle+(thing4)*Math.signum(Math.sin(angle))))  );
+								break;
+								
+							case 9: 
+								float fd5=frequency/map(roll1,-90,90,-1,1);
+								float fm5=frequency;
+								float thing5=fd5/fm5;
+								
+								float amp=bval;
+								
+								samples[i] = (float) ( Math.sin(angle+(thing5)*amp*Math.sin(angle)) ) ;
+								
+								break;
+								
+							case 10: //dunno
+														
+								float fd2=frequency/bval;
+								float fm2=frequency;
+								float thing2=fd2/fm2;
+								samples[i] = (float) (Math.sin(angle+thing2*Math.sin(angle)));
 								break;
 
 							default: ;
@@ -827,8 +875,50 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 			choice=6;
 		}
 		
+		if(v.getId()== b7.getId())
+		{
+			choice=7;
+		}
+		
+		if(v.getId()== b8.getId())
+		{
+			choice=8;
+		}
+		
+		if(v.getId()== b9.getId())
+		{
+			choice=9;
+		}
+		
+		if(v.getId()== b10.getId())
+		{
+			choice=10;
+		}
+		
+		
 		
 
+	}
+
+	@Override
+	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+		// TODO Auto-generated method stub
+		
+		bval= map(arg1,0,bar.getMax(),-1,1);
+		Log.d("atest",""+bval);
+		
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
