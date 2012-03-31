@@ -1,67 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+    android:orientation="vertical" >
 
-<Button
-    android:id="@+id/sineButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="sine" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hello" />
 
-<Button
-    android:id="@+id/squareButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="square" />
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.01" >
 
-<Button
-    android:id="@+id/triangleButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="triangle" />
+        <Button
+            android:id="@+id/sineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="sine" />
 
-<Button
-    android:id="@+id/dunnoButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="dunno" />
+        <Button
+            android:id="@+id/squareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/sineButton"
+            android:text="square" />
 
-<Button
-    android:id="@+id/choice4"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="choice4" />
+        <Button
+            android:id="@+id/triangleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/squareButton"
+            android:text="triangle" />
 
-<Button
-    android:id="@+id/choice5"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="choice5" />
+        <Button
+            android:id="@+id/dunnoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/triangleButton"
+            android:text="dunno" />
 
-<Button
-    android:id="@+id/choice6"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="choice6" />
+        <Button
+            android:id="@+id/choice4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/sineButton"
+            android:text="choice4" />
 
-<Button
-    android:id="@+id/button2"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Button" />
+        <Button
+            android:id="@+id/choice5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choice4"
+            android:layout_alignBottom="@+id/choice4"
+            android:layout_toRightOf="@+id/choice4"
+            android:text="choice5" />
 
-<TextView
-    android:id="@+id/textView1"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="TextView" />
+        <Button
+            android:id="@+id/choice6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/triangleButton"
+            android:layout_toRightOf="@+id/choice5"
+            android:text="choice6" />
+
+        <Button
+            android:id="@+id/choice7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choice6"
+            android:layout_alignBottom="@+id/choice6"
+            android:layout_toRightOf="@+id/choice6"
+            android:text="choice7" />
+
+        <Button
+            android:id="@+id/choice8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/choice4"
+            android:text="choice8" />
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/choice8" />
+
+        <Button
+            android:id="@+id/choice9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choice8"
+            android:layout_alignBottom="@+id/choice8"
+            android:layout_toRightOf="@+id/choice8"
+            android:text="choice9" />
+
+        <Button
+            android:id="@+id/choice10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choice9"
+            android:layout_alignBottom="@+id/choice9"
+            android:layout_alignLeft="@+id/choice6"
+            android:text="choice10" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
 
 </LinearLayout>
