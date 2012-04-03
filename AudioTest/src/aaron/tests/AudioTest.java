@@ -69,6 +69,7 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 
 	/////////////////
 
+	Button syncButton;
 	Button b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10;
 	int choice=0;
 	
@@ -148,6 +149,9 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		b8.setOnClickListener(this);
 		b9.setOnClickListener(this);
 		b10.setOnClickListener(this);
+		
+		syncButton = (Button) findViewById(R.id.syncButton);
+		syncButton.setOnClickListener(this);
 		
 		bar =(SeekBar) findViewById(R.id.seekBar1);
 		bar.setOnSeekBarChangeListener(this);
@@ -893,6 +897,12 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		if(v.getId()== b10.getId())
 		{
 			choice=10;
+		}
+		
+		if(v.getId()==syncButton.getId())
+		{
+			seqID=0;
+			
 		}
 		
 		
