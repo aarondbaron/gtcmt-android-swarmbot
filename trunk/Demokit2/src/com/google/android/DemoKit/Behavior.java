@@ -2208,17 +2208,38 @@ public class Behavior extends Thread
 	// For every nearby boid in the system, calculate the average velocity
 	PVector align (/*Vector boids*/) {
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
-
+		float myAng= bbc.camang;
+		if(myAng<0)
+		{
+			myAng=360+myAng;
+		}
+		
 		//float neighbordist = 50.0f;
 		float neighbordist = bbc.neighborBound;
 		PVector steer = new PVector(0, 0, 0);
+		
 		int count = 0;
 		for (int i = 0 ; i < bbc.otherBots.size(); i++) {
 			Bot other = (Bot) bbc.otherBots.get(i);
 			PVector otherloc =new PVector (other.x,other.y ) ;
+			float otherAng = other.camang;
+			if(otherAng<0)
+			{
+				otherAng=360+otherAng;
+			}
+			
 			float d = PVector.dist(loc, otherloc);
 			if ((d > 0) && (d < neighbordist)) {
-				steer.add(otherloc);
+				
+				float r=5;
+				float xx=(float) (r*Math.cos(Math.toRadians(otherAng)));
+				float yy= (float) (r*Math.sin(Math.toRadians(otherAng)));
+				PVector n=new PVector(xx,yy);
+				n.normalize();
+				steer.add(n);
+				
+				//steer.add(otherloc);//this was original
+				//steer.add(PVector.sub(otherloc,loc));//this was kindof like cohesion
 				count++;
 			}
 		}
@@ -2231,7 +2252,7 @@ public class Behavior extends Thread
 			// Implement Reynolds: Steering = Desired - Velocity
 			steer.normalize();
 			//steer.mult(maxspeed);
-			steer.sub(desiredVel);
+			//steer.sub(desiredVel);
 			//steer.limit(maxforce);
 		}
 		return steer;

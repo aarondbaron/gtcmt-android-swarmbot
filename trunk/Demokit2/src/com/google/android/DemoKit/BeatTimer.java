@@ -597,7 +597,21 @@ public class BeatTimer extends Thread{
 						{
 							mActivity.aTest.soundType(7);
 							mActivity.aTest.replay();
+							
+							
+							//// or
+							
+							//mActivity.aTest.setFrequency(440);
+							//mActivity.aTest.setFrequencyRP();
+							mActivity.aTest.setFrequencyAP();
+							mActivity.aTest.properIncrement();
 						}
+					}
+					else
+					{
+						mActivity.aTest.setFrequency(0);
+						mActivity.aTest.setIncrement(0);
+						mActivity.aTest.setAngle(0);
 					}
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
