@@ -345,12 +345,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.rfv=(RobotFaceView)mActivity.findViewById(R.id.robotFaceView);
 		this.rfv.bbc=this;
 		this.rfv.bt=mActivity.beatTimer;
+		
 
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
 
 		vest = new PVector();
 
-
+		mActivity.aTest.bbc=this;
 
 	}
 

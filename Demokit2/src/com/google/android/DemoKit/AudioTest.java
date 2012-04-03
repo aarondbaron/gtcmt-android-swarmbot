@@ -20,8 +20,13 @@ public class AudioTest
 	int fs=44100;
 	
 	float frequency=440;
-
-	public boolean useSFXR=true;
+	float angle=0;
+	float increment;
+	
+	public boolean useSFXR=false;
+	public boolean useSequencer=true;
+	
+	BoeBotController bbc;
 
 	public AudioTest()
 	{
@@ -40,8 +45,8 @@ public class AudioTest
 			public void run( )
 			{        		
 				frequency = 440;
-				float increment = (float)(2*Math.PI) * frequency / fs; // angular increment for each sample
-				float angle = 0;
+				increment = (float)(2*Math.PI) * frequency / fs; // angular increment for each sample
+				angle = 0;
 				device = new AndroidAudioDevice( fs );
 				float samples[] = new float[1024];
 
@@ -58,23 +63,23 @@ public class AudioTest
 						else
 						{
 
-							int ch=0;
+							int ch=1;
 							switch(ch)
 							{
-							case 0: //sine
-							samples[i] = (float)Math.sin( angle );
-							break;
-							case 1: //square
-							samples[i] = (float) Math.signum(Math.sin( angle ));
-							break;
-							case 2: //triangle?
-								samples[i] = (float) Math.asin(Math.sin(angle));
-								break;
-							case 3: //dunno
-								samples[i] = (float) Math.sin(angle*angle);
-								break;
+								case 0: //sine
+									samples[i] = (float)Math.sin( angle );
+									break;
+								case 1: //square
+									samples[i] = (float) Math.signum(Math.sin( angle ));
+									break;
+								case 2: //triangle?
+									samples[i] = (float) Math.asin(Math.sin(angle));
+									break;
+								case 3: //dunno
+									samples[i] = (float) Math.sin(angle*angle);
+									break;
 
-							default: ;
+								default: ;
 							}
 
 							angle += increment;
@@ -145,6 +150,42 @@ public class AudioTest
 	{
 		int f=0;
 		sdata.freq=f;
+	}
+	
+	public void setIncrement(float increment)
+	{
+		this.increment=increment;
+	}
+	public void properIncrement()
+	{
+		
+		this.increment=(float)(2*Math.PI) * frequency / fs; ;
+	}
+	public void setAngle(float angle)
+	{
+		this.angle=angle;
+	}
+	public void setFrequency(float frequency)
+	{
+		this.frequency=frequency;
+	}
+	
+	public void setFrequencyRP()
+	{
+		int n = (int) (Math.random()*pSet.length);
+		this.frequency=midiToFreq(pSet[n]);
+	}
+	
+	public void setFrequencyAP()
+	{
+		float angle1=bbc.camang;
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+		
+		int n = (int) bbc.map(angle1, 0, 360, 0+pSet.length/3+pSet.length/6, pSet.length-pSet.length/6);
+		this.frequency=midiToFreq(pSet[n]);
 	}
 
 
@@ -412,6 +453,17 @@ public class AudioTest
 
 		return new_array;
 	}  
+	
+	
+	float midiToFreq(int a)
+	{
+
+
+		float fp3 = (float) Math.pow(2, (a-base)/12.0f) *261.6255650f;
+
+
+		return fp3;
+	}
 	////////////////////////////////////////////////////////
 
 

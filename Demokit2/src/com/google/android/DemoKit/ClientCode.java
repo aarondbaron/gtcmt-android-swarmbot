@@ -143,14 +143,58 @@ public class ClientCode implements OnClickListener{
 						//Log.d("client","sending message "  + message);
 					}
 					
+					//currently as of 3/29 the server is sending vel back to all...
+					/*
+					if(line.contains("vel,"))
+					{
+						Log.d("clientCode","vel was sent of all bots");
+					}
+					*/
+					
 					if(line.contains("com,"))
 					{
 						String test [] = line.split(",");
-						int i= Integer.parseInt(test[1]);
-						if(i==bbc.ID)
+						int from= Integer.parseInt(test[1]);
+						int tome=Integer.parseInt(test[2]);
+						if(tome==bbc.ID)
 						{
-							String whatToDo = test[2];
-							String data = test[3];
+							String whatToDo = test[3];
+							String data = test[4];
+							
+							if(whatToDo=="query")
+							{
+								//assume just rhythm query for now
+								sendMessage("com," + tome+ "," + from + "," + "response," + bbc.instrumentseq.toString());
+								
+								char[] a= data.toCharArray();
+
+
+								for(int i=0;i<bbc.instrumentseq.length;i++)
+								{
+									if(i<a.length)
+									{
+										if(a[i]=='0')
+										{
+											bbc.instrumentseq[i]=false;
+											bbc.sfxrseq[i]=false;
+
+											//temporary only
+											bbc.avatarseq[i]=false;
+										}
+										else
+										{
+											bbc.instrumentseq[i]=true;
+											bbc.sfxrseq[i]=true;
+
+											//temporary only
+											bbc.avatarseq[i]=true;
+										}
+									}
+								}
+								
+								
+							}
+							
 						}
 					}
 
