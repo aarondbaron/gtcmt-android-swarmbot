@@ -105,6 +105,8 @@ public class Behavior extends Thread
 	public boolean wtfilFinalTargetReached;
 	public boolean wtoilInitial;
 	public boolean wtoilFinalTargetReached;
+	
+	float[] sacWeights;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -134,6 +136,9 @@ public class Behavior extends Thread
 		vmtimer=System.currentTimeMillis();
 		wanderVectorTimer =vmtimer;
 		wanderVectorTemp = new PVector();
+		
+		sacWeights = new float[]{1,1,1};
+		
 	}
 
 	public void run()
@@ -306,22 +311,26 @@ public class Behavior extends Thread
 			if(separation)
 			{
 				Log.d("behavior","separation " + desiredVel);
-				desiredVel.add(bbc.myBehavior.separate());
-
+				PVector v = bbc.myBehavior.separate();
+				v.mult(sacWeights[0]);
+				desiredVel.add(v);
 			}
 
 
 			if(alignment)
 			{
 				Log.d("behavior","alignment " + desiredVel);
-				desiredVel.add(bbc.myBehavior.align());
-
+				PVector v =bbc.myBehavior.align();
+				v.mult(sacWeights[1]);
+				desiredVel.add(v);
 			}
 
 			if(cohesion)
 			{
 				Log.d("behavior","cohesion " + desiredVel);
-				desiredVel.add(bbc.myBehavior.cohesion());
+				PVector v =bbc.myBehavior.cohesion();
+				v.mult(sacWeights[2]);
+				desiredVel.add(v);
 			}
 
 			if(formation)

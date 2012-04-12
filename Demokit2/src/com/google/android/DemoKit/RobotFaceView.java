@@ -227,7 +227,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		
 		int hh=90;
 		int ww= (int) ((float)hh*(4.0f/3.0f));
-		thread.arena = new Arena(getWidth()/2, getHeight()/4,ww,hh);
+		thread.arena = new Arena(getWidth()/2, getHeight()/5,ww,hh);
 
 		/*
 		thread.danceButton = new MyButton(getWidth() / 8, getHeight()
@@ -237,11 +237,11 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		*/
 		
 		int s=20;
-		thread.tempup = new MyButton(2*s,2*s,2*s,"tempoup");
-		thread.tempdown = new MyButton(getWidth()-2*s,2*s,2*s,"tempodown");
+		thread.tempup = new MyButton(2*s,2*s+s,2*s,"tempoup");
+		thread.tempdown = new MyButton(getWidth()-2*s,2*s+s,2*s,"tempodown");
 		
-		thread.divup = new MyButton(2*s,2*s+3*s,2*s,"divup");
-		thread.divdown = new MyButton(getWidth()-2*s,2*s+3*s,2*s,"divdown");
+		thread.divup = new MyButton(2*s,2*s+5*s,2*s,"divup");
+		thread.divdown = new MyButton(getWidth()-2*s,2*s+5*s,2*s,"divdown");
 		
 		
 		thread.setRunning(true);
@@ -318,9 +318,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						
 						arena.run(c);
 						
-						c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , 0, getHeight()-getHeight()/21, blackpaintText);
-						c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
-						c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , getWidth()-getWidth()/3.5f, getHeight()-getHeight()/21, blackpaintText);
+						c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
+						//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
+						c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
+						
 						
 						if(bbc!=null)
 						{
@@ -452,7 +453,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		long openTimer, closeTimer;
 		int brate = 16;
 
-		int sz = 100;
+		int sz = 85;
 		int tsz = 50;
 
 		int cbuff = 0;
@@ -863,7 +864,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		Tooth[] t;
 		Tooth[][] rteeth;
 		
-		int toothSize = 8;
+		int toothSize = 6;
 		int startx, starty;
 
 		int state = 0;
@@ -1201,11 +1202,32 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			{
 				cy=bottomy;
 			}
-			c.drawCircle(cx, cy, 2, blackpaint);
+			c.drawCircle(cx, cy, 3, greenPaint);
 			
 			for(int i=0; i<bbc.otherBots.size(); i ++)
 			{
+				Bot b= (Bot) bbc.otherBots.get(i);
 				
+				int bx=(int) map(b.x,0,640,leftx,rightx);
+				int by=(int) map(b.y,0,480,topy,bottomy);
+				if(bx<leftx)
+				{
+					bx=leftx;
+				}
+				if(bx>rightx)
+				{
+					bx=rightx;
+				}
+				if(by<topy)
+				{
+					by=topy;
+				}
+				if(by>bottomy)
+				{
+					by=bottomy;
+				}
+				
+				c.drawCircle(bx, by, 2.5f, blackpaint);
 			}
 			
 			
