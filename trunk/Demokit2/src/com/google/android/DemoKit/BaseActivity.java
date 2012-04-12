@@ -89,5 +89,7 @@ public class BaseActivity extends DemoKitActivity {
 			}
 		}
 	}
+	
+
 
 }

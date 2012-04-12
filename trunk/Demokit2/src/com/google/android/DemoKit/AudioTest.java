@@ -18,14 +18,14 @@ public class AudioTest
 	int base =72;
 	int[] pSet;
 	int fs=44100;
-	
+
 	float frequency=440;
 	float angle=0;
 	float increment;
-	
+
 	public boolean useSFXR=false;
 	public boolean useSequencer=true;
-	
+
 	BoeBotController bbc;
 
 	public AudioTest()
@@ -62,24 +62,78 @@ public class AudioTest
 						}
 						else
 						{
+							float ang1=0;;
+							if(bbc!=null){
+								ang1=bbc.camang;
+								if(ang1<0)
+								{
+									ang1=360+ang1;
+								}
+							}
+
+
 
 							int ch=1;
 							switch(ch)
 							{
-								case 0: //sine
-									samples[i] = (float)Math.sin( angle );
-									break;
-								case 1: //square
-									samples[i] = (float) Math.signum(Math.sin( angle ));
-									break;
-								case 2: //triangle?
-									samples[i] = (float) Math.asin(Math.sin(angle));
-									break;
-								case 3: //dunno
-									samples[i] = (float) Math.sin(angle*angle);
-									break;
+							case 0: //sine
+							samples[i] = (float)Math.sin( angle );
+							break;
+							case 1: //square
+								samples[i] = (float) Math.signum(Math.sin( angle ));
+								break;
+							case 2: //triangle?
+								samples[i] = (float) Math.asin(Math.sin(angle));
+								break;
+							case 3: //dunno
+								samples[i] = (float) Math.sin(angle*angle);
+								break;
+							case 4: //dunno
+								samples[i] = (float) (Math.sin(angle+Math.sin(angle)));
+								break;
+							case 5: //dunno
+								samples[i] = (float) (Math.sin(angle+frequency*Math.sin(angle)));
+								break;
+							case 6: //dunno
+								float fd=frequency/map(ang1,-90,90,-1,1);
+								float fm=frequency;
+								float thing=fd/fm;
+								samples[i] = (float) (Math.sin(angle+(thing)*Math.sin(angle))) ;
+								break;
+							case 7: //dunno
+								float fd3=frequency/map(ang1,-90,90,-1,1);
+								float fm3=frequency;
+								float thing3=fd3/fm3;
+								samples[i] = (float) (Math.signum( Math.sin(angle+(thing3)*Math.sin(angle)))  );
+								break;
+							case 8: //dunno
+								float fd4=frequency/map(ang1,-90,90,-1,1);
+								float fm4=frequency;
+								float thing4=fd4/fm4;
+								samples[i] = (float) (Math.asin( Math.sin(angle+(thing4)*Math.sin(angle)))  );
+								//samples[i] = (float) (  ( Math.sin(angle+(thing4)*Math.signum(Math.sin(angle))))  );
+								break;
 
-								default: ;
+							case 9: 
+								float fd5=frequency/map(ang1,-90,90,-1,1);
+								float fm5=frequency;
+								float thing5=fd5/fm5;
+
+								float amp=ang1;
+
+								samples[i] = (float) ( Math.sin(angle+(thing5)*amp*Math.sin(angle)) ) ;
+
+								break;
+
+							case 10: //dunno
+
+								float fd2=frequency/ang1;
+								float fm2=frequency;
+								float thing2=fd2/fm2;
+								samples[i] = (float) (Math.sin(angle+thing2*Math.sin(angle)));
+								break;
+
+							default: ;
 							}
 
 							angle += increment;
@@ -151,14 +205,14 @@ public class AudioTest
 		int f=0;
 		sdata.freq=f;
 	}
-	
+
 	public void setIncrement(float increment)
 	{
 		this.increment=increment;
 	}
 	public void properIncrement()
 	{
-		
+
 		this.increment=(float)(2*Math.PI) * frequency / fs; ;
 	}
 	public void setAngle(float angle)
@@ -169,13 +223,13 @@ public class AudioTest
 	{
 		this.frequency=frequency;
 	}
-	
+
 	public void setFrequencyRP()
 	{
 		int n = (int) (Math.random()*pSet.length);
 		this.frequency=midiToFreq(pSet[n]);
 	}
-	
+
 	public void setFrequencyAP()
 	{
 		float angle1=bbc.camang;
@@ -183,7 +237,7 @@ public class AudioTest
 		{
 			angle1=360+angle1;
 		}
-		
+
 		int n = (int) bbc.map(angle1, 0, 360, 0+pSet.length/3+pSet.length/6, pSet.length-pSet.length/6);
 		this.frequency=midiToFreq(pSet[n]);
 	}
@@ -453,8 +507,8 @@ public class AudioTest
 
 		return new_array;
 	}  
-	
-	
+
+
 	float midiToFreq(int a)
 	{
 
@@ -465,7 +519,9 @@ public class AudioTest
 		return fp3;
 	}
 	////////////////////////////////////////////////////////
-
+	public float map(float value, float istart, float istop, float ostart, float ostop) {
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	}
 
 
 }

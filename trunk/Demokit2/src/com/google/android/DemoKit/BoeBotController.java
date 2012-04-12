@@ -365,6 +365,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public final Handler mHandler = new Handler();
 	public boolean embellishOnce;
 	public int embellishCounter;
+	public boolean randomlyChangeOnce;
 
 	/////??
 
@@ -1219,7 +1220,80 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		b[this.currentIndex]=true;
 	}
 
+	void geneswap(boolean[] b1, boolean[] b2)
+	{
+	  if (b1.length!=b2.length)
+	  {
+	    return;
+	  }
 
+	  int n= (int) (Math.random()*b1.length-1);
+
+	  int step=1;
+	  int stop=n+ 3*step + (int) (Math.random()*6*step);
+	  if (stop>=b1.length)
+	  {
+	    stop=b1.length-1;
+	  }
+	 // println("" + n + " " + stop);
+
+	  int m=n%step;
+	  for (int i=n;i<stop;i++)
+	  {
+	    boolean temp=b1[i];
+	    b1[i]=b2[i];
+	    b2[i]=temp;
+	  }
+	}
+	
+	
+	int closestEuclidean(boolean[] b)
+	{
+	  int[] hammingcount = new int[b.length];
+	  int closestIndex=0;
+	  for (int i=0; i< b.length;i++)
+	  {
+	    boolean[] bb = euclidArray(i, b.length);
+	    hammingcount[i]= hammingDist(bb,b);
+
+	    if (hammingcount[i]<hammingcount[closestIndex])
+	    {
+	      closestIndex=i;
+	    }
+	  }
+
+
+	  return closestIndex;
+	}
+
+
+	int hammingDist(boolean[] b1, boolean[] b2)
+	{
+	  if(b1.length!=b2.length)
+	  {
+	   return 0; 
+	  }
+
+	  //must assume that lengths are equal here.
+	  int n=0;
+
+	  for (int i=0; i<b1.length;i++)
+	  {
+	    if (  (b1[i] && b2[i]) || (!b1[i] && !b2[i] )   )
+	    {
+
+	      //n++;
+	    }
+	    else
+	    {
+	      n++;
+	    }
+	  }
+
+	  return n;
+	}
+	
+	
 	int[] getHits(boolean[] b)
 	{
 		Vector h= new Vector();

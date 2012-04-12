@@ -588,4 +588,14 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
         Log.d("processintent", s);
     }*/
 	
+	
+	@Override
+	public void finish()
+	{
+		//this.t.stop();
+		
+		System.exit(0);
+	}
+	
+	
 }

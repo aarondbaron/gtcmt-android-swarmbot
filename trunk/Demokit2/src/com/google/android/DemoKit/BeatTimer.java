@@ -293,8 +293,8 @@ public class BeatTimer extends Thread{
 
 						for(int i=0; i <bbc.ID*step; i++)
 						{
-							bbc.shiftRhythmLeft(bbc.instrumentseq);
-							bbc.shiftRhythmLeft(bbc.sfxrseq);
+							bbc.shiftRhythmRight(bbc.instrumentseq);
+							bbc.shiftRhythmRight(bbc.sfxrseq);
 						}
 
 						break;
@@ -536,7 +536,7 @@ public class BeatTimer extends Thread{
 							float d=bbc.distanceFromAvatar();
 
 							int numS=(int) bbc.map(d,0,500,1,bbc.instrumentseq.length/2);
-							int stepp=4;
+							int stepp=2;
 
 							for(int i=0; i <numS*stepp; i++)
 							{
@@ -548,6 +548,20 @@ public class BeatTimer extends Thread{
 						break;
 						
 					case 23: 
+						
+						if(bbc.myBehavior.wander || (bbc.myBehavior.wanderThenFollowInLine && bbc.numNeighbors==0) )
+						{							
+							if(!bbc.randomlyChangeOnce)
+							{
+							 int indexToChange = (int) (Math.random()*bbc.instrumentseq.length);
+							 bbc.instrumentseq[indexToChange]=!bbc.instrumentseq[indexToChange];
+							}							 
+						}
+						else
+						{
+							//if()
+						}
+						
 						
 						break;
 
@@ -710,6 +724,8 @@ public class BeatTimer extends Thread{
 				///////////////other stuff
 				bbc.embellishOnce=false;
 				bbc.embellishCounter++;
+				
+				bbc.randomlyChangeOnce=false;
 			}
 
 		}

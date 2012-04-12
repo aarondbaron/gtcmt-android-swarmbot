@@ -406,6 +406,21 @@ public class ClientCode implements OnClickListener{
 						bbc.directControl=!bbc.directControl;
 					}
 					
+					if(line.contains("sacWeights"))
+					{
+						String test [] = line.split(",");						
+						float t[] = new float[3];						
+						for(int i=0;i<t.length;i++)
+						{
+							int ind=i+1;
+							if(ind<test.length)
+							{
+								t[i]=Float.parseFloat(test[i+1]);
+							}							
+						}						
+						bbc.myBehavior.sacWeights=t.clone();						
+					}
+					
 					if(line.contains("separation"))
 					{
 						bbc.myBehavior.toggleSeparation();
