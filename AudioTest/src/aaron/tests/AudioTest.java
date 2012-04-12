@@ -930,6 +930,17 @@ public class AudioTest extends Activity implements SensorEventListener, OnClickL
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+
+	
+	@Override
+	public void finish()
+	{
+		//this.t.stop();
+		
+		System.exit(0);
+	}
 
 
 }
