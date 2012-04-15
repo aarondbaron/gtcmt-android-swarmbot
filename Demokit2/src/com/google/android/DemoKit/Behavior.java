@@ -92,6 +92,7 @@ public class Behavior extends Thread
 	public boolean orbitClockwise;
 	public String formationType;
 	public boolean formation;
+	public int formationOffset;
 	private boolean wto1;
 	private boolean wtf1;
 	public boolean wanderThenFollow;
@@ -343,6 +344,7 @@ public class Behavior extends Thread
 			if(formation)
 			{
 				doFormation();
+				//Log.d("behavior","formation flag ");
 			}
 			if(breath1)
 			{
@@ -806,8 +808,8 @@ public class Behavior extends Thread
 
 		int w=640/2;
 		int h=480/2;
-
-		if(formationType=="circle")
+		//Log.d("behavior","doFormation" );
+		if(formationType.equals("circle"))
 		{
 			//get position to go to
 
@@ -817,18 +819,19 @@ public class Behavior extends Thread
 
 			float frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
 
-			float x = (float) (r*Math.sin( (float)(bbc.ID)*frac  ));
-			float y= (float) (-r*Math.cos( (float)(bbc.ID)*frac  ));
+			float x = (float) (r*Math.sin( (float)(bbc.ID+formationOffset)*frac  ));
+			float y= (float) (-r*Math.cos( (float)(bbc.ID+formationOffset)*frac  ));
 			PVector targ = new PVector(start.x+x, start.y+y);
 
 			this.moveTo(targ);
+			Log.d("behavior","formation move to targ: " + targ);
 			return;
-
+			
 
 
 
 		}
-		if(formationType=="square")
+		if(formationType.equals("square"))
 		{
 			//parameters for a grid
 			int s = bbc.otherBots.size()+1;
@@ -837,31 +840,31 @@ public class Behavior extends Thread
 			//PVector start = new PVector(width/4,height/4);
 
 			PVector start = new PVector(w, h);
-			int row = bbc.ID/s;
-			int col= bbc.ID%s;
+			int row = (bbc.ID+formationOffset)/s;
+			int col= (bbc.ID+formationOffset)%s;
 			PVector targ= new PVector(start.x+40*row, start.y+40*col);  
 			this.moveTo(targ);
 			return;
 
 		}
-		if(formationType=="horizontal")
+		if(formationType.equals("horizontal"))
 		{
-			PVector start = new PVector(w, h);
-			PVector targ = new PVector(start.x+40*bbc.ID, start.y);
+			PVector start = new PVector(w - (bbc.otherBots.size()/2*50), h);
+			PVector targ = new PVector(start.x+50*(bbc.ID ), start.y);
 
 			this.moveTo(targ);
 			return;
 		}
-		if(formationType=="vertical")
+		if(formationType.equals("vertical"))
 		{
-			PVector start = new PVector(w, h);
-			PVector targ = new PVector(start.x, start.y+40*bbc.ID);
+			PVector start = new PVector(w, h-(bbc.otherBots.size()/2*50)  );
+			PVector targ = new PVector(start.x, start.y+40*(bbc.ID ));
 
 			this.moveTo(targ);
 			return;
 
 		}
-		if(formationType=="diagonal")
+		if(formationType.equals("diagonal"))
 		{
 			PVector start = new PVector(w, h);
 			PVector targ = new PVector(start.x+40*bbc.ID, start.y+40*bbc.ID);
@@ -870,12 +873,12 @@ public class Behavior extends Thread
 			return;
 
 		}
-		if(formationType=="partialCircle")
+		if(formationType.equals("partialCircle"));
 		{
 			PVector start = new PVector(w, h);
 			float r=200;
-			float x = (float) (r*Math.sin( (float)bbc.ID/ (float)(2*Math.PI) ));
-			float y= (float) (-r*Math.cos( (float)bbc.ID/(float)(2*Math.PI) ));
+			float x = (float) (r*Math.sin( (float)(bbc.ID+formationOffset)/ (float)(2*Math.PI) ));
+			float y= (float) (-r*Math.cos( (float)(bbc.ID+formationOffset)/(float)(2*Math.PI) ));
 			PVector targ = new PVector(start.x+x, start.y+y);
 
 			this.moveTo(targ);
@@ -1086,6 +1089,12 @@ public class Behavior extends Thread
 	}
 	void followInLine()
 	{
+		if(bbc.ID==0)
+		{
+			this.wanderVector();
+			return;
+		}
+		
 		for(int i=0;i<bbc.otherBots.size();i++)
 		{
 			Bot b = (Bot) bbc.otherBots.get(i);
@@ -1093,6 +1102,7 @@ public class Behavior extends Thread
 			{
 				follow(b);
 			}
+			
 		}
 	}
 
@@ -2495,6 +2505,12 @@ public class Behavior extends Thread
 		// TODO Auto-generated method stub
 		this.breath2=b;
 		this.breath2Timer1=System.currentTimeMillis();
+	}
+
+	public void setWanderVector(boolean b) {
+		// TODO Auto-generated method stub
+		wanderVector=b;
+		
 	}
 
 }
