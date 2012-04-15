@@ -50,7 +50,7 @@ public class Behavior extends Thread
 	float desiredseparation=50;
 
 	long vmtimer;
-	long vmInterval=150;
+	long vmInterval=500;
 
 	long wanderVectorTimer;
 	PVector wanderVectorTemp;
@@ -84,7 +84,7 @@ public class Behavior extends Thread
 	public DemoKitActivity mActivity;
 	public boolean followMouse;
 	public boolean orbitCenter;	
-	float orbitDist=75;
+	float orbitDist=200;
 	public boolean orbitAvatar;
 	public boolean useBeacon;
 	public boolean fleeBeacon;
@@ -106,7 +106,14 @@ public class Behavior extends Thread
 	public boolean wtoilInitial;
 	public boolean wtoilFinalTargetReached;
 	
+	public boolean moveForward;
+	public boolean moveBackward;
+	public boolean rotateLeft;
+	public boolean rotateRight;
+	
 	float[] sacWeights;
+	private boolean breath1;
+	private boolean breath2;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -337,6 +344,14 @@ public class Behavior extends Thread
 			{
 				doFormation();
 			}
+			if(breath1)
+			{
+				this.breath1();
+			}
+			if(breath2)
+			{
+				this.breath2();
+			}
 			if(followInLine)
 			{
 				Log.d("behavior","followInLine " + desiredVel);
@@ -364,6 +379,23 @@ public class Behavior extends Thread
 				Log.d("behavior","orbitAvatar " + desiredVel);
 				orbitAvatar();
 			}
+			
+			if(moveForward)
+			{
+				this.forwardVector();
+			}
+			if(moveBackward)
+			{
+				
+			}
+			if(rotateLeft)
+			{
+				this.turnLeftVector();
+			}
+			if(rotateRight)
+			{
+				this.turnRightVector();
+			}
 
 
 			//Log.d("behavior","" + desiredVel);
@@ -381,6 +413,53 @@ public class Behavior extends Thread
 		}
 	}
 
+
+	public PVector forwardVector() {
+		// TODO Auto-generated method stub
+		
+ 
+		int angle1=(int)bbc.camang;
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+ 
+		
+		int r=10;
+		float xx=(float) (r*Math.cos(Math.toRadians(angle1)));
+		float yy= (float) (r*Math.sin(Math.toRadians(angle1)));		
+		PVector res = new PVector(xx,yy);
+		res.normalize();
+		return res;
+		
+		
+	}
+	
+	private void turnRightVector() {
+		// TODO Auto-generated method stub
+		
+		PVector loc = new PVector(bbc.myposx,bbc.myposy);
+		
+		float angle1 = bbc.camang;
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+
+		
+		
+		
+		PVector v2 = new PVector();
+		float offset=30;
+		//v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
+		//v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
+		
+	}
+
+	private void turnLeftVector() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public void breath1()
 	{
@@ -1920,7 +1999,7 @@ public class Behavior extends Thread
 
 		//look at desired vel
 		PVector v=new PVector(this.desiredVel.x,this.desiredVel.y);	
-		v.normalize();
+		v.normalize();//must check this
 
 		// now start to change motor speed to adjust to new 
 		// -1 means need to turn right
@@ -2400,6 +2479,22 @@ public class Behavior extends Thread
 			this.wtoilTarget=null;
 		}
 
+	}
+
+	
+
+	public void setBreath1(boolean b) {
+		// TODO Auto-generated method stub
+		
+		this.breath1=b;
+		this.breath1Timer1=System.currentTimeMillis();
+		
+	}
+
+	public void setBreath2(boolean b) {
+		// TODO Auto-generated method stub
+		this.breath2=b;
+		this.breath2Timer1=System.currentTimeMillis();
 	}
 
 }
