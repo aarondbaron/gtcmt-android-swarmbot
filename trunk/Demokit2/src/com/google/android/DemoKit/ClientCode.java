@@ -479,11 +479,14 @@ public class ClientCode implements OnClickListener{
 
 					if(line.contains("formation,"))
 					{
+						
 						String test [] = line.split(",");
+						Log.d("client","formation " + test[1] );
 						if(test[1].equals("circle"))
 						{
 							bbc.myBehavior.formationType=test[1];
 							bbc.myBehavior.setFormation(true);
+							Log.d("client","formation " + test[1] );
 						}
 						if(test[1].equals("square"))
 						{
@@ -569,6 +572,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setBreath1(false);
 						bbc.myBehavior.setBreath2(false);
 						bbc.myBehavior.setFormation(false);
+						bbc.myBehavior.setWanderVector(false);
 
 						bbc.myBehavior.setSeparation(false);
 						bbc.myBehavior.setAlignment(false);
@@ -603,6 +607,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setBreath1(false);
 						bbc.myBehavior.setBreath2(false);
 						bbc.myBehavior.setFormation(false);
+						bbc.myBehavior.setWanderVector(false);
 
 						bbc.directControl=false;
 
@@ -898,6 +903,7 @@ public class ClientCode implements OnClickListener{
 						bbc.setWander(true);					
 						 */
 						bbc.setWanderVector(true);
+						bbc.myBehavior.setWanderVector(true);
 					}
 
 					if(line.contains("wander"+myID))
@@ -908,6 +914,7 @@ public class ClientCode implements OnClickListener{
 						bbc.setWander(true);					
 						 */
 						bbc.setWanderVector(true);
+						bbc.myBehavior.setWanderVector(true);
 					}
 					if(line.contains("move"))
 					{
