@@ -47,7 +47,7 @@ public class ClientCode implements OnClickListener{
 
 	long initialConnectTimer;
 	boolean initialConnect=false;
-	
+
 	boolean messageFlag = false;
 	String message;
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
@@ -135,22 +135,22 @@ public class ClientCode implements OnClickListener{
 						bbc.resetIndex();
 						syncFlag=false;
 					}
-					
+
 					if(messageFlag)
 					{
 						out.println(message);
 						messageFlag=false;
 						//Log.d("client","sending message "  + message);
 					}
-					
+
 					//currently as of 3/29 the server is sending vel back to all...
 					/*
 					if(line.contains("vel,"))
 					{
 						Log.d("clientCode","vel was sent of all bots");
 					}
-					*/
-					
+					 */
+
 					if(line.contains("com,"))
 					{
 						String test [] = line.split(",");
@@ -160,12 +160,12 @@ public class ClientCode implements OnClickListener{
 						{
 							String whatToDo = test[3];
 							String data = test[4];
-							
+
 							if(whatToDo=="query")
 							{
 								//assume just rhythm query for now
 								sendMessage("com," + tome+ "," + from + "," + "response," + bbc.instrumentseq.toString());
-								
+
 								char[] a= data.toCharArray();
 
 
@@ -191,10 +191,10 @@ public class ClientCode implements OnClickListener{
 										}
 									}
 								}
-								
-								
+
+
 							}
-							
+
 						}
 					}
 
@@ -233,7 +233,7 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						myID= Integer.parseInt(test[1]);
 						bbc.ID=myID;
-						
+
 						////check other bots
 						for(int i=0;i<bbc.otherBots.size();i++)
 						{
@@ -241,11 +241,11 @@ public class ClientCode implements OnClickListener{
 							if(b.ID==myID)
 							{
 								bbc.otherBots.remove(b);
-								
+
 							}
 						}
-						
-						
+
+
 						///
 						handler.post(new Runnable() {
 							@Override
@@ -295,7 +295,7 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
-					*/
+					 */
 
 					if(line.contains("pattern"))
 					{
@@ -388,24 +388,24 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
-					
+
 					if(line.contains("clearRhythm"))
 					{
 						bbc.clearRhythm(bbc.instrumentseq);
 						bbc.clearRhythm(bbc.sfxrseq);
 					}
-					
+
 					if(line.contains("useSFXR"))
 					{
 						bbc.useSFXR=!bbc.useSFXR;
-					
+
 					}
-					
+
 					if(line.contains("directControl"))
 					{
 						bbc.directControl=!bbc.directControl;
 					}
-					
+
 					if(line.contains("sacWeights"))
 					{
 						String test [] = line.split(",");						
@@ -420,7 +420,7 @@ public class ClientCode implements OnClickListener{
 						}						
 						bbc.myBehavior.sacWeights=t.clone();						
 					}
-					
+
 					if(line.contains("separation"))
 					{
 						bbc.myBehavior.toggleSeparation();
@@ -434,12 +434,12 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.toggleCohesion();
 					}
 					////////////////////////
-					
+
 					if(line.contains("orbitCenter"))
 					{
 						String test [] = line.split(",");
 						int dist=(int) Float.parseFloat(test[1]);
-						
+
 						int clockwise=(int) Float.parseFloat(test[2]);
 						if(clockwise==0)
 						{
@@ -449,34 +449,34 @@ public class ClientCode implements OnClickListener{
 						{
 							bbc.myBehavior.orbitClockwise=true;
 						}
-						
-						
+
+
 						bbc.myBehavior.orbitDist=dist;
 						bbc.myBehavior.setOrbitCenter(true);
-						
-						
-						
+
+
+
 						Log.d("client","orbit center: " + dist);
-						
+
 					}
 					if(line.contains("orbitAvatar"))
 					{
 						String test [] = line.split(",");
 						int dist=(int) Float.parseFloat(test[1]);
-						
+
 						bbc.myBehavior.orbitDist=dist;
 						bbc.myBehavior.setOrbitAvatar(true);
-						
+
 						Log.d("client","orbit avatar: " + dist);
 					}
-					
+
 					//orbitInLine
 					if(line.contains("orbitInLine"))
 					{
 						bbc.myBehavior.setOrbitInLine(true);
 						//bbc.myBehavior.followInLine();
 					}
-					
+
 					if(line.contains("formation,"))
 					{
 						String test [] = line.split(",");
@@ -485,9 +485,43 @@ public class ClientCode implements OnClickListener{
 							bbc.myBehavior.formationType=test[1];
 							bbc.myBehavior.setFormation(true);
 						}
-						
+						if(test[1].equals("square"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+						if(test[1].equals("horizontal"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+						if(test[1].equals("vertical"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+						if(test[1].equals("diagonal"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+						if(test[1].equals("partialCircle"))
+						{
+							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.setFormation(true);
+						}
+
+					}
+					if(line.contains("breath1"))
+					{
+						bbc.myBehavior.setBreath1(true);
 					}
 					
+					if(line.contains("breath2"))
+					{
+						bbc.myBehavior.setBreath2(true);
+					}
+
 					if(line.contains("followInLine"))
 					{
 						bbc.myBehavior.setFollowInLine(true);
@@ -496,18 +530,20 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("followMouse"))
 					{
 						String test [] = line.split(",");
-						
+
 						bbc.myBehavior.setFollowMouse(true);
 					}
+
 					
+
 					if(line.contains("vmInterval"))
 					{
 						String test [] = line.split(",");
-						
+
 						bbc.myBehavior.vmInterval=Long.parseLong(test[1]);
 						Log.d("client","vmInterval" + bbc.myBehavior.vmInterval);
-						
-						
+
+
 					}
 
 					//[ID]position:
@@ -530,20 +566,23 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setWanderThenOrbit(false);
 						bbc.myBehavior.setWanderThenFollowInLine(false);
 						bbc.myBehavior.setWanderThenOrbitInLine(false);
-						
+						bbc.myBehavior.setBreath1(false);
+						bbc.myBehavior.setBreath2(false);
+						bbc.myBehavior.setFormation(false);
+
 						bbc.myBehavior.setSeparation(false);
 						bbc.myBehavior.setAlignment(false);
 						bbc.myBehavior.setCohesion(false);
-						
-						
+
+
 						bbc.directControl=false;
-						
-						
+
+
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
-						
-						
-						
+
+
+
 					}
 					if(line.contains("stop"+myID))
 					{
@@ -561,18 +600,23 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setWanderThenOrbit(false);
 						bbc.myBehavior.setWanderThenFollowInLine(false);
 						bbc.myBehavior.setWanderThenOrbitInLine(false);
-						
+						bbc.myBehavior.setBreath1(false);
+						bbc.myBehavior.setBreath2(false);
+						bbc.myBehavior.setFormation(false);
+
 						bbc.directControl=false;
-						
-						
+
+
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
-						
-						
+
+
 					}
 					if(line.contains("forward"+myID))
 					{
 						bbc.forward();
+						
+						//bbc.myBehavior.forwardVector();
 
 						Log.d("LINE","forward");
 						bbc.danceSequencer=false;
@@ -779,10 +823,10 @@ public class ClientCode implements OnClickListener{
 									Toast.makeText(mActivity.getApplicationContext(), "mapping set -- " +  bbc.mActivity.beatTimer.mapping + " -- by server--" + bbc.otherBots.size() + "-nn-" + bbc.numNeighbors, Toast.LENGTH_LONG).show();
 								}
 							});
-							
-							
+
+
 						}
-						
+
 					}
 
 					if(line.contains("reuc"))
@@ -819,32 +863,32 @@ public class ClientCode implements OnClickListener{
 						bbc.fillNow(bbc.sfxrseq);
 
 					}
-					
-					
-					
+
+
+
 					if(line.contains("wanderThenFollow"))
 					{
 						bbc.myBehavior.setWanderThenFollow(true);						
 					}
-					
+
 					if(line.contains("wanderThenOrbit"))
 					{
 						bbc.myBehavior.setWanderThenOrbit(true);						
-						
+
 					}
-					
+
 					if(line.contains("wtfil"))
 					{
 						bbc.myBehavior.setWanderThenFollowInLine(true);						
 					}
-					
+
 					if(line.contains("wtoil"))
 					{
 						bbc.myBehavior.setWanderThenOrbitInLine(true);						
-						
+
 					}
-					
-				
+
+
 
 					if(line.contains("wanderAll"))
 					{
@@ -852,7 +896,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.initWander();
 						bbc.myBehavior.initWanderComplete=true;
 						bbc.setWander(true);					
-						*/
+						 */
 						bbc.setWanderVector(true);
 					}
 
@@ -862,7 +906,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.initWander();
 						bbc.myBehavior.initWanderComplete=true;
 						bbc.setWander(true);					
-						*/
+						 */
 						bbc.setWanderVector(true);
 					}
 					if(line.contains("move"))
@@ -949,8 +993,8 @@ public class ClientCode implements OnClickListener{
 							fromServer.setText("position: "+line);
 						}
 					});
-					
-					
+
+
 					//beacons
 					if(line.contains("toggleBeacon"))
 					{						
@@ -959,9 +1003,9 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("setBeaconRadius"))
 					{
 						String test [] = line.split(",");
-						
+
 						int rad=(int) Float.parseFloat(test[1]);
-						
+
 						for(int i=0;i<bbc.beacons.size();i++)
 						{
 							Beacon b = new Beacon();
@@ -972,13 +1016,13 @@ public class ClientCode implements OnClickListener{
 					{
 						String test [] = line.split(",");
 						int ID,type,x,y,rad;
-						
+
 						ID=(int) Float.parseFloat(test[1]);
 						type=(int) Float.parseFloat(test[2]);
 						x=(int) Float.parseFloat(test[3]);
 						y=(int) Float.parseFloat(test[4]);
 						rad=(int) Float.parseFloat(test[5]);
-						
+
 						if(bbc.beacons.size()==0)
 						{
 							Beacon b = new Beacon();
@@ -999,13 +1043,13 @@ public class ClientCode implements OnClickListener{
 								b.y=y;
 								b.radius=rad;
 							}					
-							
+
 							//Log.d("client","beacon," + ID+","+type+","+ x+","+y+"," +rad);
-							
+
 						}
-						
-						
-						
+
+
+
 					}
 
 					//if it has myID
@@ -1013,243 +1057,257 @@ public class ClientCode implements OnClickListener{
 					{
 
 						String test [] = line.split(",");
-						//note...used to be 3..now its 4 because of new format
-						int ID = (int) Float.parseFloat(test[4]);
-
-						//Log.i("pos","x:"+test[1]);
-
-						if(ID==myID)
+						// new format  [position][x][y][angle][id]
+						if(test.length!=5)
 						{
-							//Log.i("clientcode","mypos: " + "x:"+test[1]);
-							boolean posLost=false;
-							if(test[1]=="x" || test[2]=="x")
+
+							Log.d("client","length of test is " + test.length + " \n " + test.toString());
+
+						}
+						else
+						{
+
+
+
+
+							int ID = (int) Float.parseFloat(test[4]);
+
+							//Log.i("pos","x:"+test[1]);
+
+							if(ID==myID)
 							{
-								posLost=true;							
-							}
-							bbc.positionLost=posLost;
+								//Log.i("clientcode","mypos: " + "x:"+test[1]);
+								boolean posLost=false;
+								if(test[1]=="x" || test[2]=="x")
+								{
+									posLost=true;							
+								}
+								bbc.positionLost=posLost;
 
-							if(!bbc.positionLost)
-							{
-								//int newx=(int) Float.parseFloat(    line.split(",")[1]  );
-								//int newy=(int) Float.parseFloat(    line.split(",")[2]  );
-								//position
-								int newx=(int) Float.parseFloat(   test[1]  );
-								int newy=(int) Float.parseFloat(    test[2]  );								
-								//angle from cam
-								float newang= Float.parseFloat(test[3]); 
+								if(!bbc.positionLost)
+								{
+									//int newx=(int) Float.parseFloat(    line.split(",")[1]  );
+									//int newy=(int) Float.parseFloat(    line.split(",")[2]  );
+									//position
+									int newx=(int) Float.parseFloat(   test[1]  );
+									int newy=(int) Float.parseFloat(    test[2]  );								
+									//angle from cam
+									float newang= Float.parseFloat(test[3]); 
 
 
-								bbc.camang=newang;
-								/*
+									bbc.camang=newang;
+									/*
 								bbc.myvelx=bbc.myposx-newx;
 								bbc.myvely=bbc.myposy-newy;						
 								bbc.myangle = (float) Math.atan2(bbc.myvelx, bbc.myvely);
-								 */
-								//given the structure of the robot...assuming we know how it moves..
-								//dont' take position estimate if lybte or rbyte is 128
-								if(  ! (bbc.lbyte == 128 && bbc.rbyte == 128)  )
-								{
-									bbc.pastx[bbc.vxyindex]=newx;
-									bbc.pasty[bbc.vxyindex]=newy;
-									bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
-									bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
-									bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
-
-									bbc.e.px[bbc.e.iter]=newx;
-									bbc.e.py[bbc.e.iter]=newy;
-									bbc.e.times[bbc.e.iter]=System.currentTimeMillis();
-									//bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
-									//bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
-									//bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
-
-
-									int testind;
-									if(bbc.vxyindex+1 >= bbc.vxs.length)
+									 */
+									//given the structure of the robot...assuming we know how it moves..
+									//dont' take position estimate if lybte or rbyte is 128
+									if(  ! (bbc.lbyte == 128 && bbc.rbyte == 128)  )
 									{
-										testind=0;
-									}
-									else
-									{
-										testind =bbc.vxyindex+1;
-									}
-									bbc.vest.x=newx-bbc.pastx[testind];
-									bbc.vest.x=newx-bbc.pastx[testind];
+										bbc.pastx[bbc.vxyindex]=newx;
+										bbc.pasty[bbc.vxyindex]=newy;
+										bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
+										bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
+										bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
 
-									bbc.avest=bbc.vest.heading2D();
-
-									bbc.vxyindex++;
-
-									if(bbc.vxyindex>=bbc.vxs.length)
-									{
-										bbc.vxyindex=0;									
-									}
+										bbc.e.px[bbc.e.iter]=newx;
+										bbc.e.py[bbc.e.iter]=newy;
+										bbc.e.times[bbc.e.iter]=System.currentTimeMillis();
+										//bbc.vxs[bbc.vxyindex]=bbc.myposx-newx;
+										//bbc.vys[bbc.vxyindex]=bbc.myposy-newy;
+										//bbc.aest[bbc.vxyindex] = (float)  Math.atan2(bbc.vys[bbc.vxyindex], bbc.vxs[bbc.vxyindex]);
 
 
-									handler.post(new Runnable() {
-										@Override
-										public void run() {
-											String s1 ="vel--";
-											String s2= "ang--";
-
-											float a1,a2,a3;
-											a1=0;
-											a2=a1;
-											a3=a2;
-											for(int i=0;i<bbc.vxs.length;i++)
-											{
-												s1 += "x:" + bbc.vxs[i] + "," + " y:" + bbc.vys[i];
-												s2 += bbc.aest[i] + ",";
-
-												a1+=bbc.vxs[i];
-												a2+=bbc.vys[i];
-												a3+=bbc.aest[i];
-
-
-											}
-
-											a1=a1/(float)bbc.vxs.length;
-											a2=a2/(float)bbc.vys.length;
-											a3=a3/(float)bbc.aest.length;
-
-
-											velest.setText(s1 + " -- " + a1 + " , " + a2);
-											angest.setText(s2 + " -- " + a3);
-
-											//Log.d("client"," bytes "+bbc.lbyte+  "," + bbc.rbyte);
+										int testind;
+										if(bbc.vxyindex+1 >= bbc.vxs.length)
+										{
+											testind=0;
 										}
-									});
+										else
+										{
+											testind =bbc.vxyindex+1;
+										}
+										bbc.vest.x=newx-bbc.pastx[testind];
+										bbc.vest.x=newx-bbc.pastx[testind];
+
+										bbc.avest=bbc.vest.heading2D();
+
+										bbc.vxyindex++;
+
+										if(bbc.vxyindex>=bbc.vxs.length)
+										{
+											bbc.vxyindex=0;									
+										}
 
 
-								}
+										handler.post(new Runnable() {
+											@Override
+											public void run() {
+												String s1 ="vel--";
+												String s2= "ang--";
 
-								//write position
-								//bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-								//bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
-								bbc.myposx = newx;
-								bbc.myposy = newy;
+												float a1,a2,a3;
+												a1=0;
+												a2=a1;
+												a3=a2;
+												for(int i=0;i<bbc.vxs.length;i++)
+												{
+													s1 += "x:" + bbc.vxs[i] + "," + " y:" + bbc.vys[i];
+													s2 += bbc.aest[i] + ",";
 
-
-
-							}
-							else
-							{
-								//do nothing..keep previous position?  or perhaps stop until something happens
-								bbc.stop();
-
-							}
-
-
-						}		
-						else   /// not my ID
-						{
-							boolean posLost=false;
-							if(test[1]=="x" || test[2]=="x")
-							{
-								posLost=true;							
-							}
+													a1+=bbc.vxs[i];
+													a2+=bbc.vys[i];
+													a3+=bbc.aest[i];
 
 
-							int newx=(int) Float.parseFloat(    test[1]       ) ;
-							int newy=(int) Float.parseFloat(    test[2]  )    ;
+												}
 
-							float newang = Float.parseFloat( test[3]);
-
-							//bbc.targetvelx=bbc.targetx-newx;
-							//bbc.targetvely=bbc.targety-newy;						
-							//bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
+												a1=a1/(float)bbc.vxs.length;
+												a2=a2/(float)bbc.vys.length;
+												a3=a3/(float)bbc.aest.length;
 
 
-							//							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
-							//							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
+												velest.setText(s1 + " -- " + a1 + " , " + a2);
+												angest.setText(s2 + " -- " + a3);
 
-							///////////////////////// new way
-
-							//this would be ideal if we have a comparator...but for now
-							//Bot b =bbc.otherBots.get(ID);
-							//Log.d("clientcode", "size of otherBots " + bbc.otherBots.size());
-							if(bbc.otherBots.size()==0)
-							{
-								Log.d("clientcode", "adding new bot: " + ID);
-								Bot newBot = new Bot();
-								newBot.setPos(newx, newy);
-								newBot.camang=newang;
-								newBot.ID=ID;
-								bbc.otherBots.add(newBot);
-								if(ID==0)
-								{
-									bbc.currentAvatar=newBot;
-								}
-
-								double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
-								bbc.distances.add(new Float(dist));
-							}
-
-							//boolean[] createNew= new boolean[bbc.otherBots.size()];
-							boolean cnew=true;
-
-							for(int i =0 ; i < bbc.otherBots.size();i++)
-							{
-								Bot b = bbc.otherBots.get(i);
-
-								if(b.ID==ID)
-								{
-									//Log.d("clientcode", "b.id==id  " + ID);
-									//b.setVel(newx - b.x, newy-b.y);
-									if(!posLost)
-									{
-										b.setPos(newx,newy);
-										b.camang=newang;
-
-
-										//double dist=Math.sqrt( Math.pow((bbc.myposx-b.x),2) + Math.pow((bbc.myposy-b.y),2) ) ;
-										//bbc.distances.set(ID, new Float(dist));
+												//Log.d("client"," bytes "+bbc.lbyte+  "," + bbc.rbyte);
+											}
+										});
 
 
 									}
-									//b.angle=(float) Math.atan2(b.vy, b.vx);
-									//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
-									b.positionLost=posLost;
 
-									cnew=false;
-									break;
+									//write position
+									//bbc.myposx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+									//bbc.myposy= (int) Float.parseFloat(    line.split(",")[2]  )    ;
+									bbc.myposx = newx;
+									bbc.myposy = newy;
+
+
+
 								}
-								else //this means that the ID wasn't found in otherBots..so we need ot create it..
+								else
 								{
-
-
+									//do nothing..keep previous position?  or perhaps stop until something happens
+									bbc.stop();
 
 								}
-							}
 
-							if(cnew)
+
+							}		
+							else   /// not my ID
 							{
-								Log.d("clientcode", "new bot -- b.id!=id  " + ID);
-								Bot newBot = new Bot();
-								if(!posLost)
+								boolean posLost=false;
+								if(test[1]=="x" || test[2]=="x")
 								{
+									posLost=true;							
+								}
+
+
+								int newx=(int) Float.parseFloat(    test[1]       ) ;
+								int newy=(int) Float.parseFloat(    test[2]  )    ;
+
+								float newang = Float.parseFloat( test[3]);
+
+								//bbc.targetvelx=bbc.targetx-newx;
+								//bbc.targetvely=bbc.targety-newy;						
+								//bbc.targetangle = (float) Math.atan2(bbc.targetvelx, bbc.targetvely);
+
+
+								//							bbc.targetx=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+								//							bbc.targety=(int) Float.parseFloat(    line.split(",")[2]  )  ;
+
+								///////////////////////// new way
+
+								//this would be ideal if we have a comparator...but for now
+								//Bot b =bbc.otherBots.get(ID);
+								//Log.d("clientcode", "size of otherBots " + bbc.otherBots.size());
+								if(bbc.otherBots.size()==0)
+								{
+									Log.d("clientcode", "adding new bot: " + ID);
+									Bot newBot = new Bot();
 									newBot.setPos(newx, newy);
 									newBot.camang=newang;
 									newBot.ID=ID;
+									bbc.otherBots.add(newBot);
+									if(ID==0)
+									{
+										bbc.currentAvatar=newBot;
+									}
 
 									double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
 									bbc.distances.add(new Float(dist));
-
-									Log.d("clientcode", "new bot position set ");
 								}
-								//newBot.setAngle(angle)
-								//newBot.angle = (float) Math.atan2(b.vy, b.vx);
-								//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
-								newBot.positionLost=posLost;
-								bbc.otherBots.add(newBot);
 
-								if(ID==0)
+								//boolean[] createNew= new boolean[bbc.otherBots.size()];
+								boolean cnew=true;
+
+								for(int i =0 ; i < bbc.otherBots.size();i++)
 								{
-									bbc.currentAvatar=newBot;
+									Bot b = bbc.otherBots.get(i);
+
+									if(b.ID==ID)
+									{
+										//Log.d("clientcode", "b.id==id  " + ID);
+										//b.setVel(newx - b.x, newy-b.y);
+										if(!posLost)
+										{
+											b.setPos(newx,newy);
+											b.camang=newang;
+
+
+											//double dist=Math.sqrt( Math.pow((bbc.myposx-b.x),2) + Math.pow((bbc.myposy-b.y),2) ) ;
+											//bbc.distances.set(ID, new Float(dist));
+
+
+										}
+										//b.angle=(float) Math.atan2(b.vy, b.vx);
+										//b.azimuthAngle=0.000000f;// this has to be broadcast and parsed
+										b.positionLost=posLost;
+
+										cnew=false;
+										break;
+									}
+									else //this means that the ID wasn't found in otherBots..so we need ot create it..
+									{
+
+
+
+									}
 								}
+
+								if(cnew)
+								{
+									Log.d("clientcode", "new bot -- b.id!=id  " + ID);
+									Bot newBot = new Bot();
+									if(!posLost)
+									{
+										newBot.setPos(newx, newy);
+										newBot.camang=newang;
+										newBot.ID=ID;
+
+										double dist=Math.sqrt( Math.pow((bbc.myposx-newBot.x),2) + Math.pow((bbc.myposy-newBot.y),2) ) ;
+										bbc.distances.add(new Float(dist));
+
+										Log.d("clientcode", "new bot position set ");
+									}
+									//newBot.setAngle(angle)
+									//newBot.angle = (float) Math.atan2(b.vy, b.vx);
+									//newBot.azimuthAngle=0.00000f; //this has to be broadcast and parsed
+									newBot.positionLost=posLost;
+									bbc.otherBots.add(newBot);
+
+									if(ID==0)
+									{
+										bbc.currentAvatar=newBot;
+									}
+								}
+
+
+
+
 							}
-
-
-
 
 						}
 
@@ -1267,7 +1325,7 @@ public class ClientCode implements OnClickListener{
 	}
 
 	/////////////
-	
+
 	public void sendMessage(String s)
 	{
 		message=s;
