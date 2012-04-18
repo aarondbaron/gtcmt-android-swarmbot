@@ -15,14 +15,18 @@ public class Bot
 	boolean positionLost;
 	
 	float distToMe;
+	
+	//PVector vel;
 
 	Bot()
 	{
-
+		//vel = new PVector();
 	}
 
 	Bot(int x, int y)
 	{
+		
+		//vel = new PVector();
 	}
 
 	int[] getPos()

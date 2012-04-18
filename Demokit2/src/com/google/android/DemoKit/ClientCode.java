@@ -151,6 +151,13 @@ public class ClientCode implements OnClickListener{
 					}
 					 */
 
+					if(line.contains("testing"))
+					{
+						Log.d("clientCode",line);
+					}
+
+
+
 					if(line.contains("com,"))
 					{
 						String test [] = line.split(",");
@@ -479,38 +486,51 @@ public class ClientCode implements OnClickListener{
 
 					if(line.contains("formation,"))
 					{
-						
+
 						String test [] = line.split(",");
 						Log.d("client","formation " + test[1] );
+
+						int d=80;
+						if(test.length>=3)
+						{
+							d=(int) Float.parseFloat(test[2]);
+						}
+
 						if(test[1].equals("circle"))
 						{
 							bbc.myBehavior.formationType=test[1];
 							bbc.myBehavior.setFormation(true);
+							bbc.myBehavior.distFormation=d;
 							Log.d("client","formation " + test[1] );
 						}
 						if(test[1].equals("square"))
 						{
 							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.distFormation=d;
 							bbc.myBehavior.setFormation(true);
 						}
 						if(test[1].equals("horizontal"))
 						{
 							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.distFormation=d;
 							bbc.myBehavior.setFormation(true);
 						}
 						if(test[1].equals("vertical"))
 						{
 							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.distFormation=d;
 							bbc.myBehavior.setFormation(true);
 						}
 						if(test[1].equals("diagonal"))
 						{
 							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.distFormation=d;
 							bbc.myBehavior.setFormation(true);
 						}
 						if(test[1].equals("partialCircle"))
 						{
 							bbc.myBehavior.formationType=test[1];
+							bbc.myBehavior.distFormation=d;
 							bbc.myBehavior.setFormation(true);
 						}
 
@@ -519,7 +539,7 @@ public class ClientCode implements OnClickListener{
 					{
 						bbc.myBehavior.setBreath1(true);
 					}
-					
+
 					if(line.contains("breath2"))
 					{
 						bbc.myBehavior.setBreath2(true);
@@ -537,7 +557,7 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setFollowMouse(true);
 					}
 
-					
+
 
 					if(line.contains("vmInterval"))
 					{
@@ -620,7 +640,7 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("forward"+myID))
 					{
 						bbc.forward();
-						
+
 						//bbc.myBehavior.forwardVector();
 
 						Log.d("LINE","forward");
@@ -916,6 +936,44 @@ public class ClientCode implements OnClickListener{
 						bbc.setWanderVector(true);
 						bbc.myBehavior.setWanderVector(true);
 					}
+					if(line.contains("controller,"))
+					{
+						Log.d("client","controller move");
+						String test [] = line.split(",");
+
+						if(test.length>=4)
+						{
+							int code=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+							if(code==999)
+							{
+								bbc.myBehavior.setSeparation(true);
+
+								int x=(int) Float.parseFloat(    line.split(",")[2]       ) ;
+								int y=(int) Float.parseFloat(    line.split(",")[3]  )    ;
+
+								Log.d("controller move","move to x:"+x+"y:"+y);
+								bbc.targetx=x;
+								bbc.targety=y;
+								bbc.myBehavior.phase1move=true;
+								bbc.myBehavior.phase2move=false;
+								bbc.moveToLoc(true);
+
+
+
+								//bbc.moveBehavior.move2Loc(x, y);
+
+								//////////////////////////////////
+								//////////////////////////////////
+								bbc.target.x=x;
+								bbc.target.y=y;
+
+
+								Log.d("controller move"," :"+x+"y:"+y);
+							}
+						}
+
+					}
+
 					if(line.contains("move"))
 					{
 						String test [] = line.split(",");

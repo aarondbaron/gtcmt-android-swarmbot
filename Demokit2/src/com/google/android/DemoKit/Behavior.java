@@ -93,6 +93,7 @@ public class Behavior extends Thread
 	public String formationType;
 	public boolean formation;
 	public int formationOffset;
+	public int distFormation=80;
 	private boolean wto1;
 	private boolean wtf1;
 	public boolean wanderThenFollow;
@@ -146,6 +147,8 @@ public class Behavior extends Thread
 		wanderVectorTemp = new PVector();
 		
 		sacWeights = new float[]{1,1,1};
+		
+		distFormation = 80;
 		
 	}
 
@@ -292,7 +295,7 @@ public class Behavior extends Thread
 
 			if(move2Loc)
 			{
-				Log.d("behavior", "move2Loc ");
+				//Log.d("behavior", "move2Loc ");
 				moveTo(new PVector(bbc.targetx,bbc.targety));
 
 				/*
@@ -824,7 +827,7 @@ public class Behavior extends Thread
 			PVector targ = new PVector(start.x+x, start.y+y);
 
 			this.moveTo(targ);
-			Log.d("behavior","formation move to targ: " + targ);
+			//Log.d("behavior","formation move to targ: " + targ);
 			return;
 			
 
@@ -838,27 +841,33 @@ public class Behavior extends Thread
 			s= (int) Math.round(Math.sqrt(s));
 
 			//PVector start = new PVector(width/4,height/4);
+			
+			 
 
 			PVector start = new PVector(w, h);
 			int row = (bbc.ID+formationOffset)/s;
 			int col= (bbc.ID+formationOffset)%s;
-			PVector targ= new PVector(start.x+40*row, start.y+40*col);  
+			PVector targ= new PVector(start.x+distFormation*row, start.y+distFormation*col);  
 			this.moveTo(targ);
 			return;
 
 		}
 		if(formationType.equals("horizontal"))
 		{
-			PVector start = new PVector(w - (bbc.otherBots.size()/2*50), h);
-			PVector targ = new PVector(start.x+50*(bbc.ID ), start.y);
+			 
+			
+			PVector start = new PVector(w - (bbc.otherBots.size()/2*distFormation), h);
+			PVector targ = new PVector(start.x+distFormation*(bbc.ID ), start.y);
 
 			this.moveTo(targ);
 			return;
 		}
 		if(formationType.equals("vertical"))
 		{
-			PVector start = new PVector(w, h-(bbc.otherBots.size()/2*50)  );
-			PVector targ = new PVector(start.x, start.y+40*(bbc.ID ));
+			 
+			
+			PVector start = new PVector(w, h-(bbc.otherBots.size()/2*distFormation)  );
+			PVector targ = new PVector(start.x, start.y+distFormation*(bbc.ID ));
 
 			this.moveTo(targ);
 			return;
@@ -866,8 +875,10 @@ public class Behavior extends Thread
 		}
 		if(formationType.equals("diagonal"))
 		{
-			PVector start = new PVector(w, h);
-			PVector targ = new PVector(start.x+40*bbc.ID, start.y+40*bbc.ID);
+			 
+			
+			PVector start = new PVector(55, 55);
+			PVector targ = new PVector(start.x+distFormation*bbc.ID, start.y+distFormation*bbc.ID);
 
 			this.moveTo(targ);
 			return;
