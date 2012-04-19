@@ -941,7 +941,7 @@ public class ClientCode implements OnClickListener{
 						Log.d("client","controller move");
 						String test [] = line.split(",");
 
-						if(test.length>=4)
+						if(test.length>=2)
 						{
 							int code=(int) Float.parseFloat(    line.split(",")[1]       ) ;
 							if(code==999)
@@ -969,6 +969,13 @@ public class ClientCode implements OnClickListener{
 
 
 								Log.d("controller move"," :"+x+"y:"+y);
+							}
+							if(code==998)
+							{
+								doStop();
+
+								Log.d("client Controller","stop");
+								bbc.danceSequencer=false;
 							}
 						}
 
@@ -1408,6 +1415,39 @@ public class ClientCode implements OnClickListener{
 				cThread.start();
 			}
 		}
+	}
+	
+	public void doStop()
+	{
+		bbc.stop();
+		bbc.moveToLoc(false);
+		bbc.setWander(false);
+		bbc.setWanderDance(false);
+		bbc.setWanderVector(false);
+		bbc.myBehavior.setFollowInLine(false);
+		bbc.myBehavior.setOrbitAvatar(false);
+		bbc.myBehavior.setOrbitCenter(false);
+		bbc.myBehavior.setFollowMouse(false);
+		bbc.myBehavior.setOrbitInLine(false);
+		bbc.myBehavior.setWanderThenFollow(false);
+		bbc.myBehavior.setWanderThenOrbit(false);
+		bbc.myBehavior.setWanderThenFollowInLine(false);
+		bbc.myBehavior.setWanderThenOrbitInLine(false);
+		bbc.myBehavior.setBreath1(false);
+		bbc.myBehavior.setBreath2(false);
+		bbc.myBehavior.setFormation(false);
+		bbc.myBehavior.setWanderVector(false);
+
+		bbc.myBehavior.setSeparation(false);
+		bbc.myBehavior.setAlignment(false);
+		bbc.myBehavior.setCohesion(false);
+
+
+		bbc.directControl=false;
+
+
+		Log.d("LINE","stop");
+		bbc.danceSequencer=false;
 	}
 
 	@Override
