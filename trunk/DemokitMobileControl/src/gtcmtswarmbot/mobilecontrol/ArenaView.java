@@ -39,6 +39,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	DemokitMobileControlActivity mActivity;
 	public String mode;
 
+	public long tugMoveTimer;
 
 
 	public ArenaView(Context context, SomeController bbc) {
@@ -59,6 +60,8 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		init(mHolder, context);
 
 		mode="";
+
+		tugMoveTimer =System.currentTimeMillis();
 	}
 
 	@Override
@@ -106,7 +109,9 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 				{
 					if(thread.arena.isInside(x,y))
 					{
+						thread.addLock=true;
 						thread.lines.clear();
+						thread.addLock=false;
 						thread.lines.add(new PVector(x,y));
 					}
 				}
@@ -114,10 +119,22 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 				{
 					if(thread.arena.isInside(x,y))
 					{
+
 						thread.lines.add(new PVector(x,y));
 					}
 				}
 
+			}
+
+			if(mode.equals("TugMove"))
+			{
+				if(System.currentTimeMillis()-tugMoveTimer>125)
+				{
+					int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
+					int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
+					mActivity.client.sendMessage("controller,"+ 9988 + "," + xx + "," + yy) ;
+					tugMoveTimer = System.currentTimeMillis();
+				}
 			}
 
 
@@ -137,14 +154,23 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 				for(int i=0;i<bbc.allBots.size();i++)
 				{
 					//mActivity.client.sendMessage("move,"+x+","+y+","+i);
-					//mActivity.client.sendMessage("999,"+x+","+y+","+i);
+					//mActivity.client.sendMessage("998,"+x+","+y+","+i);
 					//bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
 					int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
 
 					int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
 
-					mActivity.client.sendMessage("controller,"+ 999 + "," + xx + "," + yy) ;
+					mActivity.client.sendMessage("controller,"+ 998 + "," + xx + "," + yy) ;
 				}
+			}
+
+			if(this.mode.equals("TugMove"))
+			{
+				int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
+
+				int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
+
+				mActivity.client.sendMessage("controller,"+ 9988) ;
 			}
 
 			if(this.mode.equals("drawn"))
@@ -222,6 +248,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		Vector lines;
 		public boolean showSequencer;
+		public boolean addLock;
 
 
 
@@ -292,13 +319,22 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	{
 		int x,y;
 
+		int mn,mx, sz, amt;
+
 		boolean active;
+
+		boolean growShrink;
 
 		Cursor()
 		{
 			active=true;
 			x=getWidth()/2;
 			y=getHeight()/2;				
+			mn=10;
+			mx=25;
+			sz=10;
+			amt=1;
+			growShrink=true;
 		}
 
 
@@ -376,6 +412,23 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 			if(cursor.active)
 			{
 				c.drawCircle(cursor.x, cursor.y, 3, redPaintHighlight);
+
+				//draw the pulsing cursor
+				if(mode.equals("Move")|| mode.equals("TugMove"))
+				{
+					cursor.sz+=cursor.amt;
+					if(cursor.sz>cursor.mx)
+					{
+						cursor.amt=-1;
+						cursor.growShrink=false;
+					}
+					if(cursor.sz<cursor.mn)
+					{
+						cursor.amt=1;
+						cursor.growShrink=true;
+					}
+					c.drawCircle(cursor.x, cursor.y, cursor.sz, redPaintHighlight);
+				}
 			}
 
 			for(int i=0; i<bbc.allBots.size(); i ++)
@@ -412,12 +465,15 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 			if(mode.equals("drawn")||mode.equals("Path"))
 			{
-				for(int i=0;i< thread.lines.size();i++)
+				if(!thread.addLock)
 				{
-					PVector p = (PVector) thread.lines.get(i);
-					if(p!=null)
+					for(int i=0;i< thread.lines.size();i++)
 					{
-						c.drawCircle(p.x, p.y, 2, blackpaint);
+						PVector p = (PVector) thread.lines.get(i);
+						if(p!=null)
+						{
+							c.drawCircle(p.x, p.y, 2, blackpaint);
+						}
 					}
 				}
 			}

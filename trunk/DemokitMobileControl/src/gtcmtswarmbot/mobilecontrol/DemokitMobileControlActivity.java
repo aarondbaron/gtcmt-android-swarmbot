@@ -24,6 +24,8 @@ public class DemokitMobileControlActivity extends Activity {
 	
 	SomeController sc;
 	
+	boolean clockwise;
+	
 	
     /** Called when the activity is first created. */
     @Override
@@ -40,6 +42,7 @@ public class DemokitMobileControlActivity extends Activity {
         client = new Client(this, sc);
         
          
+        
                  
             
          
@@ -76,7 +79,7 @@ public class DemokitMobileControlActivity extends Activity {
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
     	SubMenu sub = menu.addSubMenu(0,1,0, "Music Mappings");
-    	sub.add(0,11,0,"no Mapping");
+    	sub.add(0,11,0,"noMapping");
     	sub.add(0,12,0,"showSequencer");
     	sub.add(0,13,0,"angle");
     	sub.add(0,14,0,"neighbor");
@@ -96,6 +99,7 @@ public class DemokitMobileControlActivity extends Activity {
     	sub2.add("Separation");
     	sub2.add("Alignment");
     	sub2.add("Cohesion");
+    	sub2.add("TugMove");
     	sub2.add("StopAll");
     	//sub2.add("Formation");
     	
@@ -110,6 +114,7 @@ public class DemokitMobileControlActivity extends Activity {
  
     	menu.add("StopAll");
     	menu.add("Connect");
+    	menu.add("Sync");
     	/*
 		menu.add("ViewCursor");
 		menu.add("Move");
@@ -138,22 +143,35 @@ public class DemokitMobileControlActivity extends Activity {
 		}else if (item.getTitle() == "StopAll") {
 			//mActivity.client.sendMessage("controller,"+ 999 + "," + xx + "," + yy) ;
 			arenaView.mode="StopAll";
-			this.client.sendMessage("controller,"+ 998);
+			this.client.sendMessage("controller,"+ 999);
 		}else if (item.getTitle() == "Connect") {
 			this.client.doStuff();
+		}else if (item.getTitle() == "Sync") {
+			this.client.sendMessage("controller,"+ 1000);
 		}else if (item.getTitle() == "Move") {
 			arenaView.mode="Move";
 			Log.d("item selected",""+item.getTitle());
 			 
 		}else if (item.getTitle() == "Orbit") {
 			arenaView.mode="Orbit";
+			int ck=0;
+			if(this.clockwise)
+			{
+				ck=1;
+			}
+			else
+			{
+				ck=0;
+			}
+			this.clockwise=!this.clockwise;
+			this.client.sendMessage("controller,"+ 996 + ",200," + ck );
 			Log.d("item selected",""+item.getTitle());
 			 
 		}else if (item.getTitle() == "Breath1") {
-			this.client.sendMessage("");
+			//this.client.sendMessage("");
 			 
 		}else if (item.getTitle() == "Breath2") {
-			this.client.sendMessage("");
+			//this.client.sendMessage("");
 			 
 		}else if (item.getTitle() == "OrbitLine") {
 			 
@@ -171,28 +189,77 @@ public class DemokitMobileControlActivity extends Activity {
 			 
 		}else if (item.getTitle() == "Cohesion") {
 			 
-		}else if (item.getTitle() == "FollowLine") {
-			 
+		}else if (item.getTitle() == "TugMove") {
+			this.arenaView.mode="TugMove";
 		}else if (item.getTitle() == "circle") {
+			this.arenaView.mode="formation";
+			this.client.sendMessage("controller,"+ 997 + ",circle," + 80);
 			 
 		}else if (item.getTitle() == "square") {
-			 
+			this.arenaView.mode="formation";
+			this.client.sendMessage("controller,"+ 997 + ",square," + 80);
 		}else if (item.getTitle() == "horizontal") {
-			 
+			this.arenaView.mode="formation";
+			this.client.sendMessage("controller,"+ 997 + ",horizontal," + 80);
 		}else if (item.getTitle() == "vertical") {
-			 
+			this.arenaView.mode="formation";
+			this.client.sendMessage("controller,"+ 997 + ",vertical," + 80);
 		}else if (item.getTitle() == "diagonal") {
-			 
+			this.arenaView.mode="formation";
+			this.client.sendMessage("controller,"+ 997 + ",diagonal," + 80);
 		}else if (item.getTitle() == "drawn") {
 			arenaView.mode="drawn";
 			Log.d("item selected",""+item.getTitle());
 		}else if (item.getTitle() == "showSequencer") {
 			arenaView.thread.showSequencer=!arenaView.thread.showSequencer;
+		}else if (item.getTitle() == "noMapping") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.map);
+		}else if (item.getTitle() == "angle") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE.map);
+		}else if (item.getTitle() == "neighbor") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGHBOR.map);
+		}else if (item.getTitle() == "speed") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED.map);
 		}
 		
 		
 		
 		return true;
+	}
+	
+	
+	public enum Code{
+	    SYNC(1000),STOPALL (999), MOVE(998), FORMATION(997), ORBIT(996), TUGMOVE(9988),
+	    MAPPING(800);
+	    
+	    
+	    int code;
+	    Code(int code) {
+	        this.code = code;
+ 
+	    }
+	}
+	
+	public enum Mapping{
+	    NONE(0),ANGLE (1), NEIGHBOR(2), SPEED(3);
+	    
+	    
+	    int map;
+	    Mapping(int code) {
+	        this.map = code;
+ 
+	    }
+	}
+	
+	public enum Formation{
+	    CIRCLE(0), SQUARE(1), HORIZONTAL(2), VERTICAL(3);
+	    
+	    
+	    int formation;
+	    Formation(int code) {
+	        this.formation = code;
+ 
+	    }
 	}
     
     
