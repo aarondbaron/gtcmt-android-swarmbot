@@ -575,6 +575,9 @@ public class ClientCode implements OnClickListener{
 					//[ID]backward
 					if(line.contains("stopAll"))
 					{
+						doStop();
+
+						/*
 						bbc.stop();
 						bbc.moveToLoc(false);
 						bbc.setWander(false);
@@ -604,6 +607,7 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","stop");
 						bbc.danceSequencer=false;
+						 */
 
 
 
@@ -940,16 +944,31 @@ public class ClientCode implements OnClickListener{
 					{
 						Log.d("client","controller move");
 						String test [] = line.split(",");
+						
+						
+						//just do this for now....
+						bbc.myBehavior.setSeparation(true);
 
 						if(test.length>=2)
 						{
-							int code=(int) Float.parseFloat(    line.split(",")[1]       ) ;
+							int code=(int) Float.parseFloat(    test[1]       ) ;
 							if(code==999)
 							{
+
+								doStop();
+
+								Log.d("client Controller","stop");
+								bbc.danceSequencer=false;
+
+
+							}
+							if(code==998)
+							{
+
 								bbc.myBehavior.setSeparation(true);
 
-								int x=(int) Float.parseFloat(    line.split(",")[2]       ) ;
-								int y=(int) Float.parseFloat(    line.split(",")[3]  )    ;
+								int x=(int) Float.parseFloat(    test[2]       ) ;
+								int y=(int) Float.parseFloat(    test[3]  )    ;
 
 								Log.d("controller move","move to x:"+x+"y:"+y);
 								bbc.targetx=x;
@@ -970,12 +989,76 @@ public class ClientCode implements OnClickListener{
 
 								Log.d("controller move"," :"+x+"y:"+y);
 							}
-							if(code==998)
+							if(code==997)
 							{
-								doStop();
+								if(test.length>=3)
+								{
+									bbc.myBehavior.formationType=test[2];
+									int d = (int) Float.parseFloat(  test[3] );
+									bbc.myBehavior.setFormation(true);
+									bbc.myBehavior.distFormation=d;
+									Log.d("client","formation " + test[2] );
+								}
 
-								Log.d("client Controller","stop");
-								bbc.danceSequencer=false;
+							}
+							if(code==996)
+							{
+								 
+								int dist=(int) Float.parseFloat(test[2]);
+
+								int clockwise=(int) Float.parseFloat(test[3]);
+								if(clockwise==0)
+								{
+									bbc.myBehavior.orbitClockwise=false;
+								}
+								else
+								{
+									bbc.myBehavior.orbitClockwise=true;
+								}
+								
+
+								bbc.myBehavior.orbitDist=dist;
+								bbc.myBehavior.setOrbitCenter(true);
+								Log.d("client","controller orbit center: " + dist);
+							}
+							if(code==9988)
+							{
+								if(test.length==4)
+								{
+									bbc.myBehavior.setSeparation(true);
+									int x=(int) Float.parseFloat( test[2] ) ;
+									int y=(int) Float.parseFloat( test[3] )    ;
+									bbc.targetx=x;
+									bbc.targety=y;
+									bbc.myBehavior.phase1move=true;
+									bbc.myBehavior.phase2move=false;
+									bbc.moveToLoc(true);
+									//bbc.moveBehavior.move2Loc(x, y);
+									//////////////////////////////////
+									//////////////////////////////////
+									bbc.target.x=x;
+									bbc.target.y=y;
+									Log.d("controller TUG move"," :"+x+"y:"+y);
+								}
+								if(test.length==2)
+								{
+									bbc.moveToLoc(false);
+									bbc.myBehavior.setFollowMouse(false);
+								}
+							}
+							
+							if(code==800)
+							{
+								int map = (int) Float.parseFloat(test[2]);
+								bbc.setMapping(map);
+
+								Log.d("client","  controller map" + map);
+								handler.post(new Runnable() {
+									@Override
+									public void run() {
+										Toast.makeText(mActivity.getApplicationContext(), "mapping set -- " +  bbc.mActivity.beatTimer.mapping + " -- by server--" + bbc.otherBots.size() + "-nn-" + bbc.numNeighbors, Toast.LENGTH_LONG).show();
+									}
+								});
 							}
 						}
 
@@ -1416,7 +1499,7 @@ public class ClientCode implements OnClickListener{
 			}
 		}
 	}
-	
+
 	public void doStop()
 	{
 		bbc.stop();

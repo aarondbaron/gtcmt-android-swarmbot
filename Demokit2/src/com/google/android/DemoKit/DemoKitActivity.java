@@ -470,6 +470,12 @@ public class DemoKitActivity extends Activity implements Runnable /*, CreateNdef
 	}
 
 	protected void handleTemperatureMessage(TemperatureMsg t) {
+		/*
+		if(t.temperature>125)
+		{
+			this.bbc.fillNow(bbc.sfxrseq);
+		}
+		*/
 	}
 
 	protected void handleSwitchMessage(SwitchMsg o) {

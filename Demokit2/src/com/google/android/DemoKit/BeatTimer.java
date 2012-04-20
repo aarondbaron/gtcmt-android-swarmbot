@@ -60,7 +60,7 @@ public class BeatTimer extends Thread{
 
 	BeatTimer()
 	{
-		globalTimeInterval=125*2;
+		globalTimeInterval=50;
 
 		globalTimer=System.currentTimeMillis();
 		appStartTimeMillis=globalTimer;
@@ -162,6 +162,16 @@ public class BeatTimer extends Thread{
 					}
 
 
+					if(ic!=null)
+					{
+						/*
+						if(ic.ir0>20)
+						{
+							bbc.fillNow(bbc.sfxrseq);
+							bbc.fillNow(bbc.instrumentseq);
+						}
+						*/
+					}
 					// this shoudl be in boebotcontroller.
 					switch(mapping)
 					{
