@@ -137,7 +137,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	int[][] kuku;
 	int kid;
 	int eid;
-	
+
 	public int[] reg;
 
 	int dj=0;
@@ -153,9 +153,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	boolean useSFXR=true;
 
 	boolean directControl=false;
-	
-	
+
+
 	Vector beacons;
+
+	long nComTimer;
+	boolean nComEnable;
+
+	public boolean isnComEnable() {
+		return nComEnable;
+	}
+
+	public void setnComEnable(boolean nComEnable) {
+		this.nComEnable = nComEnable;
+	}
 
 	public BoeBotController(DemoKitActivity activity, int servo1, int servo2) {
 		mActivity = activity;
@@ -187,7 +198,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		initializeDjembe();
 		initializeKuku();
 		initializeReggaeton();
-		
+
 
 		//////////////////////////
 		//setRhythm(djembe0);
@@ -260,13 +271,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		e = new Estimator(this);
 
 		distances=new Vector();
+
+		nComTimer =System.currentTimeMillis();
+		setnComEnable(true);
 	}
 
 	private void initializeReggaeton() {
 		// TODO Auto-generated method stub
 		reg = new int[] {
-			    0, 9, 12, 18, 24, 33, 36, 42
-			  };
+				0, 9, 12, 18, 24, 33, 36, 42
+		};
 	}
 
 	public void attachToView() {
@@ -345,7 +359,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.rfv=(RobotFaceView)mActivity.findViewById(R.id.robotFaceView);
 		this.rfv.bbc=this;
 		this.rfv.bt=mActivity.beatTimer;
-		
+
 
 		opcvFD = (FdView) mActivity.findViewById(R.id.fdview);
 
@@ -888,31 +902,31 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	public void setWander(boolean b)
 	{
-		
-			mActivity.beatTimer.wander=b;
-			myBehavior.wander=b;
 
-		
+		mActivity.beatTimer.wander=b;
+		myBehavior.wander=b;
+
+
 	}
 
 	public void setWanderDance(boolean b)
 	{
 
-			mActivity.beatTimer.wanderDance=b;
-			mActivity.beatTimer.wanderDanceOnce=false;
+		mActivity.beatTimer.wanderDance=b;
+		mActivity.beatTimer.wanderDanceOnce=false;
 
-			myBehavior.wanderDance=b;
-			myBehavior.wanderDanceOnce=false;
-		
+		myBehavior.wanderDance=b;
+		myBehavior.wanderDanceOnce=false;
+
 	}
 
 	public void setWanderVector(boolean b)
 	{
-		
-			mActivity.beatTimer.wanderVector=b;
 
-			myBehavior.wanderVector=b;
-		
+		mActivity.beatTimer.wanderVector=b;
+
+		myBehavior.wanderVector=b;
+
 
 	}
 
@@ -1114,7 +1128,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		}
 	}
-	
+
 	void copyRhythm(boolean[] src, boolean[] dst)
 	{
 		for(int i=0;i<dst.length;i++)
@@ -1222,78 +1236,78 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	void geneswap(boolean[] b1, boolean[] b2)
 	{
-	  if (b1.length!=b2.length)
-	  {
-	    return;
-	  }
+		if (b1.length!=b2.length)
+		{
+			return;
+		}
 
-	  int n= (int) (Math.random()*b1.length-1);
+		int n= (int) (Math.random()*b1.length-1);
 
-	  int step=1;
-	  int stop=n+ 3*step + (int) (Math.random()*6*step);
-	  if (stop>=b1.length)
-	  {
-	    stop=b1.length-1;
-	  }
-	 // println("" + n + " " + stop);
+		int step=1;
+		int stop=n+ 3*step + (int) (Math.random()*6*step);
+		if (stop>=b1.length)
+		{
+			stop=b1.length-1;
+		}
+		// println("" + n + " " + stop);
 
-	  int m=n%step;
-	  for (int i=n;i<stop;i++)
-	  {
-	    boolean temp=b1[i];
-	    b1[i]=b2[i];
-	    b2[i]=temp;
-	  }
+		int m=n%step;
+		for (int i=n;i<stop;i++)
+		{
+			boolean temp=b1[i];
+			b1[i]=b2[i];
+			b2[i]=temp;
+		}
 	}
-	
-	
+
+
 	int closestEuclidean(boolean[] b)
 	{
-	  int[] hammingcount = new int[b.length];
-	  int closestIndex=0;
-	  for (int i=0; i< b.length;i++)
-	  {
-	    boolean[] bb = euclidArray(i, b.length);
-	    hammingcount[i]= hammingDist(bb,b);
+		int[] hammingcount = new int[b.length];
+		int closestIndex=0;
+		for (int i=0; i< b.length;i++)
+		{
+			boolean[] bb = euclidArray(i, b.length);
+			hammingcount[i]= hammingDist(bb,b);
 
-	    if (hammingcount[i]<hammingcount[closestIndex])
-	    {
-	      closestIndex=i;
-	    }
-	  }
+			if (hammingcount[i]<hammingcount[closestIndex])
+			{
+				closestIndex=i;
+			}
+		}
 
 
-	  return closestIndex;
+		return closestIndex;
 	}
 
 
 	int hammingDist(boolean[] b1, boolean[] b2)
 	{
-	  if(b1.length!=b2.length)
-	  {
-	   return 0; 
-	  }
+		if(b1.length!=b2.length)
+		{
+			return 0; 
+		}
 
-	  //must assume that lengths are equal here.
-	  int n=0;
+		//must assume that lengths are equal here.
+		int n=0;
 
-	  for (int i=0; i<b1.length;i++)
-	  {
-	    if (  (b1[i] && b2[i]) || (!b1[i] && !b2[i] )   )
-	    {
+		for (int i=0; i<b1.length;i++)
+		{
+			if (  (b1[i] && b2[i]) || (!b1[i] && !b2[i] )   )
+			{
 
-	      //n++;
-	    }
-	    else
-	    {
-	      n++;
-	    }
-	  }
+				//n++;
+			}
+			else
+			{
+				n++;
+			}
+		}
 
-	  return n;
+		return n;
 	}
-	
-	
+
+
 	int[] getHits(boolean[] b)
 	{
 		Vector h= new Vector();
@@ -1317,7 +1331,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		return hits;
 
 	}
-	
+
 	/*
 	void embellish1(boolean[] b)
 	{
@@ -1348,7 +1362,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		b[choice-1]=true;
 
 	}
-	*/
+	 */
 
 	//////embellish by putting a number of repeated hits somehwere where there is at least one hit
 	void embellish(boolean[] b, int number)
@@ -1406,7 +1420,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
-	
+
 	// embellish, but also specifiy a skip width
 	void embellish(boolean[] b, int number, int skip)
 	{
@@ -1463,29 +1477,29 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			}
 		}
 	}
-	
+
 	////////////////embellish by making a section of repeated hits
 	void embellish2(boolean[] b, int section, int step)
 	{
 
-	  int stop=section+ 3*step + (int) (Math.random()*6*step);
-	  if (stop>=b.length)
-	  {
-	    stop=b.length-1;
-	  }
+		int stop=section+ 3*step + (int) (Math.random()*6*step);
+		if (stop>=b.length)
+		{
+			stop=b.length-1;
+		}
 
-	  int m=section%step;
-	  for (int i=section;i<stop;i++)
-	  {
-	    if (i%step==m)
-	    {
-	      b[i]=true;
-	    }
-	    else
-	    {
-	      b[i]=false;
-	    }
-	  }
+		int m=section%step;
+		for (int i=section;i<stop;i++)
+		{
+			if (i%step==m)
+			{
+				b[i]=true;
+			}
+			else
+			{
+				b[i]=false;
+			}
+		}
 	}
 
 
@@ -1902,10 +1916,19 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			if( dist < neighborBound )	
 			{
 				numNeighbors++;
-				
+
 				b.isNeighbor=true;
+
 				//communicate to neighbor
-				//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "state" + "," + "orbit");
+				if(isnComEnable())
+				{
+					//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "state" + "," + "orbit");
+					if(System.currentTimeMillis()-nComTimer >350 + (long)Math.random()*50)
+					{
+						mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+						nComTimer = System.currentTimeMillis();
+					}
+				}
 
 			}
 			else
@@ -2504,11 +2527,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		//rebuildMusicShape();
 	}
-	
+
 	float distanceFromAvatar()
 	{
 		float f=0;
-		
+
 		if(ID!=0)
 		{
 			for(int i = 0; i<otherBots.size();i++)
@@ -2519,14 +2542,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 					f=PVector.dist(new PVector(this.myposx,this.myposy), new PVector (b.x,b.y));
 					break;
 				}
-				
+
 			}
 		}
-		
-		
-		
+
+
+
 		return f;
-		
+
 	}
 
 
@@ -2688,12 +2711,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean[] getReggaeton() {
 		// TODO Auto-generated method stub
 		boolean[] b = new boolean[this.SEQUENCERLENGTH];;
-		
+
 		for(int i=0;i<this.reg.length;i++)
 		{
 			b[reg[i]]=true;
 		}
-		
+
 		return b;
 	}
 
