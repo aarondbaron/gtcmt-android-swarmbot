@@ -2,6 +2,7 @@ package gtcmtswarmbot.mobilecontrol;
 
  
 
+import gtcmtswarmbot.mobilecontrol.enums.Mapping;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -84,6 +85,9 @@ public class DemokitMobileControlActivity extends Activity {
     	sub.add(0,13,0,"angle");
     	sub.add(0,14,0,"neighbor");
     	sub.add(0,15,0,"speed");
+    	sub.add(0,16,0,"angle_embellish");
+    	sub.add(0,17,0,"neighbor_embellish");
+    	sub.add(0,18,0,"speed_embellish");
     	
     	
     	SubMenu sub2 = menu.addSubMenu(0,1,0, "Movement Behaviors");
@@ -213,54 +217,48 @@ public class DemokitMobileControlActivity extends Activity {
 		}else if (item.getTitle() == "showSequencer") {
 			arenaView.thread.showSequencer=!arenaView.thread.showSequencer;
 		}else if (item.getTitle() == "noMapping") {
-			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.map);
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
 		}else if (item.getTitle() == "angle") {
-			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE.map);
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE.getMap());
 		}else if (item.getTitle() == "neighbor") {
-			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGHBOR.map);
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGHBOR.getMap());
 		}else if (item.getTitle() == "speed") {
-			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED.map);
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED.getMap());
+		}else if (item.getTitle() == "angle_embellish") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE_EMBELLISH.getMap());
+		}else if (item.getTitle() == "neighbor_embellish") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGBHOR_EMBELLISH.getMap());
+		}else if (item.getTitle() == "speed_embellish") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED_EMBELLISH.getMap());
 		}
 		
 		
+		
+		/*
+		Mapping m = Mapping.NONE;
+ 
+		switch(m)
+		{
+		case NONE:
+			break;
+		case ANGLE:
+			
+			default : 
+				;
+		
+		}
+		*/
+		 
 		
 		return true;
 	}
 	
 	
-	public enum Code{
-	    SYNC(1000),STOPALL (999), MOVE(998), FORMATION(997), ORBIT(996), TUGMOVE(9988),
-	    MAPPING(800);
-	    
-	    
-	    int code;
-	    Code(int code) {
-	        this.code = code;
  
-	    }
-	}
 	
-	public enum Mapping{
-	    NONE(0),ANGLE (1), NEIGHBOR(2), SPEED(3);
-	    
-	    
-	    int map;
-	    Mapping(int code) {
-	        this.map = code;
  
-	    }
-	}
 	
-	public enum Formation{
-	    CIRCLE(0), SQUARE(1), HORIZONTAL(2), VERTICAL(3);
-	    
-	    
-	    int formation;
-	    Formation(int code) {
-	        this.formation = code;
- 
-	    }
-	}
+	
     
     
     
