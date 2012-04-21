@@ -160,22 +160,30 @@ public class ClientCode implements OnClickListener{
 
 					if(line.contains("com,"))
 					{
+						//substring 0 is com
+						//substring 1 is from who
+						//substring 2, to whom
+						//substring 3 what 
+						//substring 4 ..the data????
+						
 						String test [] = line.split(",");
 						int from= Integer.parseInt(test[1]);
 						int tome=Integer.parseInt(test[2]);
+						
+						Log.d("client com" , "from: " + from );
+						
 						if(tome==bbc.ID)
 						{
 							String whatToDo = test[3];
 							String data = test[4];
 
-							if(whatToDo=="query")
+							if(whatToDo.equals("query"))
 							{
 								//assume just rhythm query for now
-								sendMessage("com," + tome+ "," + from + "," + "response," + bbc.instrumentseq.toString());
-
+								sendMessage("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
+								
+								/*
 								char[] a= data.toCharArray();
-
-
 								for(int i=0;i<bbc.instrumentseq.length;i++)
 								{
 									if(i<a.length)
@@ -198,8 +206,45 @@ public class ClientCode implements OnClickListener{
 										}
 									}
 								}
+								*/
 
 
+							}
+							if(whatToDo.equals("response"))
+							{
+								char[] a= data.toCharArray();
+								boolean[] b  = new boolean[bbc.instrumentseq.length];
+								for(int i=0;i<bbc.instrumentseq.length;i++)
+								{
+									if(i<a.length)
+									{
+										if(a[i]=='0')
+										{
+											b[i] = false;
+											//bbc.instrumentseq[i]=false;
+											//bbc.sfxrseq[i]=false;
+
+											//temporary only
+											//bbc.avatarseq[i]=false;
+										}
+										else
+										{
+											b[i]=true;
+											//bbc.instrumentseq[i]=true;
+											//bbc.sfxrseq[i]=true;
+
+											//temporary only
+											//bbc.avatarseq[i]=true;
+										}
+									}
+
+								}
+								
+								if(from<bbc.ID)
+								{
+									Log.d("client com" , "set rhythm from: " + from );
+									bbc.setRhythm(b);
+								}
 							}
 
 						}

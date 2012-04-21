@@ -699,8 +699,15 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				for (int i = 0; i < tt.length(); i++) {
 
 					// The character and its width
-					char currentChar = tt.charAt(i);
-
+					char currentChar='0';
+					if(i<tt.length())
+					{
+					 currentChar = tt.charAt(i);
+					}
+					else
+					{
+						
+					}
 					// Instead of a constant width, we check the width of each
 					// character.
 					float w = blackpaintText.measureText(tt, i, i) + 15;
