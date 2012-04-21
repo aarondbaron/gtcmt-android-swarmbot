@@ -574,6 +574,48 @@ public class BeatTimer extends Thread{
 						
 						
 						break;
+						
+					//these are going to be what to do when received a message from a neighbor//
+					case 24: 
+						/*
+						if(from<bbc.ID)
+						{
+							Log.d("client com" , "set rhythm from: " + from );
+							bbc.setRhythm(b);
+						}
+						*/
+						
+						if(bbc.numNeighbors>0)
+						{
+							bbc.setRhythm(bbc.receivedSequence);
+						}
+						else
+						{
+							if(!bbc.shiftOnce)
+							{
+								if(Math.random()<.5)
+								{
+									bbc.shiftRhythmLeft(bbc.instrumentseq);
+									bbc.shiftRhythmLeft(bbc.sfxrseq);
+								
+								}
+								else
+								{
+									bbc.shiftRhythmRight(bbc.instrumentseq);
+									bbc.shiftRhythmRight(bbc.sfxrseq);
+								}
+								bbc.shiftOnce=true;
+							}
+						}
+						break;
+						
+						
+					
+						 
+					case 25://if get nearby then randomly choose which one gets to be copied--- otheriwse shift?
+						break;
+					case 26:
+						break;
 
 					default: ; break;
 
@@ -736,6 +778,8 @@ public class BeatTimer extends Thread{
 				bbc.embellishCounter++;
 				
 				bbc.randomlyChangeOnce=false;
+				
+				bbc.shiftOnce=false;
 			}
 
 		}

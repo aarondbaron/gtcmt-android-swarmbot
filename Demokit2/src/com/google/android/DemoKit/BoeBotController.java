@@ -3,6 +3,7 @@ package com.google.android.DemoKit;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.LinkedHashSet;
 import java.util.Vector;
 
 
@@ -159,7 +160,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	long nComTimer;
 	boolean nComEnable;
-
+ 
+	
+	LinkedHashSet queue;
+	boolean[] receivedSequence ;
+	
 	public boolean isnComEnable() {
 		return nComEnable;
 	}
@@ -188,6 +193,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		instrumentseq = new boolean[SEQUENCERLENGTH];
 
 		avatarseq = new boolean[SEQUENCERLENGTH];
+		
+		receivedSequence = new boolean[SEQUENCERLENGTH];
 
 
 		djembe0 = new boolean[SEQUENCERLENGTH];
@@ -274,6 +281,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		nComTimer =System.currentTimeMillis();
 		setnComEnable(true);
+		queue = new LinkedHashSet();
 	}
 
 	private void initializeReggaeton() {
@@ -380,6 +388,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean embellishOnce;
 	public int embellishCounter;
 	public boolean randomlyChangeOnce;
+	public boolean shiftOnce;
 
 	/////??
 
@@ -1908,6 +1917,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		for(int i =0 ; i < otherBots.size();i++)
 		{
+			
+			 
 			Bot b = otherBots.get(i);
 
 			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
@@ -1922,12 +1933,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				//communicate to neighbor
 				if(isnComEnable())
 				{
-					//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "state" + "," + "orbit");
+					
+					queue.add(b);
+					mActivity.client.sendMessage2("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+					/*
 					if(System.currentTimeMillis()-nComTimer >350 + (long)Math.random()*50)
 					{
-						mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+						//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+						
+						queue.add(b);
+						mActivity.client.sendMessage2("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+						
 						nComTimer = System.currentTimeMillis();
 					}
+					*/
 				}
 
 			}
