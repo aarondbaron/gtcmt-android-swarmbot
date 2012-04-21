@@ -467,13 +467,29 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 			{
 				if(!thread.addLock)
 				{
-					for(int i=0;i< thread.lines.size();i++)
+					PVector p1, p2;
+
+					for(int i=0;i< thread.lines.size()-1;i++)
 					{
-						PVector p = (PVector) thread.lines.get(i);
-						if(p!=null)
+						p1 = (PVector) thread.lines.get(i);
+						c.drawCircle(p1.x, p1.y, 2, blackpaint);
+						if(thread.lines.size()>1)
 						{
-							c.drawCircle(p.x, p.y, 2, blackpaint);
+							p2 = (PVector) thread.lines.get(i+1);
 						}
+						else
+						{
+							p2=p1;
+						}
+						if(p2!=null && p1!=null)
+						{
+							c.drawLine(p1.x, p1.y, p2.x, p2.y, blackpaint);
+						}
+
+
+
+
+						p1=p2;
 					}
 				}
 			}

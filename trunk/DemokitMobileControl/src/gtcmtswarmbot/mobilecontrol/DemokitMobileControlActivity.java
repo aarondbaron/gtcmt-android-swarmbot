@@ -2,6 +2,7 @@ package gtcmtswarmbot.mobilecontrol;
 
  
 
+import gtcmtswarmbot.mobilecontrol.enums.ControllerCode;
 import gtcmtswarmbot.mobilecontrol.enums.Mapping;
 import android.app.Activity;
 import android.os.Bundle;
@@ -80,15 +81,15 @@ public class DemokitMobileControlActivity extends Activity {
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
     	SubMenu sub = menu.addSubMenu(0,1,0, "Music Mappings");
-    	sub.add(0,11,0,"noMapping");
-    	sub.add(0,12,0,"showSequencer");
-    	sub.add(0,13,0,"angle");
-    	sub.add(0,14,0,"neighbor");
-    	sub.add(0,15,0,"speed");
-    	sub.add(0,16,0,"angle_embellish");
-    	sub.add(0,17,0,"neighbor_embellish");
-    	sub.add(0,18,0,"speed_embellish");
-    	
+    	sub.add("noMapping");
+    	sub.add("showSequencer");
+    	sub.add("angle");
+    	sub.add("neighbor");
+    	sub.add("speed");
+    	sub.add("angle_embellish");
+    	sub.add("neighbor_embellish");
+    	sub.add("speed_embellish");
+    	sub.add("proximity1");
     	
     	SubMenu sub2 = menu.addSubMenu(0,1,0, "Movement Behaviors");
     	sub2.add("ViewCursor");
@@ -230,6 +231,8 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGBHOR_EMBELLISH.getMap());
 		}else if (item.getTitle() == "speed_embellish") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED_EMBELLISH.getMap());
+		}else if (item.getTitle() == "proximity1") {
+			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.PROXIMITY1.getMap());
 		}
 		
 		
