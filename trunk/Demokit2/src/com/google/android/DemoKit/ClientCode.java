@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Iterator;
 
 
 
@@ -50,6 +51,9 @@ public class ClientCode implements OnClickListener{
 
 	boolean messageFlag = false;
 	String message;
+	
+	PrintWriter out2;
+	
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
 		bbc=BBC;
@@ -96,6 +100,9 @@ public class ClientCode implements OnClickListener{
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
+				out2 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+
+				
 				while ((line = in.readLine()) != null) {
 					if(line.contains("header"))
 					{
@@ -181,6 +188,7 @@ public class ClientCode implements OnClickListener{
 							{
 								//assume just rhythm query for now
 								sendMessage("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
+								//sendMessage2("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
 								
 								/*
 								char[] a= data.toCharArray();
@@ -221,6 +229,7 @@ public class ClientCode implements OnClickListener{
 										if(a[i]=='0')
 										{
 											b[i] = false;
+											bbc.receivedSequence[i]=false;
 											//bbc.instrumentseq[i]=false;
 											//bbc.sfxrseq[i]=false;
 
@@ -230,6 +239,7 @@ public class ClientCode implements OnClickListener{
 										else
 										{
 											b[i]=true;
+											bbc.receivedSequence[i]=true;
 											//bbc.instrumentseq[i]=true;
 											//bbc.sfxrseq[i]=true;
 
@@ -240,11 +250,17 @@ public class ClientCode implements OnClickListener{
 
 								}
 								
+								
+								
+								///this should be a mapping behavior
+								/*
 								if(from<bbc.ID)
 								{
 									Log.d("client com" , "set rhythm from: " + from );
 									bbc.setRhythm(b);
 								}
+								*/
+								
 							}
 
 						}
@@ -1530,6 +1546,22 @@ public class ClientCode implements OnClickListener{
 	{
 		message=s;
 		this.messageFlag=true;
+	}
+	
+	public void sendMessage2(String s)
+	{
+		if(System.currentTimeMillis()-bbc.nComTimer>300)
+		{
+			Iterator<?> i = bbc.queue.iterator();		
+			Bot b = (Bot) i.next();
+			i.remove();
+			String ss="com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn";
+
+			Log.d("client sendMessage2",""+ ss);
+			out2.println(ss);
+			
+			bbc.nComTimer=System.currentTimeMillis();
+		}
 	}
 
 	public void doStuff()
