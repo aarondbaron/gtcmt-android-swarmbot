@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -23,10 +24,14 @@ public class DemokitMobileControlActivity extends Activity {
 	ArenaView arenaView;
 	
 	Client client;
+
+	BeatTimer beatTimer;
 	
 	SomeController sc;
 	
 	boolean clockwise;
+	
+	String prevMode;
 	
 	
     /** Called when the activity is first created. */
@@ -35,7 +40,14 @@ public class DemokitMobileControlActivity extends Activity {
     	requestWindowFeature(Window.FEATURE_NO_TITLE);  
     	super.onCreate(savedInstanceState);
         //setContentView(R.layout.main);
-        sc = new SomeController();
+    	
+    	beatTimer = new BeatTimer(this);
+    	
+		
+        sc = new SomeController(this);
+        beatTimer.bbc=sc;
+        
+		
         arenaView = new ArenaView(this,sc);
         setContentView(arenaView);
         arenaView.requestFocus(); 
@@ -44,7 +56,8 @@ public class DemokitMobileControlActivity extends Activity {
         client = new Client(this, sc);
         
          
-        
+        beatTimer.setRunning(true);
+		beatTimer.start();
                  
             
          
@@ -76,6 +89,25 @@ public class DemokitMobileControlActivity extends Activity {
 		System.exit(0);
     }
     
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            // do something on back.
+        	
+        	if(this.arenaView.thread.showSequencer)
+        	{
+        		this.arenaView.thread.showSequencer=false;
+        	}
+        	else
+        	{
+        		finish();
+        	}
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+    
     
     
     @Override
@@ -105,6 +137,7 @@ public class DemokitMobileControlActivity extends Activity {
     	sub2.add("Alignment");
     	sub2.add("Cohesion");
     	sub2.add("TugMove");
+    	sub2.add("AvatarMove");
     	sub2.add("StopAll");
     	//sub2.add("Formation");
     	
@@ -183,7 +216,7 @@ public class DemokitMobileControlActivity extends Activity {
 		}else if (item.getTitle() == "FollowLine") {
 			 
 		}else if (item.getTitle() == "Wander") {
-			 
+			this.client.sendMessage("controller,"+ 995 );
 		}else if (item.getTitle() == "Path") {
 			arenaView.mode="Path";
 			Log.d("item selected",""+item.getTitle());
@@ -196,6 +229,8 @@ public class DemokitMobileControlActivity extends Activity {
 			 
 		}else if (item.getTitle() == "TugMove") {
 			this.arenaView.mode="TugMove";
+		}else if (item.getTitle() == "AvatarMove") {
+			this.arenaView.mode="AvatarMove";
 		}else if (item.getTitle() == "circle") {
 			this.arenaView.mode="formation";
 			this.client.sendMessage("controller,"+ 997 + ",circle," + 80);
@@ -217,6 +252,15 @@ public class DemokitMobileControlActivity extends Activity {
 			Log.d("item selected",""+item.getTitle());
 		}else if (item.getTitle() == "showSequencer") {
 			arenaView.thread.showSequencer=!arenaView.thread.showSequencer;
+			if(arenaView.thread.showSequencer)
+			{
+				prevMode=arenaView.mode;
+				arenaView.mode="editSequencer";
+			}
+			else
+			{
+				arenaView.mode=prevMode;
+			}
 		}else if (item.getTitle() == "noMapping") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
 		}else if (item.getTitle() == "angle") {

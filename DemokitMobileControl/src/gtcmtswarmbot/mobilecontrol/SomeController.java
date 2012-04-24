@@ -19,19 +19,28 @@ public class SomeController {
 	public boolean danceSequencer;
 	public Bot currentAvatar;
 	
-	private int currentIndex;
+	int currentIndex;
 	public Vector beacons;
+	public boolean[] receivedSequence;
 	
-	SomeController()
+	int SEQUENCERLENGTH=48;
+	public boolean sequencerMode=true;
+	
+	DemokitMobileControlActivity mActivity;
+	
+	BeatTimer bt;
+	
+	SomeController(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
 		
-		
+		this.mActivity= demokitMobileControlActivity;
 		allBots=new Vector();
 		beacons = new Vector();
 		
-		instrumentseq = new boolean[48];
-		sfxrseq = new boolean[48];
-		avatarseq = new boolean[48];
+		instrumentseq = new boolean[SEQUENCERLENGTH];
+		sfxrseq = new boolean[SEQUENCERLENGTH];
+		avatarseq = new boolean[SEQUENCERLENGTH];
+		receivedSequence = new boolean[SEQUENCERLENGTH];
 		
 		behavior = new Behavior();
 		
@@ -39,7 +48,7 @@ public class SomeController {
 
 	public void resetIndex() {
 		// TODO Auto-generated method stub
-		
+		mActivity.beatTimer.resetIndex();
 	}
 
 	

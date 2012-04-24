@@ -17,6 +17,10 @@ public class Bot
 	float distToMe;
 
 	PVector vel;
+	
+	boolean inspect=false;
+	public boolean vibrateOnce;
+	
 	Bot()
 	{
 		vel = new PVector();
@@ -55,6 +59,45 @@ public class Bot
 
 	public float getAngle() {
 		return angle;
+	}
+
+	public boolean isNearCursor(float tx, float ty, int bx, int by) {
+		// TODO Auto-generated method stub
+		int sz=50;
+		
+		PVector t = new PVector(tx,ty);
+		
+		//int bx=(int) map(b.x,0,640,leftx,rightx);
+		//int by=(int) map(b.y,0,480,topy,bottomy);
+		
+		PVector loc = new PVector(bx,by);
+		if(PVector.dist(t,loc)<50)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+		/*
+		if(tx>this.x-sz && tx < this.x+sz && ty>this.y-sz && ty < this.y+sz)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		*/
+			
+
+	}
+	
+	public void inspect()
+	{
+		inspect=!inspect;
+		
 	}
 
 }
