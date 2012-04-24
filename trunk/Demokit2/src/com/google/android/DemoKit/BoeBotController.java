@@ -389,6 +389,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public int embellishCounter;
 	public boolean randomlyChangeOnce;
 	public boolean shiftOnce;
+	public boolean changeOnce;
+	public boolean swapOnce;
 
 	/////??
 
@@ -2737,6 +2739,72 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 
 		return b;
+	}
+
+	public void swapRandomPortion(boolean[] seq1,boolean[] seq2) {
+		// TODO Auto-generated method stub
+		
+		if(seq1.length==0||seq2.length==0)
+		{
+			return;
+		}
+		int sz=Math.min(seq1.length,seq2.length);
+		
+		int start = (int) Math.random()*sz/2;
+		
+		int stop = start + (int) (Math.random()*(sz-start));
+		
+		for(int i=start;i<stop;i++)
+		{
+			 
+			if(i<sz-1)
+			{
+				boolean temp = seq1[i];
+				seq1[i]=seq2[i];
+				seq2[i]=temp;
+			}
+		}
+		
+		
+	}
+	
+	public void swapPortion(boolean[] seq1,boolean[] seq2, int start, int stop)
+	{
+		if(seq1.length!=seq2.length)
+		{
+			return;
+		}
+		if(seq1.length==0|| seq2.length==0)
+		{
+			return;
+		}
+		
+		if(start>seq1.length-1 || stop > seq1.length-1)
+		{
+			return;
+		}
+		
+		if(start>stop)
+		{
+			return;
+		}
+		
+		int sz= seq1.length;
+		
+		for(int i=start;i<stop;i++)
+		{
+			
+			if(i<sz-1)
+			{
+				boolean temp = seq1[i];
+				seq1[i]=seq2[i];
+				seq2[i]=temp;
+			}
+		}
+		
+		
+		
+		
 	}
 
 

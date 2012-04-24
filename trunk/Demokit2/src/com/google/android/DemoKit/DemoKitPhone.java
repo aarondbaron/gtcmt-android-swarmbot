@@ -70,8 +70,8 @@ public class DemoKitPhone extends BaseActivity implements OnClickListener {
 		mCamLabel.setOnClickListener(this);
 		mFaceLabel.setOnClickListener(this);
 
-		//showTabContents(true);
 		showTabContents(R.id.robotFaceLabel);
+		//showTabContents(R.id.cameraLabel);
 	}
 
 	void showTabContents(Boolean showInput) {
