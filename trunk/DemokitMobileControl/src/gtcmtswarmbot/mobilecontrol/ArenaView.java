@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 
 import gtcmtswarmbot.mobilecontrol.ArenaView.Cursor;
+import gtcmtswarmbot.mobilecontrol.enums.Mapping;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -41,6 +43,15 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 	public long tugMoveTimer;
 
+	public long inspectTimer;
+	boolean inspecting;
+	//boolean vibrateOnce;
+
+	Bot botToInspect;
+
+	Vibrator vib;
+	
+	boolean surfCreated;
 
 	public ArenaView(Context context, SomeController bbc) {
 		//super(context);
@@ -62,6 +73,27 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		mode="";
 
 		tugMoveTimer =System.currentTimeMillis();
+		inspectTimer = System.currentTimeMillis();
+
+		botToInspect=null;
+
+		/*
+		Bot testBot = new Bot();
+		testBot.x=640/4;
+		testBot.y=480/4;
+		testBot.ID=0;
+		bbc.allBots.add(testBot);
+		
+		testBot = new Bot();
+		testBot.x=640-640/4;
+		testBot.y=480-480/4;
+		testBot.ID=1;
+		bbc.allBots.add(testBot);
+		 */
+		 
+
+		vib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
+
 	}
 
 	@Override
@@ -83,6 +115,8 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		int hoff=10;
 		thread.arena = new Arena(getWidth()/2, getHeight()/2,getWidth()/2-woff,getHeight()/2-hoff);		
 		thread.sequencer = new Sequencer(this);
+		
+		surfCreated=true;
 
 	}
 
@@ -96,12 +130,15 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
 
-		if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) 
+		{
 
 			float x = event.getX();
 			float y = event.getY();
 			thread.arena.cursor.x=(int) x;
 			thread.arena.cursor.y=(int) y;
+
+
 
 			if(mode.equals("drawn")||mode.equals("Path"))
 			{
@@ -136,6 +173,82 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 					tugMoveTimer = System.currentTimeMillis();
 				}
 			}
+			if(mode.equals("AvatarMove"))
+			{
+				if(System.currentTimeMillis()-tugMoveTimer>125)
+				{
+					int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
+					int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
+					mActivity.client.sendMessage("controller,"+ 9987 + "," + xx + "," + yy) ;
+					tugMoveTimer = System.currentTimeMillis();
+				}
+			}
+
+			if(this.mode.equals("editSequencer"))
+			{
+
+			}
+
+			boolean vibrateOnceCheck=false;
+			/*
+			if(vibrateOnce)
+			{
+
+			}
+			else
+			{
+				this.inspectTimer=System.currentTimeMillis();
+			}
+			 */
+
+
+			for(int i=0;i<bbc.allBots.size();i++)
+			{
+				Bot b = (Bot) bbc.allBots.get(i);
+
+				int bx=(int) map(b.x,0,640,this.thread.arena.leftx,this.thread.arena.rightx);
+				int by=(int) map(b.y,0,480,this.thread.arena.topy,this.thread.arena.bottomy);
+
+				if(b.isNearCursor(x,y, bx, by))
+				{
+					//Log.d("inspect","x: " + x + "  y:" + y  + "||bx: " + b.x + "  by:" + b.y);
+					b.inspect=true;
+
+					if(!b.vibrateOnce)
+					{
+						vib.vibrate(50);
+						b.vibrateOnce=true;
+					}
+					else
+					{
+						this.inspectTimer=System.currentTimeMillis();
+					}
+					if(System.currentTimeMillis()-this.inspectTimer>1000)
+					{
+
+						//inspecting=true;
+						Log.d("sending query","bot " + b.ID);
+						this.inspectTimer=System.currentTimeMillis();
+						mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+
+
+					}
+				}
+				else
+				{
+					b.inspect=false;
+					b.vibrateOnce=false;
+					//Log.d("fail inspect","x: " + x + "  y:" + y + "||bx: " + b.x + "  by:" + b.y);
+				}
+
+			}
+
+
+
+			if(inspecting)
+			{
+
+			}
 
 
 
@@ -149,6 +262,9 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 			thread.arena.fixCursor();
 
+			inspecting=false;
+			//vibrateOnce=false;
+
 			if(this.mode.equals("Move"))
 			{
 				for(int i=0;i<bbc.allBots.size();i++)
@@ -161,6 +277,9 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 					int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
 
 					mActivity.client.sendMessage("controller,"+ 998 + "," + xx + "," + yy) ;
+
+					Bot b = (Bot) bbc.allBots.get(i);
+					b.vibrateOnce=false;
 				}
 			}
 
@@ -172,6 +291,14 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 				mActivity.client.sendMessage("controller,"+ 9988) ;
 			}
+			if(this.mode.equals("AvatarMove"))
+			{
+				int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
+
+				int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
+
+				mActivity.client.sendMessage("controller,"+ 9987) ;
+			}
 
 			if(this.mode.equals("drawn"))
 			{
@@ -180,6 +307,13 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 			if(this.mode.equals("Path"))
 			{
 
+			}
+
+			if(this.mode.equals("editSequencer"))
+			{
+				mActivity.client.sendMessage("controller,"+ 801 + "," + this.thread.sequencer.getMySequence());
+
+				thread.sequencer.checkInside(thread.arena.cursor.x,thread.arena.cursor.y);
 			}
 
 		}
@@ -455,6 +589,10 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 				}
 
 				c.drawCircle(bx, by, 2.5f, blackpaint);
+				if(b.inspect)
+				{
+					c.drawCircle(bx, by, 50, redPaintHighlight);
+				}
 
 				c.drawLine(bx, by, bx+b.vel.x*100, by+b.vel.y*100, greenPaint);
 				if(b.vel.x==0)
