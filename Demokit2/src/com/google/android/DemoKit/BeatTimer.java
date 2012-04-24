@@ -170,7 +170,7 @@ public class BeatTimer extends Thread{
 							bbc.fillNow(bbc.sfxrseq);
 							bbc.fillNow(bbc.instrumentseq);
 						}
-						*/
+						 */
 					}
 					// this shoudl be in boebotcontroller.
 					switch(mapping)
@@ -538,7 +538,7 @@ public class BeatTimer extends Thread{
 							{
 								boolean[] tt= bbc.getKuku(0);
 								bbc.avatarseq=tt.clone();
-								
+
 							}
 							bbc.setRhythm(bbc.avatarseq);
 
@@ -556,26 +556,26 @@ public class BeatTimer extends Thread{
 						}
 
 						break;
-						
+
 					case 23: 
-						
+
 						if(bbc.myBehavior.wander || (bbc.myBehavior.wanderThenFollowInLine && bbc.numNeighbors==0) )
 						{							
 							if(!bbc.randomlyChangeOnce)
 							{
-							 int indexToChange = (int) (Math.random()*bbc.instrumentseq.length);
-							 bbc.instrumentseq[indexToChange]=!bbc.instrumentseq[indexToChange];
+								int indexToChange = (int) (Math.random()*bbc.instrumentseq.length);
+								bbc.instrumentseq[indexToChange]=!bbc.instrumentseq[indexToChange];
 							}							 
 						}
 						else
 						{
 							//if()
 						}
-						
-						
+
+
 						break;
-						
-					//these are going to be what to do when received a message from a neighbor//
+
+						//these are going to be what to do when received a message from a neighbor//
 					case 24: 
 						/*
 						if(from<bbc.ID)
@@ -583,8 +583,8 @@ public class BeatTimer extends Thread{
 							Log.d("client com" , "set rhythm from: " + from );
 							bbc.setRhythm(b);
 						}
-						*/
-						
+						 */
+
 						if(bbc.numNeighbors>0)
 						{
 							bbc.setRhythm(bbc.receivedSequence);
@@ -597,7 +597,7 @@ public class BeatTimer extends Thread{
 								{
 									bbc.shiftRhythmLeft(bbc.instrumentseq);
 									bbc.shiftRhythmLeft(bbc.sfxrseq);
-								
+
 								}
 								else
 								{
@@ -608,14 +608,51 @@ public class BeatTimer extends Thread{
 							}
 						}
 						break;
-						
-						
-					
-						 
+
+
+
+
 					case 25://if get nearby then randomly choose which one gets to be copied--- otheriwse shift?
+						//
 						break;
-					case 26:
+					case 26: //if get nearby then swap portion?
+						if(bbc.numNeighbors==0)
+						{
+
+						}
+						else
+						{
+							if(!bbc.swapOnce)
+							{
+								//bbc.swapRandomPortion(bbc.instrumentseq, bbc.receivedSequence );
+								bbc.swapPortion(bbc.instrumentseq, bbc.receivedSequence, 0, bbc.instrumentseq.length/2);
+								bbc.setRhythm(bbc.instrumentseq);
+								bbc.swapOnce=true;
+							}
+						}
+
 						break;
+					case 100: //if alone keep same, else randomly change?
+						if(bbc.numNeighbors==0)
+						{
+
+						}
+						else
+						{
+							if(!bbc.changeOnce)
+							{
+								for(int i=0;i<bbc.numNeighbors;i++)
+								{
+									int indexToChange = (int) (Math.random()*bbc.instrumentseq.length); 
+									bbc.instrumentseq[indexToChange] = ! bbc.instrumentseq[indexToChange];
+									bbc.sfxrseq[indexToChange] = ! bbc.sfxrseq[indexToChange];
+								}
+								bbc.changeOnce=true;
+							}
+						}
+						break;
+
+
 
 					default: ; break;
 
@@ -663,10 +700,10 @@ public class BeatTimer extends Thread{
 						{
 							mActivity.aTest.soundType(7);
 							mActivity.aTest.replay();
-							
-							
+
+
 							//// or
-							
+
 							//mActivity.aTest.setFrequency(440);
 							//mActivity.aTest.setFrequencyRP();
 							mActivity.aTest.setFrequencyAP();
@@ -765,7 +802,7 @@ public class BeatTimer extends Thread{
 		//allowedToFire=true;
 		if(bbc!=null)
 		{
-			bbc.currentIndex=generalIndex%bbc.fseq.length;
+			bbc.currentIndex=generalIndex%bbc.instrumentseq.length;
 
 			if(bbc.currentIndex==0)
 			{
@@ -776,10 +813,14 @@ public class BeatTimer extends Thread{
 				///////////////other stuff
 				bbc.embellishOnce=false;
 				bbc.embellishCounter++;
-				
+
 				bbc.randomlyChangeOnce=false;
-				
+
 				bbc.shiftOnce=false;
+
+				bbc.changeOnce=false;
+				
+				bbc.swapOnce =false;
 			}
 
 		}

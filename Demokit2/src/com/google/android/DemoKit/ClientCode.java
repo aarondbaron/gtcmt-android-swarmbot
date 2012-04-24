@@ -51,9 +51,9 @@ public class ClientCode implements OnClickListener{
 
 	boolean messageFlag = false;
 	String message;
-	
+
 	PrintWriter out2;
-	
+
 	public ClientCode(DemoKitActivity mActivity, BoeBotController BBC)
 	{
 		bbc=BBC;
@@ -102,7 +102,7 @@ public class ClientCode implements OnClickListener{
 
 				out2 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-				
+
 				while ((line = in.readLine()) != null) {
 					if(line.contains("header"))
 					{
@@ -172,13 +172,13 @@ public class ClientCode implements OnClickListener{
 						//substring 2, to whom
 						//substring 3 what 
 						//substring 4 ..the data????
-						
+
 						String test [] = line.split(",");
 						int from= Integer.parseInt(test[1]);
 						int tome=Integer.parseInt(test[2]);
-						
+
 						Log.d("client com" , "from: " + from );
-						
+
 						if(tome==bbc.ID)
 						{
 							String whatToDo = test[3];
@@ -189,32 +189,8 @@ public class ClientCode implements OnClickListener{
 								//assume just rhythm query for now
 								sendMessage("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
 								//sendMessage2("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
-								
-								/*
-								char[] a= data.toCharArray();
-								for(int i=0;i<bbc.instrumentseq.length;i++)
-								{
-									if(i<a.length)
-									{
-										if(a[i]=='0')
-										{
-											bbc.instrumentseq[i]=false;
-											bbc.sfxrseq[i]=false;
 
-											//temporary only
-											bbc.avatarseq[i]=false;
-										}
-										else
-										{
-											bbc.instrumentseq[i]=true;
-											bbc.sfxrseq[i]=true;
-
-											//temporary only
-											bbc.avatarseq[i]=true;
-										}
-									}
-								}
-								*/
+								 
 
 
 							}
@@ -249,9 +225,9 @@ public class ClientCode implements OnClickListener{
 									}
 
 								}
-								
-								
-								
+
+
+
 								///this should be a mapping behavior
 								/*
 								if(from<bbc.ID)
@@ -259,8 +235,8 @@ public class ClientCode implements OnClickListener{
 									Log.d("client com" , "set rhythm from: " + from );
 									bbc.setRhythm(b);
 								}
-								*/
-								
+								 */
+
 							}
 
 						}
@@ -989,6 +965,7 @@ public class ClientCode implements OnClickListener{
 						 */
 						bbc.setWanderVector(true);
 						bbc.myBehavior.setWanderVector(true);
+						bbc.myBehavior.setSeparation(true);
 					}
 
 					if(line.contains("wander"+myID))
@@ -1000,20 +977,21 @@ public class ClientCode implements OnClickListener{
 						 */
 						bbc.setWanderVector(true);
 						bbc.myBehavior.setWanderVector(true);
+						bbc.myBehavior.setSeparation(true);
 					}
 					if(line.contains("controller,"))
 					{
 						Log.d("client","controller move");
 						String test [] = line.split(",");
-						
-						
+
+
 						//just do this for now....
 						bbc.myBehavior.setSeparation(true);
 
 						if(test.length>=2)
 						{
 							int code=(int) Float.parseFloat(    test[1]       ) ;
-							if(code==999)
+							if(code==999) // stop all
 							{
 
 								doStop();
@@ -1023,7 +1001,7 @@ public class ClientCode implements OnClickListener{
 
 
 							}
-							if(code==998)
+							if(code==998) // move with mouse continuously
 							{
 
 								bbc.myBehavior.setSeparation(true);
@@ -1064,7 +1042,7 @@ public class ClientCode implements OnClickListener{
 							}
 							if(code==996)
 							{
-								 
+
 								int dist=(int) Float.parseFloat(test[2]);
 
 								int clockwise=(int) Float.parseFloat(test[3]);
@@ -1076,13 +1054,13 @@ public class ClientCode implements OnClickListener{
 								{
 									bbc.myBehavior.orbitClockwise=true;
 								}
-								
+
 
 								bbc.myBehavior.orbitDist=dist;
 								bbc.myBehavior.setOrbitCenter(true);
 								Log.d("client","controller orbit center: " + dist);
 							}
-							if(code==9988)
+							if(code==9988) //tug move
 							{
 								if(test.length==4)
 								{
@@ -1107,7 +1085,43 @@ public class ClientCode implements OnClickListener{
 									bbc.myBehavior.setFollowMouse(false);
 								}
 							}
+
+							if(code==9987) //avatar tug move
+							{
+								if(bbc.ID==0)
+								{
+									if(test.length==4)
+									{
+										bbc.myBehavior.setSeparation(true);
+										int x=(int) Float.parseFloat( test[2] ) ;
+										int y=(int) Float.parseFloat( test[3] )    ;
+										bbc.targetx=x;
+										bbc.targety=y;
+										bbc.myBehavior.phase1move=true;
+										bbc.myBehavior.phase2move=false;
+										bbc.moveToLoc(true);
+										//bbc.moveBehavior.move2Loc(x, y);
+										//////////////////////////////////
+										//////////////////////////////////
+										bbc.target.x=x;
+										bbc.target.y=y;
+										Log.d("controller TUG move"," :"+x+"y:"+y);
+									}
+									if(test.length==2)
+									{
+										bbc.moveToLoc(false);
+										bbc.myBehavior.setFollowMouse(false);
+									}
+								}
+							}
 							
+							if(code==995) //wander
+							{
+								bbc.setWanderVector(true);
+								bbc.myBehavior.setWanderVector(true);
+								bbc.myBehavior.setSeparation(true);
+							}
+
 							if(code==800)
 							{
 								int map = (int) Float.parseFloat(test[2]);
@@ -1547,7 +1561,7 @@ public class ClientCode implements OnClickListener{
 		message=s;
 		this.messageFlag=true;
 	}
-	
+
 	public void sendMessage2(String s)
 	{
 		if(System.currentTimeMillis()-bbc.nComTimer>300)
@@ -1559,7 +1573,7 @@ public class ClientCode implements OnClickListener{
 
 			Log.d("client sendMessage2",""+ ss);
 			out2.println(ss);
-			
+
 			bbc.nComTimer=System.currentTimeMillis();
 		}
 	}

@@ -1400,7 +1400,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				if(cnt==2)
 				{
 					cnt=2;
-					bbc.setMapping(2);//was 6
+					bbc.setMapping(6);//was 6
 					thread.message.displayMessage("mapping: " + cnt + "  how close your face is...neighbor");
 					
 				}
