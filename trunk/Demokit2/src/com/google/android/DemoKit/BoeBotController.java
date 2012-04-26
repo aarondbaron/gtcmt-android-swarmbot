@@ -165,6 +165,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	LinkedHashSet queue;
 	boolean[] receivedSequence ;
 	
+	FightSong fightSong;
+	
 	public boolean isnComEnable() {
 		return nComEnable;
 	}
@@ -282,6 +284,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		nComTimer =System.currentTimeMillis();
 		setnComEnable(true);
 		queue = new LinkedHashSet();
+		
+		fightSong= new FightSong();
+		
+		this.setMapping(101);
+		
+		
 	}
 
 	private void initializeReggaeton() {
@@ -391,6 +399,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean shiftOnce;
 	public boolean changeOnce;
 	public boolean swapOnce;
+	public boolean useSong=true;
 
 	/////??
 

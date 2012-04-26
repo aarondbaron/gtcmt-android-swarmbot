@@ -56,6 +56,7 @@ public class BeatTimer extends Thread{
 
 	boolean wanderVector;
 
+	Measure currentMeasure;
 
 
 	BeatTimer()
@@ -65,6 +66,8 @@ public class BeatTimer extends Thread{
 		globalTimer=System.currentTimeMillis();
 		appStartTimeMillis=globalTimer;
 		Log.d("beatTimer created", "checking here ");
+		
+		currentMeasure = new Measure();
 	}
 
 	@Override
@@ -651,6 +654,12 @@ public class BeatTimer extends Thread{
 							}
 						}
 						break;
+						
+					case 101:
+						
+						currentMeasure = bbc.fightSong.getMeasure((int) this.generalMeasure);
+						bbc.setRhythm(currentMeasure.toRhythm());
+						//mActivity.aTest.setFrequency(m);
 
 
 
@@ -706,7 +715,14 @@ public class BeatTimer extends Thread{
 
 							//mActivity.aTest.setFrequency(440);
 							//mActivity.aTest.setFrequencyRP();
-							mActivity.aTest.setFrequencyAP();
+							if(!bbc.useSong)
+							{
+								mActivity.aTest.setFrequencyAP();
+							}
+							else
+							{
+								 mActivity.aTest.setFrequency(currentMeasure.notes[bbc.currentIndex]);
+							}
 							mActivity.aTest.properIncrement();
 						}
 					}
