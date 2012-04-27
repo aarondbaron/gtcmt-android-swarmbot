@@ -90,7 +90,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	PVector target;
 	PVector vel;
 
-	int rbyte, lbyte;
+	int rbyte, lbyte, headbyte;
 	public int modDistance;
 
 
@@ -165,6 +165,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	LinkedHashSet queue;
 	boolean[] receivedSequence ;
 	
+	int servo3;
+	
 	FightSong fightSong;
 	
 	public boolean isnComEnable() {
@@ -181,6 +183,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		bbs1 = servo1;
 		bbs2 = servo2;
 		instrument = 3;
+		
+		servo3=3;
+		
 		mCommandTarget1 = (byte) (bbs1 - 1 + 0x10);
 		mCommandTarget2 = (byte) (bbs2 - 1 + 0x10);
 		mCommandTarget3 = (byte) (instrument - 1 + 0x10);
@@ -779,6 +784,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		rbyte=b;
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte)b);
+	}
+	
+	public void writeHead(int b)
+	{
+		headbyte=b;
+		byte commandTarget= (byte) (this.servo3 - 1 + 0x10);
+		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND, commandTarget, (byte) b);
 	}
 
 	public float getSpeed()

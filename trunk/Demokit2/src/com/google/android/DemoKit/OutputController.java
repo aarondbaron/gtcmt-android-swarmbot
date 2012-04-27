@@ -12,7 +12,8 @@ public class OutputController extends AccessoryController {
 	}
 
 	protected void onAccesssoryAttached() {
-		setupServoController(1, R.id.servo1);
+		//setupServoController(1, R.id.servo1);
+		setupServoController(3, R.id.servo1);
 		setupServoController(2, R.id.servo2);
 		setupBoeBotController(1,2);
 		
