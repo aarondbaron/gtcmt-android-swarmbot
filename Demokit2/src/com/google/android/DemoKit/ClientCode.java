@@ -444,6 +444,10 @@ public class ClientCode implements OnClickListener{
 						bbc.useSFXR=!bbc.useSFXR;
 
 					}
+					if(line.contains("useSong"))
+					{
+						bbc.useSong=!bbc.useSong;
+					}
 
 					if(line.contains("directControl"))
 					{
@@ -738,6 +742,15 @@ public class ClientCode implements OnClickListener{
 						bbc.calibrationAngle=bbc.angleAzimuth;
 
 						Log.d("LINE","calibration done");
+					}
+					
+					if(line.contains("headMotor,"))
+					{
+						String test [] = line.split(",");
+						int i = Integer.parseInt(test[1]);
+						
+						bbc.writeHead(i);
+						
 					}
 
 					if(line.contains("calibrateAll"))

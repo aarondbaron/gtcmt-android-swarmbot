@@ -721,7 +721,8 @@ public class BeatTimer extends Thread{
 							}
 							else
 							{
-								 mActivity.aTest.setFrequency(currentMeasure.notes[bbc.currentIndex]);
+								 mActivity.aTest.setNote(currentMeasure.notes[bbc.currentIndex]);
+								 //mActivity.aTest.properIncrement();
 							}
 							mActivity.aTest.properIncrement();
 						}

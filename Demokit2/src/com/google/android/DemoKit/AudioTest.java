@@ -227,7 +227,7 @@ public class AudioTest
 	public void setNote(int n)
 	{
 		this.angle=0;
-		this.frequency=midiToFreq(n+24);
+		this.frequency=midiToFreq(n);
 	}
 
 	public void setFrequencyRP()

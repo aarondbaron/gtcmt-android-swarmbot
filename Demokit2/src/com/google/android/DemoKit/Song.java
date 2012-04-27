@@ -34,6 +34,60 @@ public class Song {
 		
 	}
 	
+	Vector getMeasuresWithAnyNotes(int[] notesToFind)
+	{
+		Vector result = new Vector();
+		if(notesToFind.length==0)
+		{
+			return result;
+		}
+		
+		for(int i=0;i<measures.size();i++)
+		{
+			Measure m = (Measure) measures.get(i);
+			for(int k=0;k<notesToFind.length;k++)
+			{
+				if(m.contains(notesToFind[k]))
+				{
+					result.add(m);
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	Vector getMeasuresWithTheseNotes(int[] notesToFind)
+	{
+		Vector result = new Vector();
+		if(notesToFind.length==0)
+		{
+			return result;
+		}
+		
+		for(int i=0;i<measures.size();i++)
+		{
+			Measure m = (Measure) measures.get(i);
+			boolean test=true;
+			for(int k=0;k<notesToFind.length;k++)
+			{
+				if(!m.contains(notesToFind[k]))
+				{
+					test=false;
+					break;
+				}
+			}
+			
+			if(test)
+			{
+				result.add(m);
+			}
+		}
+		
+		return result;
+	}
+	
 	
 	
 }
@@ -60,18 +114,18 @@ public class Song {
 		Measure m1 = new Measure();
 		m1.notes[0]=72+12;
 		m1.notes[0+12]=72+9;
-		m1.notes[0+24]=72+6;
+		m1.notes[0+24]=72+7;
 		m1.notes[0+36]=72+4;
 		
 		measures.add(m1);
 		
 		Measure m2 = new Measure();
-		m2.notes[0]=72+6;
-		m2.notes[0+4]=72+8;
-		m2.notes[0+8]=72+6;
-		m2.notes[0+12]=72+4;
-		m2.notes[0+16]=72+3;
-		m2.notes[0+20]=72+3;
+		m2.notes[0]=72+7;
+		m2.notes[0+4]=72+9;
+		m2.notes[0+8]=72+7;
+		m2.notes[0+12]=72+5;
+		m2.notes[0+16]=72+4;
+		m2.notes[0+20]=72+2;
 		m2.notes[0+24]=72;
 		m2.notes[0+36]=72+4;
 		m2.notes[0+44]=72+2;
@@ -85,22 +139,22 @@ public class Song {
 		m1.notes[0]=72;
 		m1.notes[0+8]=72;
 		m1.notes[0+12]=72;
-		m1.notes[20]=72;
-		m1.notes[24]=72;
-		m1.notes[32]=72;
-		m1.notes[36]=72;
-		m1.notes[40]=72;
+		m1.notes[20]=72+2;
+		m1.notes[24]=72+4;
+		m1.notes[32]=72+4;
+		m1.notes[36]=72+4;
+		m1.notes[40]=72+2;
 		
 		m1.notes[44]=72;
 		
 		measures.add(m1);
 		
 		Measure m2 = new Measure();
-		m2.notes[0]=72;
-		m2.notes[0+4]=72;
-		m2.notes[0+8]=72;
+		m2.notes[0]=72+2;
+		m2.notes[0+4]=72+4;
+		m2.notes[0+8]=72+2;
 		m2.notes[0+12]=72;
-		m2.notes[0+20]=72;
+		m2.notes[0+20]=72-1;
 		m2.notes[0+24]=72;
 		
 		measures.add(m2);
@@ -111,55 +165,61 @@ public class Song {
 	void idea2()
 	{
 		Measure m1 = new Measure();
-		m1.notes[0]=72;
-		m1.notes[0+4]=72;
-		m1.notes[0+8]=72;
-		m1.notes[0+12]=72;
+		m1.notes[0]=72+4;
+		m1.notes[0+4]=72+4;
+		m1.notes[0+8]=72+4;
+		m1.notes[0+12]=72+4;
 		
-		m1.notes[20]=72;
-		m1.notes[24]=72;
-		m1.notes[28]=72;
-		m1.notes[32]=72;
-		m1.notes[36]=72;
+		m1.notes[20]=72+5;
+		m1.notes[24]=72+7;
+		m1.notes[28]=72+7;
+		m1.notes[32]=72+7;
+		m1.notes[36]=72+7;
 		
-		m1.notes[40]=72;
+		m1.notes[44]=72+7;
 		
 		measures.add(m1);
 		
 		Measure m2 = new Measure();
-		m2.notes[0]=72;
-		m2.notes[0+4]=72;
-		m2.notes[0+8]=72;
-		m2.notes[0+12]=72;
+		m2.notes[0]=72+7;
+		m2.notes[0+4]=72+2;
+		m2.notes[0+8]=72+2;
+		m2.notes[0+12]=72+2;
 		
-		m2.notes[0+20]=72;
-		m2.notes[0+24]=72;
+		m2.notes[0+20]=72+4;
+		m2.notes[0+24]=72+2;
 		
-		m2.notes[0+44]=72;
+		m2.notes[0+44]=72+7;
+		
+		measures.add(m2);
 		 
 	}
 	
 	void idea3()
 	{
 		Measure m1 = new Measure();
-		m1.notes[0]=72;
-		m1.notes[0+8]=72;
-		m1.notes[0+12]=72;
-		m1.notes[20]=72;
-		m1.notes[24]=72;
-		m1.notes[28]=72;
+		m1.notes[0]=72+9;
+		m1.notes[0+8]=72+9;
+		m1.notes[0+12]=72+9;
+		m1.notes[20]=72+9;
+		m1.notes[24]=72+9;
+		m1.notes[28]=72+12;
 		
-		m1.notes[44]=72;
+		m1.notes[44]=72+9;
+		
+		measures.add(m1);
 		
 		Measure m2 = new Measure();
-		m1.notes[0]=72;
-		m1.notes[0+8]=72;
-		m1.notes[0+12]=72;
-		m1.notes[20]=72;
-		m1.notes[24]=72;
+		m2.notes[0]=72+7;
+		m2.notes[0+8]=72+7;
+		m2.notes[0+12]=72+7;
+		m2.notes[20]=72+4;
+		m2.notes[24]=72+2;
 		
-		m2.notes[0+36]=72;
-		m2.notes[0+44]=72;
+		m2.notes[0+36]=72+4;
+		m2.notes[0+44]=72+2;
+		
+		measures.add(m2);
 		
 	}
 	
