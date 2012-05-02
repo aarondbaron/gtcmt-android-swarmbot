@@ -870,7 +870,12 @@ public class ClientCode implements OnClickListener{
 						bbc.setWander(true);
 					}
 
-
+					if(line.contains("chooseSong,"))
+					{
+						String test [] = line.split(",");
+						int song = (int) Float.parseFloat(test[1]);
+						bbc.chooseSong(song);
+					}
 					if(line.contains("mapping"))
 					{
 						String test [] = line.split(",");
@@ -1126,6 +1131,23 @@ public class ClientCode implements OnClickListener{
 										bbc.myBehavior.setFollowMouse(false);
 									}
 								}
+							}
+							if(code==9986) // move relative
+							{
+								bbc.myBehavior.setSeparation(true);
+
+								int x=(int) Float.parseFloat(    test[2]       ) ;
+								int y=(int) Float.parseFloat(    test[3]  )    ;
+
+								Log.d("controller move relative","move relative x:"+x+"y:"+y);
+								bbc.targetx=bbc.myposx+1000*x;
+								bbc.targety=bbc.myposy+1000*y;
+								bbc.myBehavior.phase1move=true;
+								bbc.myBehavior.phase2move=false;
+								bbc.moveToLoc(true);
+								
+								//should we just make a move relative behavior?
+								
 							}
 							
 							if(code==995) //wander

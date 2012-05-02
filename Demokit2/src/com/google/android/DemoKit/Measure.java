@@ -1,5 +1,6 @@
 package com.google.android.DemoKit;
 
+import java.lang.reflect.Array;
 import java.util.Vector;
 
 public class Measure
@@ -9,6 +10,19 @@ public class Measure
 	Measure()
 	{
 		notes = new int[SEQUENCERLENGTH];
+	}
+	
+	Measure(Measure m)
+	{
+		notes = new int[m.SEQUENCERLENGTH];
+		
+		for(int i=0;i< SEQUENCERLENGTH ; i++)
+		{
+			notes[i]=m.notes[i];
+		}
+		
+		
+		
 	}
 
 	boolean[] toRhythm()
@@ -39,6 +53,23 @@ public class Measure
 		return b;
 	}
 	
+	Vector findNote (int note)
+	{
+		//int[] nn=null;
+		
+		Vector n = new Vector();
+		
+		for(int i=0;i<notes.length;i++)
+		{
+			if(notes[i]==note)
+			{
+				n.add(i);			
+			}
+		
+		}
+		return n;
+	}
+	
 	int numNotesOfType(int note)
 	{
 		int num=0;
@@ -66,6 +97,58 @@ public class Measure
 		
 		return num;
 	}
+	
+	void transpose(int n)
+	{
+		for(int i=0;i<notes.length;i++)
+		{
+			notes[i]+=n;
+		}		
+	}
+	
+	void reverse()
+	{
+		for(int i = 0; i < notes.length/2; i++)
+		{
+		    int temp = notes[i];
+		    notes[i] = notes[notes.length - i - 1];
+		    notes[notes.length - i - 1] = temp;
+		}
+
+	
+	}
+	
+	
+	void shiftRight()
+	{
+		//roll[number-1].pressed=roll[0].pressed;
+		int temp = notes[notes.length-1];
+		for (int i=notes.length-1; i>0;i--)
+		{
+			notes[i]=notes[i-1];
+		}
+
+		notes[0] = temp;
+	}
+
+	void shiftLeft( )
+	{
+		//roll[number-1].pressed=roll[0].pressed;
+		int temp = notes[0];
+		for (int i=0; i<notes.length-1;i++)
+		{
+			notes[i]=notes[i+1];
+		}
+
+		notes[notes.length - 1] = temp;
+	}
+	
+	
+	//Object clone()
+	{
+		
+	}
+	
 
 
 

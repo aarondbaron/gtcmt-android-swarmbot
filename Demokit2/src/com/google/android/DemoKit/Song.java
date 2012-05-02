@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class Song {
 
-	Vector notes;
+	//Vector notes;
 	Vector measures;
 	
 	int SEQUENCERLENGTH=48;
@@ -20,6 +20,15 @@ public class Song {
 	
 	
 	
+	public int numNotes()
+	{
+		return 0;
+	}
+	
+	public int numMeasures()
+	{
+		return measures.size();
+	}
 	
 	public Measure getMeasure(int i)
 	{
@@ -229,4 +238,386 @@ public class Song {
 	}
 	
 	
+	
+	
+	
 }
+ 
+ 
+ class OldMacDonald extends Song
+ {
+	 int base =72+7;
+	 OldMacDonald()
+	 {
+		 super();
+		idea1(); 
+		idea2();
+		idea3();
+		idea1();
+		
+	 }
+	 
+	 
+	 void idea1()
+	 {
+	
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base;
+		 m1.notes[6]=base;
+		 m1.notes[12]=base;
+		 m1.notes[18]=base-5;
+		 m1.notes[24]=base-3;
+		 m1.notes[30]=base-3;
+		 m1.notes[36]=base-5;
+		 
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[0]=base+4;
+		 m2.notes[6]=base+4;
+		 m2.notes[12]=base+2;
+		 m2.notes[18]=base+2;
+		 m2.notes[24]=base;
+		 
+		 m2.notes[42]=base-5;
+		 
+		 measures.add(m2);
+		 
+		 
+	 }
+	 
+	 void idea2()
+	 {
+		 //
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base;
+		 m1.notes[6]=base;
+		 m1.notes[12]=base;
+		 m1.notes[18]=base-5;
+		 m1.notes[24]=base-3;
+		 m1.notes[30]=base-3;
+		 m1.notes[36]=base-5;
+		 
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[0]=base+4;
+		 m2.notes[6]=base+4;
+		 m2.notes[12]=base+2;
+		 m2.notes[18]=base+2;
+		 m2.notes[24]=base;
+		 
+		 m2.notes[42]=base-5;
+		 m2.notes[45]=base-5;
+		 
+		 measures.add(m2);
+	 }
+	 
+	 void idea3()
+	 {
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base;
+		 m1.notes[6]=base;
+		 m1.notes[12]=base;
+		 m1.notes[18]=base-5;
+		 m1.notes[21]=base-5;
+		 
+		 m1.notes[24]=base;
+		 m1.notes[30]=base;
+		 m1.notes[36]=base;
+		 
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[0]=base;
+		 m2.notes[3]=base;
+		 m2.notes[6]=base;
+		 
+		 m2.notes[12]=base;
+		 m2.notes[15]=base;
+		 m2.notes[18]=base;
+		 
+		 m2.notes[24]=base;
+		 m2.notes[27]=base;
+		 m2.notes[30]=base;
+		 m2.notes[33]=base;
+		 m2.notes[36]=base;
+		 m2.notes[42]=base;
+		 
+		 measures.add(m2);
+		 
+	 }
+
+ }
+ 
+ class Joyful extends Song
+ {
+	 int base=72;
+	 Joyful()
+	 {
+		 super();
+		 idea1();
+		 idea2();
+		 idea3();
+		 idea2();
+	 }
+	 
+	 void idea1()
+	 {
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base+4;
+		 m1.notes[6]=base+4;
+		 m1.notes[12]=base+5;
+		 m1.notes[18]=base+7;
+		 m1.notes[24]=base+7;
+		 m1.notes[30]=base+5;
+		 m1.notes[36]=base+4;
+		 m1.notes[42]=base+2;
+		 measures.add(m1);
+		 
+		 Measure m2= new Measure();
+		 m2.notes[0]=base;
+		 m2.notes[6]=base;
+		 m2.notes[12]=base+2;
+		 m2.notes[18]=base+4;
+		 m2.notes[24]=base+4;
+		 m2.notes[33] = base+2;
+		 m2.notes[36]=base+2;
+		 measures.add(m2);
+		 
+		 
+	 }
+	 
+	 void idea2()
+	 {
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base+4;
+		 m1.notes[6]=base+4;
+		 m1.notes[12]=base+5;
+		 m1.notes[18]=base+7;
+		 m1.notes[24]=base+7;
+		 m1.notes[30]=base+5;
+		 m1.notes[36]=base+4;
+		 m1.notes[42]=base+2;
+		 measures.add(m1);
+		 
+		 Measure m2= new Measure();
+		 m2.notes[0]=base;
+		 m2.notes[6]=base;
+		 m2.notes[12]=base+2;
+		 m2.notes[18]=base+4;
+		 m2.notes[24]=base+2;
+		 m2.notes[33] = base;
+		 m2.notes[36]=base;
+		 measures.add(m2);
+	 }
+	 
+	 void idea3()
+	 {
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base+2;
+		 m1.notes[6]=base+2;
+		 m1.notes[12]=base+4;
+		 m1.notes[18]=base;
+		 m1.notes[24]=base+2;
+		 m1.notes[30]=base+4;
+		 m1.notes[33]=base+5;
+		 m1.notes[36]=base+4;
+		 m1.notes[42]=base;
+		 measures.add(m1);
+		 
+		 Measure m2= new Measure();
+		 m2.notes[0]=base+2;
+		 m2.notes[6]=base+4;
+		 m2.notes[9]=base+5;
+		 m2.notes[12]=base+4;
+		 m2.notes[18]=base+2;
+		 m2.notes[24] = base;
+		 m2.notes[30]=base+2;
+		 m2.notes[36]=base-5;
+		 measures.add(m2);
+	 }
+	 
+	 
+ }
+ 
+ class LionSleeps extends Song
+ {
+	 int base =72+7;
+	 LionSleeps()
+	 {
+		 
+		 super();
+		 idea1();
+		 idea2();
+		 idea3();
+		 idea4();
+		 
+		 idea5();
+		 idea6();
+		 
+		 idea5();
+		 idea6();
+		 
+	 }
+	 
+	 void idea1()
+	 {	 //in the jungle the mighty jungle
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base;
+		 m1.notes[12]=base+2;
+		 m1.notes[18]=base+4;
+		 m1.notes[30]=base+2;
+		 m1.notes[42]=base+4;
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 
+		 m2.notes[0]=base+5;
+		 m2.notes[12]=base+4;
+		 m2.notes[18]=base+2;
+		 m2.notes[30]=base;
+		 m2.notes[42]=base+2;
+		 measures.add(m2);
+		 
+		 
+	 }
+	 
+	 
+	 void idea2()
+	 {	 //the lion sleeps tonight
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base+4;
+		 m1.notes[12]=base+2;
+		 m1.notes[18]=base;
+		 m1.notes[34]=base+4;
+		 m1.notes[40]=base+2;
+		 for(int i=40;i<m1.notes.length;i++)
+		 {
+			 m1.notes[i]=base+2;
+		 }
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[0]=base+2;
+		 for(int i=0;i<m2.notes.length;i++)
+		 {
+			 if(i==24)
+			 {
+				 break;
+			 }
+			 m2.notes[i]=base+2;
+		 }
+		 measures.add(m2);
+	 }
+	 
+	 void idea3()
+	 { // (high) in the jungle the mighty jungle
+		 Measure m1 = new Measure();
+		 m1.notes[0]=base+7;
+		 m1.notes[12]=base+4;
+		 m1.notes[18]=base+2;
+		 m1.notes[30]=base+4;
+		 m1.notes[42]=base+7;
+		 measures.add(m1);
+		 
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[0]=base+5;
+		 m2.notes[12]=base+4;
+		 m2.notes[18]=base+2;
+		 m2.notes[30]=base;
+		 m2.notes[42]=base+2;
+		 measures.add(m2);
+		 
+		 
+	 }
+	 
+	 void idea4()
+	 {
+		 //the lion sleeps tonight
+		 idea2();
+	 }
+	 void idea5()
+	 {
+		 ///long notes oooweeeeeeeeee
+		 Measure m1 = new Measure();
+		 for(int i=0;i<m1.notes.length;i++)
+		 {
+			 m1.notes[i] = base+7;
+			 /*
+			 if(i==48)
+			 {
+				 break;
+			 }
+			 */
+		 
+		 }		 
+		 
+		 measures.add(m1);
+		 
+		 
+		 Measure m2 = new Measure();
+		 
+		 m2.notes[0]=base+7;
+		 m2.notes[12]=base+7;
+		 
+		 m2.notes[3]=base+5;
+		 m2.notes[9]=base+7;
+		 m2.notes[15]=base+5;
+		 
+		 m2.notes[12]=base+2;
+		  
+		 
+		 measures.add(m2);
+		 
+		 
+	 }
+	 
+	 void idea6()
+	 {
+		 //ah wee um bum ba way.
+		 
+		 
+		 Measure m1 = new Measure();
+		 m1.notes[12]=base+4;
+		 
+		 m1.notes[12]=base-5;
+		 m1.notes[12]=base-5;
+		 m1.notes[12]=base-5;
+		 
+		 m1.notes[12]=base-5;
+		 measures.add(m1);
+		 
+		 Measure m2 = new Measure();
+		 m2.notes[12]=base-5;
+		 m2.notes[12]=base-5; 
+		 m2.notes[12]=base-5;
+		 m2.notes[12]=base-5;
+		 m2.notes[12]=base-5;
+		 
+		 measures.add(m2);
+		 
+		 
+		 
+	 }
+	 
+	 
+ }
+ 
+ class Tetris extends Song
+ {
+	 Tetris()
+	 {
+		 super();
+		 idea1();
+	 }
+	 
+	 void idea1()
+	 {
+		 
+	 }
+	 
+ }
+ 
+ 

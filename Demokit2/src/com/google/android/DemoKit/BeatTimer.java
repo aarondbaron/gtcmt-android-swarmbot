@@ -66,7 +66,7 @@ public class BeatTimer extends Thread{
 		globalTimer=System.currentTimeMillis();
 		appStartTimeMillis=globalTimer;
 		Log.d("beatTimer created", "checking here ");
-		
+
 		currentMeasure = new Measure();
 	}
 
@@ -635,6 +635,29 @@ public class BeatTimer extends Thread{
 						}
 
 						break;
+						
+					case 27://virus
+						
+						if(bbc.numNeighbors>0 && bbc.isSilent(bbc.instrumentseq))
+						{
+							bbc.setRhythm(bbc.receivedSequence);
+						}
+						else
+						{
+							if(!bbc.isSilent(bbc.instrumentseq))
+							{
+								if(!bbc.swapOnce)
+								{
+									//bbc.swapRandomPortion(bbc.instrumentseq, bbc.receivedSequence );
+									bbc.swapPortion(bbc.instrumentseq, bbc.receivedSequence, 0, bbc.instrumentseq.length/2);
+									bbc.setRhythm(bbc.instrumentseq);
+									bbc.swapOnce=true;
+								}
+							}
+						}
+						
+						break;
+						
 					case 100: //if alone keep same, else randomly change?
 						if(bbc.numNeighbors==0)
 						{
@@ -654,14 +677,140 @@ public class BeatTimer extends Thread{
 							}
 						}
 						break;
-						
-					case 101:
-						
-						currentMeasure = bbc.fightSong.getMeasure((int) this.generalMeasure);
+
+					case 101: //play a song completely
+
+						currentMeasure = bbc.mySong.getMeasure((int) this.generalMeasure);
 						bbc.setRhythm(currentMeasure.toRhythm());
 						//mActivity.aTest.setFrequency(m);
+						break;
+						
+					case 102://play a song only with repsectot neighbors
+						
+						currentMeasure = bbc.mySong.getMeasure(bbc.numNeighbors);
+						bbc.setRhythm(currentMeasure.toRhythm());
+					  
+						break;
+						
+					case 103:  //play song wit respect to angle (this should go well with orbit
+						int angind = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
+						
+						currentMeasure = bbc.mySong.getMeasure(angind);
+						bbc.setRhythm(currentMeasure.toRhythm());
+						
+						break;
+						
+					case 104: //play song with respect ot speed
+						
+						break;
+						
+					case 105: //play a song and shift wrt neigbhor
+						currentMeasure = new Measure(bbc.mySong.getMeasure((int) this.generalMeasure) );
+						for(int i=0;i<bbc.numNeighbors*4;i++)
+						{
+							currentMeasure.shiftLeft();
+						}
+						bbc.setRhythm(currentMeasure.toRhythm());
+						break;
+						
+					case 106: //play a song with angle.. such that it plays the song continuously, but shifted index according ot angle
+						
+						int theang = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
+						
+						currentMeasure = bbc.mySong.getMeasure((int) this.generalMeasure+theang);
+						bbc.setRhythm(currentMeasure.toRhythm());
+						
+						
+						break;
 
+					case 200:
 
+						int mmval=20;
+						if(this.generalMeasure%2==0)
+						{
+							bbc.writeHead(128-mmval);
+						}
+						else
+						{
+							bbc.writeHead(128+mmval);
+						}
+
+						break;
+
+					case 201:
+
+						int mmmval=30;
+						int tind=this.generalIndex%bbc.instrumentseq.length;						
+						int vv = (int) bbc.map(tind, 0, bbc.instrumentseq.length-1, 128-mmmval, 128+mmmval);						
+						bbc.writeHead(vv);
+
+						break;
+
+					case 202:
+						int mval=30;
+						if(this.generalMeasure%2==0)
+						{
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;						
+							int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128-mval, 128+mval);						
+							bbc.writeHead(val);
+							Log.d("beattimer headval", "" + val + " index: " + testIndex );
+						}
+						else
+						{
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;						
+							int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128+mval, 128-mval);						
+							bbc.writeHead(val);
+							Log.d("beattimer headval", "" + val + " index: " + testIndex );
+						}
+						break;
+					case 203:
+						int mvall=36;
+						if(this.generalMeasure%2==0)
+						{
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;
+							if(testIndex%4==0)
+							{
+								int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128-mvall, 128+mvall);						
+								bbc.writeHead(val);
+								Log.d("beattimer headval", "" + val + " index: " + testIndex );
+							}
+						}
+						else
+						{
+
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;						
+							if(testIndex%4==0)
+							{
+								int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128+mvall, 128-mvall);						
+								bbc.writeHead(val);
+								Log.d("beattimer headval", "" + val + " index: " + testIndex );
+							}
+						}
+						break;
+					case 204:
+						int mvalll=36;
+						if(this.generalMeasure%2==0)
+						{
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;
+							if(testIndex% (bbc.instrumentseq.length/4)==0)
+							{
+								int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128-mvalll, 128+mvalll);						
+								bbc.writeHead(val);
+								Log.d("beattimer headval", "" + val + " index: " + testIndex );
+							}
+						}
+						else
+						{
+
+							int testIndex=this.generalIndex%bbc.instrumentseq.length;						
+							if(testIndex%(bbc.instrumentseq.length/4)==0)
+							{
+								int val = (int) bbc.map(testIndex, 0, bbc.instrumentseq.length-1, 128+mvalll, 128-mvalll);						
+								bbc.writeHead(val);
+								Log.d("beattimer headval", "" + val + " index: " + testIndex );
+							}
+						}
+						break;
 
 					default: ; break;
 
@@ -721,8 +870,8 @@ public class BeatTimer extends Thread{
 							}
 							else
 							{
-								 mActivity.aTest.setNote(currentMeasure.notes[bbc.currentIndex]);
-								 //mActivity.aTest.properIncrement();
+								mActivity.aTest.setNote(currentMeasure.notes[bbc.currentIndex]);
+								//mActivity.aTest.properIncrement();
 							}
 							mActivity.aTest.properIncrement();
 						}
@@ -836,7 +985,7 @@ public class BeatTimer extends Thread{
 				bbc.shiftOnce=false;
 
 				bbc.changeOnce=false;
-				
+
 				bbc.swapOnce =false;
 			}
 
