@@ -126,6 +126,7 @@ public class DemokitMobileControlActivity extends Activity {
     	SubMenu sub2 = menu.addSubMenu(0,1,0, "Movement Behaviors");
     	sub2.add("ViewCursor");
     	sub2.add("Move");
+    	sub2.add("MoveRelative");
     	sub2.add("Orbit");
     	sub2.add("Breath1");
     	sub2.add("Breath2");
@@ -188,6 +189,10 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.sendMessage("controller,"+ 1000);
 		}else if (item.getTitle() == "Move") {
 			arenaView.mode="Move";
+			Log.d("item selected",""+item.getTitle());
+			 
+		}else if (item.getTitle() == "MoveRelative") {
+			arenaView.mode="MoveRelative";
 			Log.d("item selected",""+item.getTitle());
 			 
 		}else if (item.getTitle() == "Orbit") {
