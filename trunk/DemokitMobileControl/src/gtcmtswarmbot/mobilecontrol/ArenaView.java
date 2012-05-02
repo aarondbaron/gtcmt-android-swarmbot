@@ -77,19 +77,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		botToInspect=null;
 
-		/*
-		Bot testBot = new Bot();
-		testBot.x=640/4;
-		testBot.y=480/4;
-		testBot.ID=0;
-		bbc.allBots.add(testBot);
-		
-		testBot = new Bot();
-		testBot.x=640-640/4;
-		testBot.y=480-480/4;
-		testBot.ID=1;
-		bbc.allBots.add(testBot);
-		 */
+	
 		 
 
 		vib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
@@ -110,13 +98,34 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		Log.d("SURFACECREATED", "W:" + getWidth() + "  H:" + getHeight());
 
+		float w=640;
+		float h =480;
+		
+		float factor = w/h;
+		
+		
 
-		int woff=10;
-		int hoff=10;
-		thread.arena = new Arena(getWidth()/2, getHeight()/2,getWidth()/2-woff,getHeight()/2-hoff);		
+		//int woff=10;
+		//int hoff=10;
+		//thread.arena = new Arena(getWidth()/2, getHeight()/2,getWidth()/2-woff,getHeight()/2-hoff);		
+		thread.arena = new Arena(getWidth()/2, getHeight()/2, (int) ((getWidth()/2)/factor) ,(int)( getHeight()/2) );		
 		thread.sequencer = new Sequencer(this);
 		
 		surfCreated=true;
+		
+		
+		Bot testBot = new Bot();
+		testBot.x=640/4;
+		testBot.y=480/4;
+		testBot.ID=0;
+		bbc.allBots.add(testBot);
+		
+		testBot = new Bot();
+		testBot.x=640-640/4;
+		testBot.y=480-480/4;
+		testBot.ID=1;
+		bbc.allBots.add(testBot);
+		 
 
 	}
 
@@ -313,7 +322,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 			{
 				mActivity.client.sendMessage("controller,"+ 801 + "," + this.thread.sequencer.getMySequence());
 
-				thread.sequencer.checkInside(thread.arena.cursor.x,thread.arena.cursor.y);
+				thread.sequencer.checkInside((int)x, (int)y);
 			}
 
 		}
