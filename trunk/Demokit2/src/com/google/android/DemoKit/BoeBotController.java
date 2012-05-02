@@ -167,7 +167,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	int servo3;
 	
-	FightSong fightSong;
+	Song mySong;
 	
 	public boolean isnComEnable() {
 		return nComEnable;
@@ -290,9 +290,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		setnComEnable(true);
 		queue = new LinkedHashSet();
 		
-		fightSong= new FightSong();
+		//mySong= new FightSong();
+		//mySong = new OldMacDonald();
+		//mySong = new Joyful();
+		//mySong = new LionSleeps();
+		chooseSong(0);
 		
-		this.setMapping(101);
+		this.setMapping(204);
 		
 		
 	}
@@ -2831,6 +2835,34 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	//if 48, what euclid works?  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 	// 1, 2, 3, 4, 6, 8, 12, 16
+	
+	
+	void chooseSong(int i)
+	{
+		switch(i)
+		{
+		case 0:
+			this.mySong=new FightSong();
+			break;
+		case 1:
+			this.mySong= new OldMacDonald();
+			break;
+		case 2:
+			this.mySong = new Joyful();
+			break;
+		case 3:
+			this.mySong= new LionSleeps();
+			break;
+		case 4: 
+			this.mySong = new Tetris();
+			break;
+			
+		default:
+			this.mySong=new FightSong();
+		
+		
+		}
+	}
 
 
 }
