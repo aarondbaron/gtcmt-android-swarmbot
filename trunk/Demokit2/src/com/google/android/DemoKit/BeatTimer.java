@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+import java.util.Vector;
+
 import com.google.android.DemoKit.ClientCode.ClientThread;
 
 import android.os.Handler;
@@ -57,6 +59,7 @@ public class BeatTimer extends Thread{
 	boolean wanderVector;
 
 	Measure currentMeasure;
+	Vector possibleMeasures;
 
 
 	BeatTimer()
@@ -68,6 +71,7 @@ public class BeatTimer extends Thread{
 		Log.d("beatTimer created", "checking here ");
 
 		currentMeasure = new Measure();
+		possibleMeasures = new Vector();
 	}
 
 	@Override
@@ -568,6 +572,9 @@ public class BeatTimer extends Thread{
 							{
 								int indexToChange = (int) (Math.random()*bbc.instrumentseq.length);
 								bbc.instrumentseq[indexToChange]=!bbc.instrumentseq[indexToChange];
+								
+								//this should be here
+								bbc.randomlyChangeOnce=true;
 							}							 
 						}
 						else
@@ -721,6 +728,86 @@ public class BeatTimer extends Thread{
 						bbc.setRhythm(currentMeasure.toRhythm());
 						
 						
+						break;
+						
+					case 110: // play a song in full but only according to my bell note
+						currentMeasure = bbc.mySong.getMeasure((int) this.generalMeasure);
+						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
+						break;
+						
+					case 111: //play a song but only choose measures that contain my own note AND from other neighbors
+						
+						Vector notesToFind = new Vector();
+						notesToFind.add(new Integer(bbc.myNote));
+						
+						for(int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);
+							if(b.isNeighbor)
+							{
+								notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+							}							
+								
+						}
+						
+						if(!bbc.findOnce)
+						{
+							
+							possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(notesToFind);
+							
+							if(possibleMeasures.size()!=0)
+							{
+								currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
+								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+								
+								bbc.findOnce=true;//ok if here ?
+							}
+							
+						}
+						 
+					
+						
+						break;
+						
+					case 112:
+						
+						if(bbc.numNeighbors==0)
+						{
+							bbc.clearRhythm(bbc.instrumentseq);
+							bbc.clearRhythm(bbc.sfxrseq);
+							
+						}
+						else
+						{
+							Vector ntf = new Vector();
+							ntf.add(new Integer(bbc.myNote));
+							
+							for(int i=0;i<bbc.otherBots.size();i++)
+							{
+								Bot b = (Bot) bbc.otherBots.get(i);
+								if(b.isNeighbor)
+								{
+									ntf.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+								}							
+									
+							}
+							
+							if(!bbc.findOnce)
+							{
+								
+								possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(ntf);
+								
+								if(possibleMeasures.size()!=0)
+								{
+									currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
+									bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+									
+									bbc.findOnce=true;//ok if here ?
+								}
+								
+							}
+						}
 						break;
 
 					case 200:
@@ -987,6 +1074,8 @@ public class BeatTimer extends Thread{
 				bbc.changeOnce=false;
 
 				bbc.swapOnce =false;
+				
+				bbc.findOnce=false;
 			}
 
 		}

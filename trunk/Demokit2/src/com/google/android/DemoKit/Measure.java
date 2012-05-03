@@ -39,6 +39,20 @@ public class Measure
 		return b;
 
 	}
+	
+	boolean[] toBellRhythm(int nnn)
+	{
+		boolean[] b= new boolean[SEQUENCERLENGTH];
+
+		for(int i=0;i<b.length;i++)
+		{
+			if(notes[i]==nnn)
+			{
+				b[i]=true;
+			}
+		}
+		return b;
+	}
 
 	boolean contains(int note)
 	{
