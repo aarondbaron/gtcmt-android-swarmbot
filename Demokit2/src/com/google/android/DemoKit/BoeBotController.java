@@ -293,8 +293,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//mySong= new FightSong();
 		//mySong = new OldMacDonald();
 		//mySong = new Joyful();
-		//mySong = new LionSleeps();
-		chooseSong(0);
+		//mySong = new LionSleeps(); 
+		chooseSong(10);
 		
 		this.setMapping(204);
 		
@@ -391,6 +391,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		vest = new PVector();
 
 		mActivity.aTest.bbc=this;
+		
+		MSDeg = new int[8];
+		MSDeg[0]=0;
+		MSDeg[1]=2;
+		MSDeg[2]=4;
+		MSDeg[3]=5;
+		MSDeg[4]=7;
+		MSDeg[5]=9;
+		MSDeg[6]=11;
+		MSDeg[7]=12;
 
 	}
 
@@ -408,7 +418,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean shiftOnce;
 	public boolean changeOnce;
 	public boolean swapOnce;
+	public boolean findOnce;
 	public boolean useSong=true;
+	public int myNote=72;
+	public int[] MSDeg;
+	
 
 	/////??
 
@@ -2856,12 +2870,26 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		case 4: 
 			this.mySong = new Tetris();
 			break;
+		case 10: 
+			this.mySong = new TestSong();
+			break;
 			
 		default:
-			this.mySong=new FightSong();
+			this.mySong=new TestSong();
 		
 		
 		}
+	}
+	
+	public void setMyNote(int n)
+	{
+		this.myNote=n;	
+	}
+	
+	public int getMSDegree(int n)
+	{
+		
+		return MSDeg[n%MSDeg.length];
 	}
 
 

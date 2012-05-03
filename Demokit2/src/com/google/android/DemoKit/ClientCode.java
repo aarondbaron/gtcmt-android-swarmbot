@@ -238,6 +238,12 @@ public class ClientCode implements OnClickListener{
 								 */
 
 							}
+							/*
+							if(whatToDo.equals("songmode"))
+							{
+								
+							}
+							*/
 
 						}
 					}
@@ -289,6 +295,7 @@ public class ClientCode implements OnClickListener{
 							}
 						}
 
+						bbc.setMyNote(bbc.MSDeg[bbc.ID]+72);
 
 						///
 						handler.post(new Runnable() {
