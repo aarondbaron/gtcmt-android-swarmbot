@@ -282,7 +282,7 @@ class FightSong extends Song
 		m2.notes[0+8]=72+7;
 		m2.notes[0+12]=72+7;
 		m2.notes[20]=72+4;
-		m2.notes[24]=72+2;
+		m2.notes[24]=72+7;
 
 		m2.notes[0+36]=72+4;
 		m2.notes[0+44]=72+2;
@@ -790,8 +790,8 @@ class TestSong extends Song
 		Measure m8 = new Measure();
 		for(int i=0;i<m8.notes.length;i++)
 		{
-			m8.notes[i]=testnotes[(testnotes.length -1)%testnotes.length];
-			m8.notes[i+1]=testnotes[(testnotes.length -1)%testnotes.length];
+			m8.notes[i]=testnotes[(testnotes.length -1)-(i%testnotes.length)];
+			m8.notes[i+1]=testnotes[(testnotes.length -1)-(i%testnotes.length)];
 			i++;
 		}
 		measures.add(m8);

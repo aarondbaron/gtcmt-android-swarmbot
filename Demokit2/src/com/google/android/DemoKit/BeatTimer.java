@@ -61,6 +61,8 @@ public class BeatTimer extends Thread{
 	Measure currentMeasure;
 	Vector possibleMeasures;
 
+	int gilcounter=0;
+
 
 	BeatTimer()
 	{
@@ -572,7 +574,7 @@ public class BeatTimer extends Thread{
 							{
 								int indexToChange = (int) (Math.random()*bbc.instrumentseq.length);
 								bbc.instrumentseq[indexToChange]=!bbc.instrumentseq[indexToChange];
-								
+
 								//this should be here
 								bbc.randomlyChangeOnce=true;
 							}							 
@@ -642,12 +644,22 @@ public class BeatTimer extends Thread{
 						}
 
 						break;
-						
+
 					case 27://virus
-						
+
 						if(bbc.numNeighbors>0 && bbc.isSilent(bbc.instrumentseq))
 						{
 							bbc.setRhythm(bbc.receivedSequence);
+							/*
+							if(bbc.isSilent(bbc.receivedSequence))
+							{
+								
+							}
+							else
+							{
+								bbc.setRhythm(bbc.receivedSequence);
+							}
+							*/
 						}
 						else
 						{
@@ -662,9 +674,9 @@ public class BeatTimer extends Thread{
 								}
 							}
 						}
-						
+
 						break;
-						
+
 					case 100: //if alone keep same, else randomly change?
 						if(bbc.numNeighbors==0)
 						{
@@ -691,26 +703,26 @@ public class BeatTimer extends Thread{
 						bbc.setRhythm(currentMeasure.toRhythm());
 						//mActivity.aTest.setFrequency(m);
 						break;
-						
+
 					case 102://play a song only with repsectot neighbors
-						
+
 						currentMeasure = bbc.mySong.getMeasure(bbc.numNeighbors);
 						bbc.setRhythm(currentMeasure.toRhythm());
-					  
+
 						break;
-						
+
 					case 103:  //play song wit respect to angle (this should go well with orbit
 						int angind = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
-						
+
 						currentMeasure = bbc.mySong.getMeasure(angind);
 						bbc.setRhythm(currentMeasure.toRhythm());
-						
+
 						break;
-						
+
 					case 104: //play song with respect ot speed
-						
+
 						break;
-						
+
 					case 105: //play a song and shift wrt neigbhor
 						currentMeasure = new Measure(bbc.mySong.getMeasure((int) this.generalMeasure) );
 						for(int i=0;i<bbc.numNeighbors*4;i++)
@@ -719,95 +731,168 @@ public class BeatTimer extends Thread{
 						}
 						bbc.setRhythm(currentMeasure.toRhythm());
 						break;
-						
+
 					case 106: //play a song with angle.. such that it plays the song continuously, but shifted index according ot angle
-						
+
 						int theang = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
-						
+
 						currentMeasure = bbc.mySong.getMeasure((int) this.generalMeasure+theang);
 						bbc.setRhythm(currentMeasure.toRhythm());
-						
-						
+
+
 						break;
-						
+
 					case 110: // play a song in full but only according to my bell note
 						currentMeasure = bbc.mySong.getMeasure((int) this.generalMeasure);
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
-						
+
 						break;
-						
+
 					case 111: //play a song but only choose measures that contain my own note AND from other neighbors
-						
+
 						Vector notesToFind = new Vector();
 						notesToFind.add(new Integer(bbc.myNote));
-						
+
 						for(int i=0;i<bbc.otherBots.size();i++)
 						{
 							Bot b = (Bot) bbc.otherBots.get(i);
 							if(b.isNeighbor)
 							{
-								notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+								//notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+								notesToFind.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
 							}							
-								
+
 						}
-						
+
 						if(!bbc.findOnce)
 						{
-							
+
 							possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(notesToFind);
-							
+
 							if(possibleMeasures.size()!=0)
 							{
 								currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
 								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
-								
+
 								bbc.findOnce=true;//ok if here ?
 							}
-							
+
 						}
-						 
-					
-						
+
+
+
 						break;
-						
-					case 112:
-						
+
+					case 112: //gil's
+
 						if(bbc.numNeighbors==0)
 						{
 							bbc.clearRhythm(bbc.instrumentseq);
 							bbc.clearRhythm(bbc.sfxrseq);
-							
+
 						}
 						else
 						{
 							Vector ntf = new Vector();
 							ntf.add(new Integer(bbc.myNote));
-							
+
 							for(int i=0;i<bbc.otherBots.size();i++)
 							{
 								Bot b = (Bot) bbc.otherBots.get(i);
 								if(b.isNeighbor)
 								{
-									ntf.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+									//ntf.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+									ntf.add( new Integer( bbc.getMSDegree(b.ID)+72 ) );
 								}							
-									
+
 							}
-							
+
 							if(!bbc.findOnce)
 							{
-								
-								possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(ntf);
-								
+
+								possibleMeasures=bbc.mySong.getMeasuresWithAnyNotes(ntf);
+
 								if(possibleMeasures.size()!=0)
 								{
-									currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
+									currentMeasure  = (Measure) possibleMeasures.get((int) (generalMeasure%possibleMeasures.size())  );
 									bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
-									
+
 									bbc.findOnce=true;//ok if here ?
+									gilcounter++;
+
+									if(gilcounter>=64)
+									{
+										gilcounter=0;
+										bbc.setMapping(110);
+										//this.mapping=110;//shoudl probably an inform method..and let the inform method do the mapping set
+									}
+
+
 								}
-								
+
 							}
 						}
+						break;
+
+					case 113: //play song but only with bell and shift measure on angle
+						Vector nnttff = new Vector();
+						nnttff.add(new Integer(bbc.myNote));
+
+						for(int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);
+							if(b.isNeighbor)
+							{
+								//notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
+								nnttff.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
+							}							
+
+						}
+
+						if(!bbc.findOnce)
+						{
+
+							possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(nnttff);
+
+
+
+							if(possibleMeasures.size()!=0)
+							{
+
+								int shift = (int) bbc.map(angle1,0,360,0,8);
+
+
+
+								currentMeasure  = (Measure) possibleMeasures.get( (int) ((generalMeasure+shift)%possibleMeasures.size()) );
+								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+
+								bbc.findOnce=true;//ok if here ?
+							}
+
+						}
+
+						break;
+
+					case 120: //for wander then follow in line
+						if(bbc.myBehavior.wanderVector)
+						{
+
+						}
+						if(bbc.myBehavior.wtfilFinalTargetReached)
+						{
+
+						}
+						if(bbc.myBehavior.wanderThenFollowInLine)
+						{
+
+						}
+
+
+						break;
+
+					case 199: 
+
+
 						break;
 
 					case 200:
@@ -1074,7 +1159,7 @@ public class BeatTimer extends Thread{
 				bbc.changeOnce=false;
 
 				bbc.swapOnce =false;
-				
+
 				bbc.findOnce=false;
 			}
 

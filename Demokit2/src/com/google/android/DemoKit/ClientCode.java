@@ -295,7 +295,8 @@ public class ClientCode implements OnClickListener{
 							}
 						}
 
-						bbc.setMyNote(bbc.MSDeg[bbc.ID]+72);
+						//bbc.setMyNote(    bbc.MSDeg[bbc.ID]+72);
+						bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
 
 						///
 						handler.post(new Runnable() {
@@ -308,6 +309,12 @@ public class ClientCode implements OnClickListener{
 
 					}
 
+					if(line.contains("setNComEnable"))
+					{
+						bbc.setnComEnable(!bbc.nComEnable);
+						
+						Log.d("client ncom", "balue: " + bbc.nComEnable);
+					}
 
 					if(line.contains("getPattern"))
 					{
@@ -1613,7 +1620,7 @@ public class ClientCode implements OnClickListener{
 			i.remove();
 			String ss="com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn";
 
-			Log.d("client sendMessage2",""+ ss);
+			Log.d("client sendMessage2","qsize: " +bbc.queue.size() + " " + ss );
 			out2.println(ss);
 
 			bbc.nComTimer=System.currentTimeMillis();
