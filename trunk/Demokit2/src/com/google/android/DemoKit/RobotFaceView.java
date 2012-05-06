@@ -25,7 +25,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		SurfaceHolder.Callback, Runnable {
 
 	Paint paint1, paint2, blackpaint, blackpaintText, redPaintHighlight,
-			greenPaint, yellowPaint;
+			greenPaint, yellowPaint, goldPaint;
 
 	private SurfaceHolder mHolder;
 
@@ -72,6 +72,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		redPaintHighlight = new Paint();
 		greenPaint = new Paint();
 		yellowPaint = new Paint();
+		goldPaint = new Paint();
 
 		paint1.setColor(Color.WHITE);
 		paint1.setAntiAlias(true);
@@ -96,6 +97,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 
 		yellowPaint.setColor(Color.YELLOW);
 		yellowPaint.setAntiAlias(true);
+		
+		goldPaint.setColor(Color.rgb(255,215,0));
+		 
 		
 		thread = new RobotFaceViewThread(holder, context);
 		this.setOnTouchListener(this);
@@ -310,10 +314,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						//cameraButton.run(c);
 						danceButton.run(c);
 						modeButton.run(c);
-						tempup.run(c);
-						tempdown.run(c);
-						divup.run(c);
-						divdown.run(c);
+						//tempup.run(c);
+						//tempdown.run(c);
+						//divup.run(c);
+						//divdown.run(c);
 						message.run(c);
 						
 						arena.run(c);
@@ -377,7 +381,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		}
 
 		public void render(Canvas canvas) {
-			canvas.drawColor(Color.GRAY);
+			canvas.drawPaint(goldPaint);
 
 			if (true) {
 				try {
@@ -453,7 +457,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		long openTimer, closeTimer;
 		int brate = 16;
 
-		int sz = 85;
+		int sz = 80;
 		int tsz = 50;
 
 		int cbuff = 0;
@@ -615,7 +619,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				// ellipse(x,y,sz,sz);
 				
 				float f1,f2,f3,f4;
-				float m=13;
+				float m=21;
 				f1=m*(float)(2*Math.random()-1);
 				f2=m*(float)(2*Math.random()-1);
 				f3=m*(float)(2*Math.random()-1);
@@ -1104,14 +1108,14 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	// start nosebutton
 	class NoseButton {
 
-		int sz = 50;
+		int sz = 40;
 
 		boolean pressed;
 		int x, y;
 
 		NoseButton() {
 			x = getWidth() / 2;
-			y = getHeight() / 2;
+			y = getHeight()-getHeight() / 3;
 		}
 
 		void run(Canvas c) {
@@ -1126,7 +1130,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 
 		void render(Canvas c) {
 			if (!pressed)
-				c.drawCircle(x, y, sz, paint2);
+				c.drawCircle(x, y, sz, blackpaint);
 			else
 				c.drawCircle(x, y, sz, paint1);
 
@@ -1550,6 +1554,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			}
 			*/
 			
+			
+			/*
 			if(thread.tempdown.inButton(x, y))
 			{
 			
@@ -1573,6 +1579,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				bbc.divDown();
 				thread.message.displayMessage("div: " + bbc.getDiv());
 			}
+			*/
 
 			return true;
 

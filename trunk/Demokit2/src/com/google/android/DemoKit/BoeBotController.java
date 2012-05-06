@@ -2868,7 +2868,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			this.mySong= new LionSleeps();
 			break;
 		case 4: 
-			this.mySong = new Tetris();
+			//this.mySong = new Tetris();
+			this.mySong = new TestSong();
 			break;
 		case 10: 
 			this.mySong = new TestSong();
