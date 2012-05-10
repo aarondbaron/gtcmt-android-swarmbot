@@ -50,7 +50,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	Bot botToInspect;
 
 	Vibrator vib;
-	
+
 	boolean surfCreated;
 
 	public ArenaView(Context context, SomeController bbc) {
@@ -77,8 +77,8 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		botToInspect=null;
 
-	
-		 
+
+
 
 		vib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -100,32 +100,32 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		float w=640;
 		float h =480;
-		
+
 		float factor = w/h;
-		
-		
+
+
 
 		//int woff=10;
 		//int hoff=10;
 		//thread.arena = new Arena(getWidth()/2, getHeight()/2,getWidth()/2-woff,getHeight()/2-hoff);		
 		thread.arena = new Arena(getWidth()/2, getHeight()/2, (int) ((getWidth()/2)/factor) ,(int)( getHeight()/2) );		
 		thread.sequencer = new Sequencer(this);
-		
+
 		surfCreated=true;
-		
-		
+
+/*
 		Bot testBot = new Bot();
 		testBot.x=640/4;
 		testBot.y=480/4;
 		testBot.ID=0;
 		bbc.allBots.add(testBot);
-		
+
 		testBot = new Bot();
 		testBot.x=640-640/4;
 		testBot.y=480-480/4;
 		testBot.ID=1;
 		bbc.allBots.add(testBot);
-		 
+*/
 
 	}
 
@@ -210,44 +210,46 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 			}
 			 */
 
-
-			for(int i=0;i<bbc.allBots.size();i++)
+			if(this.mode.equals("Inspect"))
 			{
-				Bot b = (Bot) bbc.allBots.get(i);
-
-				int bx=(int) map(b.x,0,640,this.thread.arena.leftx,this.thread.arena.rightx);
-				int by=(int) map(b.y,0,480,this.thread.arena.topy,this.thread.arena.bottomy);
-
-				if(b.isNearCursor(x,y, bx, by))
+				for(int i=0;i<bbc.allBots.size();i++)
 				{
-					//Log.d("inspect","x: " + x + "  y:" + y  + "||bx: " + b.x + "  by:" + b.y);
-					b.inspect=true;
+					Bot b = (Bot) bbc.allBots.get(i);
 
-					if(!b.vibrateOnce)
+					int bx=(int) map(b.x,0,640,this.thread.arena.leftx,this.thread.arena.rightx);
+					int by=(int) map(b.y,0,480,this.thread.arena.topy,this.thread.arena.bottomy);
+
+					if(b.isNearCursor(x,y, bx, by))
 					{
-						vib.vibrate(50);
-						b.vibrateOnce=true;
+						//Log.d("inspect","x: " + x + "  y:" + y  + "||bx: " + b.x + "  by:" + b.y);
+						b.inspect=true;
+
+						if(!b.vibrateOnce)
+						{
+							vib.vibrate(50);
+							b.vibrateOnce=true;
+						}
+						else
+						{
+							this.inspectTimer=System.currentTimeMillis();
+						}
+						if(System.currentTimeMillis()-this.inspectTimer>1000)
+						{
+
+							//inspecting=true;
+							Log.d("sending query","bot " + b.ID);
+							this.inspectTimer=System.currentTimeMillis();
+							mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
+
+
+						}
 					}
 					else
 					{
-						this.inspectTimer=System.currentTimeMillis();
+						b.inspect=false;
+						b.vibrateOnce=false;
+						//Log.d("fail inspect","x: " + x + "  y:" + y + "||bx: " + b.x + "  by:" + b.y);
 					}
-					if(System.currentTimeMillis()-this.inspectTimer>1000)
-					{
-
-						//inspecting=true;
-						Log.d("sending query","bot " + b.ID);
-						this.inspectTimer=System.currentTimeMillis();
-						mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
-
-
-					}
-				}
-				else
-				{
-					b.inspect=false;
-					b.vibrateOnce=false;
-					//Log.d("fail inspect","x: " + x + "  y:" + y + "||bx: " + b.x + "  by:" + b.y);
 				}
 
 			}
@@ -320,9 +322,10 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 			if(this.mode.equals("editSequencer"))
 			{
+				
+				thread.sequencer.checkInside((int)x, (int)y);
 				mActivity.client.sendMessage("controller,"+ 801 + "," + this.thread.sequencer.getMySequence());
 
-				thread.sequencer.checkInside((int)x, (int)y);
 			}
 
 		}
