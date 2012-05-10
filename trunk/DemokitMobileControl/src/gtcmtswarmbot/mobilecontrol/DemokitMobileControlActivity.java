@@ -114,7 +114,7 @@ public class DemokitMobileControlActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
     	SubMenu sub = menu.addSubMenu(0,1,0, "Music Mappings");
     	sub.add("noMapping");
-    	sub.add("showSequencer");
+    	sub.add("broadcastSequence");
     	sub.add("angle");
     	sub.add("neighbor");
     	sub.add("speed");
@@ -139,6 +139,10 @@ public class DemokitMobileControlActivity extends Activity {
     	sub2.add("Cohesion");
     	sub2.add("TugMove");
     	sub2.add("AvatarMove");
+    	sub2.add("followAvatar");
+    	sub2.add("followAvatarInLine");
+    	sub2.add("evadeAvatar");
+    	sub2.add("orbitAvatar");
     	sub2.add("StopAll");
     	//sub2.add("Formation");
     	
@@ -154,6 +158,7 @@ public class DemokitMobileControlActivity extends Activity {
     	menu.add("StopAll");
     	menu.add("Connect");
     	menu.add("Sync");
+    	menu.add("Inspect");
     	/*
 		menu.add("ViewCursor");
 		menu.add("Move");
@@ -187,6 +192,8 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.doStuff();
 		}else if (item.getTitle() == "Sync") {
 			this.client.sendMessage("controller,"+ 1000);
+		}else if (item.getTitle() == "Inspect") {
+			arenaView.mode="Inspect";
 		}else if (item.getTitle() == "Move") {
 			arenaView.mode="Move";
 			Log.d("item selected",""+item.getTitle());
@@ -236,6 +243,18 @@ public class DemokitMobileControlActivity extends Activity {
 			this.arenaView.mode="TugMove";
 		}else if (item.getTitle() == "AvatarMove") {
 			this.arenaView.mode="AvatarMove";
+		}else if (item.getTitle() == "followAvatar") {
+			this.client.sendMessage("controller,"+ 99879 );
+			this.arenaView.mode="AvatarMove";
+		}else if (item.getTitle() == "followAvatarInLine") {
+			this.client.sendMessage("controller,"+ 99878 );
+			this.arenaView.mode="AvatarMove";
+		}else if (item.getTitle() == "evadeAvatar") {
+			this.client.sendMessage("controller,"+ 99877 );
+			this.arenaView.mode="AvatarMove";
+		}else if (item.getTitle() == "orbitAvatar") {
+			this.client.sendMessage("controller,"+ 99876 );
+			this.arenaView.mode="AvatarMove";
 		}else if (item.getTitle() == "circle") {
 			this.arenaView.mode="formation";
 			this.client.sendMessage("controller,"+ 997 + ",circle," + 80);
@@ -255,7 +274,7 @@ public class DemokitMobileControlActivity extends Activity {
 		}else if (item.getTitle() == "drawn") {
 			arenaView.mode="drawn";
 			Log.d("item selected",""+item.getTitle());
-		}else if (item.getTitle() == "showSequencer") {
+		}else if (item.getTitle() == "broadcastSequence") {
 			arenaView.thread.showSequencer=!arenaView.thread.showSequencer;
 			if(arenaView.thread.showSequencer)
 			{
