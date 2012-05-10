@@ -381,8 +381,15 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		}
 
 		public void render(Canvas canvas) {
-			canvas.drawPaint(goldPaint);
-
+			if(bbc.avatarMoving)
+			{
+				canvas.drawPaint(greenPaint);
+			}
+			else
+			{
+				canvas.drawPaint(goldPaint);
+			}
+			
 			if (true) {
 				try {
 					for (Point point : points) {

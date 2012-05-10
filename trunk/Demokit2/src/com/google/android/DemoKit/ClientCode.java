@@ -399,7 +399,7 @@ public class ClientCode implements OnClickListener{
 
 					}
 
-
+					/*
 					if(line.contains("avatarpattern"))
 					{
 						String test [] = line.split(",");
@@ -446,6 +446,7 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
+					*/
 
 					if(line.contains("clearRhythm"))
 					{
@@ -1120,7 +1121,7 @@ public class ClientCode implements OnClickListener{
 
 							if(code==9987) //avatar tug move
 							{
-								if(bbc.ID==0)
+								if(bbc.ID==0)//only avatar
 								{
 									if(test.length==4)
 									{
@@ -1137,14 +1138,48 @@ public class ClientCode implements OnClickListener{
 										//////////////////////////////////
 										bbc.target.x=x;
 										bbc.target.y=y;
-										Log.d("controller TUG move"," :"+x+"y:"+y);
+										Log.d("controller avatar TUG move"," :"+x+"y:"+y);
+										
+										if(bbc.ID==0)
+										{
+											bbc.avatarMoving=true;
+										}
 									}
 									if(test.length==2)
 									{
 										bbc.moveToLoc(false);
+										if(bbc.ID==0)
+										{
+											bbc.avatarMoving=false;
+										}
 										bbc.myBehavior.setFollowMouse(false);
 									}
 								}
+							}
+							if(code==99879)
+							{
+								
+								//follow   avatar
+								//bbc.myBehavior.follow((Bot)bbc.otherBots.get(0));
+								bbc.myBehavior.botTarget=bbc.currentAvatar;
+								bbc.myBehavior.setFollowAvatar(true);
+								
+							}
+							if(code==99878)
+							{
+								//follow in line with avatar
+								bbc.myBehavior.setFollowInLine(true);
+							}
+							if(code==99877)
+							{
+								//evade avatar
+								
+								bbc.myBehavior.setEvadeAvatar(true);
+								
+							}
+							if(code==99876)
+							{
+								
 							}
 							if(code==9986) // move relative
 							{
@@ -1181,6 +1216,49 @@ public class ClientCode implements OnClickListener{
 									@Override
 									public void run() {
 										Toast.makeText(mActivity.getApplicationContext(), "mapping set -- " +  bbc.mActivity.beatTimer.mapping + " -- by server--" + bbc.otherBots.size() + "-nn-" + bbc.numNeighbors, Toast.LENGTH_LONG).show();
+									}
+								});
+							}
+							if(code==801)
+							{								 
+								
+								char[] a= test[2].toCharArray();
+								boolean[] b  = new boolean[bbc.instrumentseq.length];
+								for(int i=0;i<bbc.instrumentseq.length;i++)
+								{
+									if(i<a.length)
+									{
+										if(a[i]=='0')
+										{
+											b[i] = false;
+											bbc.receivedSequence[i]=false;
+											//bbc.instrumentseq[i]=false;
+											//bbc.sfxrseq[i]=false;
+
+											//temporary only
+											//bbc.avatarseq[i]=false;
+										}
+										else
+										{
+											b[i]=true;
+											bbc.receivedSequence[i]=true;
+											//bbc.instrumentseq[i]=true;
+											//bbc.sfxrseq[i]=true;
+
+											//temporary only
+											//bbc.avatarseq[i]=true;
+										}
+									}
+
+								}
+								
+								bbc.setRhythm(bbc.receivedSequence);
+								
+								
+								handler.post(new Runnable() {
+									@Override
+									public void run() {
+										Toast.makeText(mActivity.getApplicationContext(), "sequence-- "  , Toast.LENGTH_LONG).show();
 									}
 								});
 							}
@@ -1647,8 +1725,7 @@ public class ClientCode implements OnClickListener{
 		bbc.setWander(false);
 		bbc.setWanderDance(false);
 		bbc.setWanderVector(false);
-		bbc.myBehavior.setFollowInLine(false);
-		bbc.myBehavior.setOrbitAvatar(false);
+		bbc.myBehavior.setFollowInLine(false);		
 		bbc.myBehavior.setOrbitCenter(false);
 		bbc.myBehavior.setFollowMouse(false);
 		bbc.myBehavior.setOrbitInLine(false);
@@ -1660,6 +1737,10 @@ public class ClientCode implements OnClickListener{
 		bbc.myBehavior.setBreath2(false);
 		bbc.myBehavior.setFormation(false);
 		bbc.myBehavior.setWanderVector(false);
+		
+		bbc.myBehavior.setFollowAvatar(false);
+		bbc.myBehavior.setEvadeAvatar(false);
+		bbc.myBehavior.setOrbitAvatar(false);
 
 		bbc.myBehavior.setSeparation(false);
 		bbc.myBehavior.setAlignment(false);

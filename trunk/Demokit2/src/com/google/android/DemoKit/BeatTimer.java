@@ -834,7 +834,7 @@ public class BeatTimer extends Thread{
 						}
 						break;
 
-					case 113: //play song but only with bell and shift measure on angle
+					case 113: //play song but only with bell and shift measure on angle  (needs fixing)
 						Vector nnttff = new Vector();
 						nnttff.add(new Integer(bbc.myNote));
 
@@ -871,6 +871,15 @@ public class BeatTimer extends Thread{
 
 						}
 
+						break;
+						
+					case 114:
+						
+						int angind2 = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
+
+						currentMeasure = bbc.mySong.getMeasure(angind2);
+						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
 						break;
 
 					case 120: //for wander then follow in line
