@@ -78,6 +78,8 @@ public class Behavior extends Thread
 	public boolean alignment;
 	public boolean cohesion;
 	public boolean followInLine;
+	
+	public boolean followAvatar;
 
 	public Handler handler =new Handler();
 
@@ -116,6 +118,8 @@ public class Behavior extends Thread
 	float[] sacWeights;
 	private boolean breath1;
 	private boolean breath2;
+	private boolean evadeAvatar;
+	//private boolean followBot;
 
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
@@ -367,6 +371,18 @@ public class Behavior extends Thread
 				Log.d("behavior","orbitInLine " + desiredVel);
 				orbitInLine();
 			}
+			
+			 
+			
+			if(followAvatar)
+			{
+				
+			   if(bbc.currentAvatar!=null && bbc.ID!=0)
+			   {
+				   follow(bbc.currentAvatar);
+			   }
+			}
+			
 
 			if(followMouse)
 			{
@@ -418,6 +434,8 @@ public class Behavior extends Thread
 		}
 	}
 
+
+	 
 
 	public PVector forwardVector() {
 		// TODO Auto-generated method stub
@@ -529,7 +547,7 @@ public class Behavior extends Thread
 		int w=640/2;
 		int h=480/2;
 
-		boolean followBot;
+		//boolean followBot;
 		Bot botToFollow=null;
 		if(!wtf1)
 		{
@@ -659,7 +677,7 @@ public class Behavior extends Thread
 	{
 		int w=640/2;
 		int h=480/2;
-		boolean followBot;
+		//boolean followBot;
 		Bot botToFollow=null;
 
 		if(bbc.ID!=0)
@@ -2521,6 +2539,19 @@ public class Behavior extends Thread
 	public void setWanderVector(boolean b) {
 		// TODO Auto-generated method stub
 		wanderVector=b;
+		
+	}
+
+	public void setFollowAvatar(boolean b) {
+		// TODO Auto-generated method stub
+		followAvatar=b;
+		
+	}
+
+	public void setEvadeAvatar(boolean b) {
+		// TODO Auto-generated method stub
+		
+		evadeAvatar=b;
 		
 	}
 

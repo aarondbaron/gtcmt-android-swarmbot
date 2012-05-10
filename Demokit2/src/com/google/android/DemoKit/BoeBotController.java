@@ -169,6 +169,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	Song mySong;
 	
+	 
+	
 	public boolean isnComEnable() {
 		return nComEnable;
 	}
@@ -296,7 +298,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//mySong = new LionSleeps(); 
 		chooseSong(10);
 		
-		this.setMapping(204);
+		//this.setMapping(204);
 		
 		
 	}
@@ -422,6 +424,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean useSong=true;
 	public int myNote=72;
 	public int[] MSDeg;
+	public boolean avatarMoving;
 	
 
 	/////??
@@ -2258,7 +2261,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	void setMapping(int a)
 	{
-
+		//this.avatarMode=false;
 		mActivity.beatTimer.mapping=a;
 
 
