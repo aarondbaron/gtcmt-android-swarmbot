@@ -16,6 +16,8 @@ public class Bot
 	
 	float distToMe;
 	
+	int numN;
+	
 	//PVector vel;
 
 	Bot()

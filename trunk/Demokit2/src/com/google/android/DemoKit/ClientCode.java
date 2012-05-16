@@ -255,6 +255,21 @@ public class ClientCode implements OnClickListener{
 						{						
 						}						
 					}
+					
+					if(line.contains("setAvatar"))
+					{
+						String test [] = line.split(",");
+						int t= Integer.parseInt(test[1]);
+						if(t==bbc.ID)
+						{
+							bbc.setAvatarMode(true);
+						}
+						else
+						{
+							bbc.setAvatarMode(false);
+						}
+						 
+					}
 
 					if(line.contains("djembe"))
 					{
