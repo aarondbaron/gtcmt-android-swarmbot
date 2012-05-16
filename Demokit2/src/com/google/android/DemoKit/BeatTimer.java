@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Vector;
 
 import com.google.android.DemoKit.ClientCode.ClientThread;
@@ -60,6 +62,14 @@ public class BeatTimer extends Thread{
 
 	Measure currentMeasure;
 	Vector possibleMeasures;
+	boolean possibleMeasuresSilent;
+	boolean [] testMeasure;
+	float cang;
+
+	LinkedHashSet notebots;
+	Iterator itr;
+	int measureInd;
+	boolean incMIndOnce;
 
 	int gilcounter=0;
 
@@ -93,6 +103,7 @@ public class BeatTimer extends Thread{
 					{
 						mActivity.client.doStuff();					
 						mActivity.client.initialConnect=true;
+						bbc.stopAll();
 					}
 				}
 			}
@@ -653,13 +664,13 @@ public class BeatTimer extends Thread{
 							/*
 							if(bbc.isSilent(bbc.receivedSequence))
 							{
-								
+
 							}
 							else
 							{
 								bbc.setRhythm(bbc.receivedSequence);
 							}
-							*/
+							 */
 						}
 						else
 						{
@@ -872,14 +883,14 @@ public class BeatTimer extends Thread{
 						}
 
 						break;
-						
+
 					case 114:
-						
+
 						int angind2 = (int) bbc.map(angle1, 0, 360, 0, bbc.mySong.numMeasures()-1);
 
 						currentMeasure = bbc.mySong.getMeasure(angind2);
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
-						
+
 						break;
 
 					case 120: //for wander then follow in line
@@ -897,6 +908,318 @@ public class BeatTimer extends Thread{
 						}
 
 
+						break;
+
+					case 121:
+						Vector measures = bbc.mySong.getMeasures(measureInd,measureInd+1);
+						boolean allSilent=true;
+						for(int i=0;i<measures.size();i++)
+						{
+							Measure m = (Measure) measures.get(i);
+							if(!bbc.isSilent ( m.toBellRhythm(bbc.myNote)))
+							{
+								allSilent=false;
+							}
+
+						}
+
+						currentMeasure=bbc.mySong.getMeasure((int) (measureInd+generalMeasure%2));
+						boolean[] bb=currentMeasure.toBellRhythm(bbc.myNote);
+
+						//
+						if (!allSilent)
+						{
+							//this.separation = getDefaultSeparation();
+							//this.alignment  = getDefaultAlignment();
+							//this.cohesion = getDefaultCohesion();
+							bbc.myBehavior.formationType="circle";
+							bbc.myBehavior.setFormation(true);
+							bbc.myBehavior.setOrbitCenter(false);
+
+
+
+							if (bbc.numNeighbors==0 )
+							{
+
+								bbc.setRhythm(bb);
+								for (int i=0;i<(bbc.ID+4)*4;i++)
+								{
+									bbc.shiftRhythmLeft(bbc.instrumentseq);
+									bbc.shiftRhythmLeft(bbc.sfxrseq);
+								}
+							}
+							else
+							{
+								bbc.setRhythm(bb);
+							}
+						}
+						else
+						{
+							bbc.myBehavior.setFormation(false);
+							bbc.setRhythm(bb);
+							//this.separation=5;
+							// this.alignment=0;
+							//this.cohesion=0;
+							if(generalMeasure%2==0)
+							{
+								bbc.myBehavior.setOrbitCenter(true);
+								bbc.myBehavior.orbitClockwise=true;
+								// bbc.myBehavior.orbit(new PVector(width/2,height/2), 200,true);
+							}
+							else
+							{
+								bbc.myBehavior.setOrbitCenter(true);
+								bbc.myBehavior.orbitClockwise=false;
+								//this.orbit(new PVector(width/2,height/2), 200,false);
+							}
+						}
+						//
+
+
+						break;
+
+					case 122: // choose the subset to follow each other in line// the ones that dont play dont move.//play according t angle
+						Vector measures2 = bbc.mySong.getMeasures(measureInd,measureInd+1);
+						boolean allSilent2=true;
+						for(int i=0;i<measures2.size();i++)
+						{
+							Measure m = (Measure) measures2.get(i);
+							if(!bbc.isSilent ( m.toBellRhythm(bbc.myNote)))
+							{
+								allSilent2=false;
+							}
+
+						}
+
+						currentMeasure=bbc.mySong.getMeasure((int) (measureInd+generalMeasure%2));
+						boolean[] bb2=currentMeasure.toBellRhythm(bbc.myNote);
+
+						// get which bots are playing this...
+						LinkedHashSet notebots = bbc.mySong.getNotesFromMeasures(measureInd, measureInd+1);
+
+						// follow the appropriate bot in the list
+
+
+
+
+						// map rhyhtm accoring to angle if notebots
+
+
+
+
+
+						break;
+
+
+					case 123:  ///this is one in which angles ar eused...//ones that are in it move..ones that are not in measure dont
+
+
+						possibleMeasures = bbc.mySong.getMeasures(measureInd, measureInd+1);
+
+
+						possibleMeasuresSilent=true;
+						for (int i=0;i<possibleMeasures.size();i++)
+						{
+							Measure m = (Measure) possibleMeasures.get(i);
+							if (!bbc.isSilent ( m.toBellRhythm(bbc.myNote)))
+							{
+								possibleMeasuresSilent=false;
+							}
+						}
+
+						currentMeasure= bbc.mySong.getMeasure((int) (measureInd+generalMeasure%2));
+						testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+
+						if (!possibleMeasuresSilent)
+						{
+							/*
+					      this.separation = getDefaultSeparation();
+					       this.alignment  = getDefaultAlignment();
+					       this.cohesion = getDefaultCohesion();
+							 */
+							//resume();
+						}
+						else
+						{
+							/*
+					      this.separation=5;
+					       this.alignment=0;
+					       this.cohesion=0;
+							 */
+							bbc.stopAll();
+							bbc.myBehavior.setSeparation(true);
+						}
+
+
+
+						// get which bots are playing this...
+
+						notebots =  bbc.mySong.getNotesFromMeasures(measureInd, measureInd+1);
+						itr = notebots.iterator();
+						/*
+						if (bbc.ID==0)
+						{
+							System.out.println("LinkedHashSet contains : ");
+							while (itr.hasNext ())
+								System.out.println(itr.next());
+						}
+						*/
+
+						Vector botsToFollow = new Vector();
+						for (int i=0; i<bbc.otherBots.size(); i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);
+
+							int botsnote= bbc.getMSDegree(b.ID);
+							int bnote = botsnote+72; // got to get appropriate note
+							if (notebots.contains(new Integer(bnote)))
+							{
+								botsToFollow.add(b);
+
+							 
+							}
+							else
+							{
+								bbc.myBehavior.setSeparation(true);
+								
+								/*
+								PVector bloc = new PVector(b.x,b.y);
+								PVector loc = new PVector(bbc.myposx,bbc.myposy);
+								if ( PVector.dist(bloc,  loc)<100)
+								{
+									bbc.myBehavior.evade(bloc);
+								}
+								*/
+								
+							}
+
+
+
+						}
+
+						if (!this.possibleMeasuresSilent&&botsToFollow.size()!=0)
+						{
+							Bot toFollow = (Bot)botsToFollow.get(0);
+							if (toFollow.ID>bbc.ID)
+							{
+								if (generalMeasure%2==0)
+								{
+									bbc.myBehavior.setOrbitCenter(true);
+									bbc.myBehavior.orbitClockwise=true;				
+									//this.orbit(new PVector(width/2, height/2), 200, false);
+									Log.d("","orbitting clockwise because to follow is" + toFollow.ID);
+								}
+								else
+								{
+									bbc.myBehavior.setOrbitCenter(true);
+									bbc.myBehavior.orbitClockwise=false;	
+									
+									Log.d("","orbitting because to follow is" + toFollow.ID);
+									//this.orbit(new PVector(width/2, height/2), 200, false);
+									//println("orbitting because to follow is" + toFollow.ID);
+								}
+							}
+							else
+							{
+								bbc.myBehavior.follow(toFollow);
+								//bbc.myBehavior.leaderFollow(toFollow);
+								Log.d("","id: " + bbc.ID+ " following" + toFollow.ID);
+							}
+						}
+
+						// follow the appropriate bot in the list
+
+
+
+
+						// map rhyhtm accoring to angle if notebots
+						cang = bbc.camang;
+						if(cang<0)
+						{
+							cang=360+cang;
+						}
+						
+						 
+						int angShift= (int) bbc.map(cang, 0, 360, 0, bbc.SEQUENCERLENGTH/2);
+
+						bbc.setRhythm(this.testMeasure );
+						for (int i=0;i<angShift;i++)
+						{
+
+
+							bbc.shiftRhythmLeft(bbc.sfxrseq);
+							bbc.shiftRhythmLeft(bbc.instrumentseq);
+						}
+
+
+
+						if (generalMeasure%12==0 )
+						{
+							bbc.clearRhythm(bbc.sfxrseq);
+							bbc.clearRhythm(bbc.instrumentseq);
+							if (!incMIndOnce)
+							{
+								measureInd+=2;
+								incMIndOnce=true;
+								//flockFunctionTimer2=JMSL.now();
+							}
+
+
+
+
+
+							currentMeasure=bbc.mySong.getMeasure(measureInd);
+							bbc.setRhythm( currentMeasure.toBellRhythm(bbc.myNote)) ;
+							//LinkedHashSet nn =currentMeasure.uniqueNotes();
+							//println("unique notes: "+ nn.size());
+							//mcount=0;
+							//println(measureInd);
+						}
+
+
+						break;
+						
+						
+					case 124:  //map all measure(two "measures") to an angle (simple)
+						
+						cang = bbc.camang;
+						if(cang<0)
+						{
+							cang=360+cang;
+						}
+
+						int mshift= (int) bbc.map(cang, 0, 360, 0, bbc.mySong.numMeasures());
+						
+						if(mshift%2==1)
+						{
+							mshift-=1;							
+						}
+						
+						/*
+						possibleMeasures = bbc.mySong.getMeasures(mshift, mshift+1);
+
+
+						possibleMeasuresSilent=true;
+						for (int i=0;i<possibleMeasures.size();i++)
+						{
+							Measure m = (Measure) possibleMeasures.get(i);
+							if (!bbc.isSilent ( m.toBellRhythm(bbc.myNote)))
+							{
+								possibleMeasuresSilent=false;
+							}
+						}
+						*/
+
+						currentMeasure= bbc.mySong.getMeasure((int) (mshift+generalMeasure%2));
+						testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+						
+						bbc.setRhythm(testMeasure);					
+						
+						break;
+						
+					case 125: //
+						
+						
 						break;
 
 					case 199: 

@@ -1,6 +1,7 @@
 package com.google.android.DemoKit;
 
 import java.lang.reflect.Array;
+import java.util.LinkedHashSet;
 import java.util.Vector;
 
 public class Measure
@@ -162,6 +163,28 @@ public class Measure
 	{
 		
 	}
+	
+	LinkedHashSet uniqueNotes()
+	{
+		 
+		
+		LinkedHashSet vv = new LinkedHashSet();
+		
+		for(int i=0;i<notes.length;i++)
+		{
+			if(notes[i]!=0)
+		      {
+		        Integer n = new Integer(notes[i]);
+		        vv.add(n);
+		      }	  
+		}
+	   
+		
+		return vv;
+	}
+	
+	
+	                  
 	
 
 

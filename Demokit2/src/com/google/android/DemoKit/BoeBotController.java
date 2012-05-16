@@ -2896,5 +2896,12 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		return MSDeg[n%MSDeg.length];
 	}
 
+	public void setAvatarMode(boolean b) {
+		// TODO Auto-generated method stub
+		
+		this.avatarMode=b;
+		
+	}
+
 
 }

@@ -12,6 +12,7 @@ import org.opencv.android.*;
 import org.opencv.utils.*;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -158,13 +159,19 @@ class FdView extends SampleCvViewBase {
             int height = mGray.rows();
             //int faceSize = Math.round(height * FdActivity.minFaceSize);
             int faceSize = Math.round(height * minFaceSize);
+            /*
             List<Rect> faces = new LinkedList<Rect>();
             mCascade.detectMultiScale(mGray, faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                     , new Size(faceSize, faceSize));
 
             numFaces=faces.size();
-
-            for (Rect r : faces)
+             */
+            MatOfRect faces = new MatOfRect();
+            mCascade.detectMultiScale(mGray, faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
+                    , new Size(faceSize, faceSize), new Size());
+            
+            //for (Rect r : faces)
+            for (Rect r : faces.toArray())
             {
                 Core.rectangle(mRgba, r.tl(), r.br(), new Scalar(0, 255, 0, 255), 3);
                 x=r.x;
@@ -175,11 +182,23 @@ class FdView extends SampleCvViewBase {
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
 
+        /*
         if (Utils.matToBitmap(mRgba, bmp))
             return bmp;
 
         bmp.recycle();
         return null;
+        */
+        try {
+        	Utils.matToBitmap(mRgba, bmp);
+            return bmp;
+        } catch(Exception e) {
+        	Log.e("org.opencv.samples.puzzle15", "Utils.matToBitmap() throws an exception: " + e.getMessage());
+            bmp.recycle();
+            return null;
+        }
+        
+        
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.google.android.DemoKit;
 
+import java.util.LinkedHashSet;
 import java.util.Vector;
 
 public class Song {
@@ -66,7 +67,7 @@ public class Song {
 
 		return result;
 	}
-	
+
 	Vector getMeasuresWithAnyNotes(Vector notesToFind)
 	{
 		Vector result = new Vector();
@@ -91,8 +92,8 @@ public class Song {
 
 		return result;
 	}
-	
-	
+
+
 
 	Vector getMeasuresWithTheseNotes(int[] notesToFind)
 	{
@@ -123,7 +124,7 @@ public class Song {
 
 		return result;
 	}
-	
+
 	Vector getMeasuresWithTheseNotes(Vector notesToFind)
 	{
 		Vector result = new Vector();
@@ -138,7 +139,7 @@ public class Song {
 			boolean test=true;
 			for(int k=0;k<notesToFind.size();k++)
 			{
-				
+
 				Integer tf = (Integer) notesToFind.get(k);
 				if(!m.contains( tf.intValue()) )
 				{
@@ -155,9 +156,41 @@ public class Song {
 
 		return result;
 	}
-	
-	
-	
+
+
+	Vector getMeasures(int start, int end)
+	{
+		Vector n= new Vector();
+
+		for(int i=start;i<=end;i++)
+		{
+			Measure m= (Measure)measures.get(i%measures.size());
+			n.add(m);
+		}
+
+
+		return n;
+	}
+
+	LinkedHashSet getNotesFromMeasures(int start, int end)
+	{
+		LinkedHashSet n= new LinkedHashSet();
+
+		for(int i=start;i<=end;i++)
+		{
+			Measure m= (Measure)measures.get(i%measures.size());
+			n.addAll(m.uniqueNotes());
+			 
+		}
+
+
+		return n;
+
+	}
+
+
+
+
 }
 
 class FightSong extends Song
@@ -699,7 +732,7 @@ class TestSong extends Song
 		testnotes[6]=base+11;
 		testnotes[7]=base+12;
 		testnotes[8]=base+12+2;
-		
+
 		idea1();
 	}
 
@@ -734,9 +767,9 @@ class TestSong extends Song
 			}
 		}
 		measures.add(m3);
-		
+
 		Measure  m4 = new Measure();
-		 k=0;
+		k=0;
 		for(int i=0;i<m4.notes.length;i++)
 		{
 			if(i%4==0)
@@ -746,36 +779,36 @@ class TestSong extends Song
 			}
 		}
 		measures.add(m4);
-		
-		
+
+
 		Measure m5 = new Measure();
 		int off=0;
 		m5.notes[0]=testnotes[0];
 		for(int i=1;i<m5.notes.length;i++)
 		{
-		   m5.notes[i]=testnotes[(i+off)%testnotes.length];
-		  if(i%testnotes.length==0)
-		  {			  
-			  off++;
-		  }
+			m5.notes[i]=testnotes[(i+off)%testnotes.length];
+			if(i%testnotes.length==0)
+			{			  
+				off++;
+			}
 		}
 		measures.add(m5);
-		
-		
+
+
 		Measure m6 = new Measure();
-		  off=0;
+		off=0;
 		m6.notes[0]=testnotes[0];
 		for(int i=1;i<m6.notes.length;i++)
 		{
-		   m6.notes[i]=testnotes[(testnotes.length -1) - (i+off)%testnotes.length];
-		  if(i%testnotes.length==0)
-		  {			  
-			  off++;
-		  }
+			m6.notes[i]=testnotes[(testnotes.length -1) - (i+off)%testnotes.length];
+			if(i%testnotes.length==0)
+			{			  
+				off++;
+			}
 		}
 		measures.add(m6);
-		
-		
+
+
 		Measure m7 = new Measure();
 		for(int i=0;i<m7.notes.length;i++)
 		{
@@ -784,9 +817,9 @@ class TestSong extends Song
 			i++;
 		}
 		measures.add(m7);
-		
-		
-		
+
+
+
 		Measure m8 = new Measure();
 		for(int i=0;i<m8.notes.length;i++)
 		{
@@ -795,8 +828,8 @@ class TestSong extends Song
 			i++;
 		}
 		measures.add(m8);
-		
-		
+
+
 
 
 	}
