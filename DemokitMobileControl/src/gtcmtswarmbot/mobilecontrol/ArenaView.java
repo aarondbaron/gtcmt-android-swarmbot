@@ -27,11 +27,14 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 	private Paint paint1;
 	private Paint paint2;
-	private Paint blackpaint;
-	private Paint blackpaintText;
+	private Paint blackPaint;
+	private Paint blackPaintText;
+	private Paint whitePaintText;
 	private Paint redPaintHighlight;
+	private Paint greenPaintHighlight;
 	private Paint greenPaint;
 	private Paint yellowPaint;
+	private Paint whitePaintStroke;
 	ArenaViewThread thread;
 
 	SomeController bbc;
@@ -52,6 +55,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	Vibrator vib;
 
 	boolean surfCreated;
+	boolean simulateVel;
 
 	public ArenaView(Context context, SomeController bbc) {
 		//super(context);
@@ -113,7 +117,14 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 
 		surfCreated=true;
 
-/*
+		//doTest();
+ 
+
+	}
+	
+	void doTest()
+	{
+		/*
 		Bot testBot = new Bot();
 		testBot.x=640/4;
 		testBot.y=480/4;
@@ -125,8 +136,21 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		testBot.y=480-480/4;
 		testBot.ID=1;
 		bbc.allBots.add(testBot);
-*/
-
+		*/
+		
+		
+		
+		for(int i=0;i<8;i++)
+		{
+			Bot testBot = new Bot();
+			testBot.x=(int) (Math.random()*640);
+			testBot.y=(int) (Math.random()*480);
+			testBot.ID=i;
+			testBot.camang=(float) ((  2*Math.random()-1  ) *180 );
+			bbc.allBots.add(testBot);
+		}
+		
+		simulateVel=true;
 	}
 
 	@Override
@@ -339,11 +363,15 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 	void init(SurfaceHolder holder, Context context) {
 		paint1 = new Paint();
 		paint2 = new Paint();
-		blackpaint = new Paint();
-		blackpaintText = new Paint();
+		blackPaint = new Paint();
+		blackPaintText = new Paint();
+		whitePaintText = new Paint();
 		redPaintHighlight = new Paint();
+		greenPaintHighlight = new Paint();
+		
 		greenPaint = new Paint();
 		yellowPaint = new Paint();
+		whitePaintStroke = new Paint();
 
 		paint1.setColor(Color.WHITE);
 		paint1.setAntiAlias(true);
@@ -352,16 +380,24 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		paint2.setAntiAlias(true);
 		// paint2.setStyle(Paint.Style.STROKE);
 
-		blackpaint.setColor(Color.BLACK);
-		blackpaint.setAntiAlias(true);
+		blackPaint.setColor(Color.BLACK);
+		blackPaint.setAntiAlias(true);
 
-		blackpaintText.setTextSize(25);
-		blackpaintText.setColor(Color.BLACK);
-		blackpaintText.setAntiAlias(true);
+		blackPaintText.setTextSize(25);
+		blackPaintText.setColor(Color.BLACK);
+		blackPaintText.setAntiAlias(true);
+		
+		whitePaintText.setTextSize(20);
+		whitePaintText.setColor(Color.WHITE);
+		whitePaintText.setAntiAlias(true);
 
 		redPaintHighlight.setColor(Color.RED);
 		redPaintHighlight.setAntiAlias(true);
 		redPaintHighlight.setStyle(Paint.Style.STROKE);
+		
+		greenPaintHighlight.setColor(Color.RED);
+		greenPaintHighlight.setAntiAlias(true);
+		greenPaintHighlight.setStyle(Paint.Style.STROKE);
 
 		greenPaint.setColor(Color.GREEN);
 		greenPaint.setAntiAlias(true);
@@ -369,6 +405,10 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 		yellowPaint.setColor(Color.YELLOW);
 		yellowPaint.setAntiAlias(true);
 
+		whitePaintStroke.setColor(Color.WHITE);
+		whitePaintStroke.setAntiAlias(true);
+		whitePaintStroke.setStyle(Paint.Style.STROKE);
+		
 		thread = new ArenaViewThread(holder, context);
 		this.setOnTouchListener(this);
 	}
@@ -576,10 +616,51 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 					c.drawCircle(cursor.x, cursor.y, cursor.sz, redPaintHighlight);
 				}
 			}
+			
+			//bbc.numberOfNeigbhors();
 
 			for(int i=0; i<bbc.allBots.size(); i ++)
 			{
 				Bot b= (Bot) bbc.allBots.get(i);
+				
+				if(simulateVel)
+				{
+					
+					if(Math.random()<.5)
+					{
+						b.x+=1;
+					}
+					else
+					{
+						b.x-=1;
+					}
+					if(Math.random()<.5)
+					{
+						b.y+=1;
+					}
+					else
+					{
+						b.y-=1;
+					}
+					
+					if(b.x<0)
+					{
+						b.x+=1;
+					}
+					if(b.y<0)
+					{
+						b.y+=1;
+					}
+					if(b.x>640)
+					{
+						b.x-=1;
+					}
+					if(b.y>480)
+					{
+						b.y-=1;
+					}
+					 
+				}
 
 				int bx=(int) map(b.x,0,640,leftx,rightx);
 				int by=(int) map(b.y,0,480,topy,bottomy);
@@ -599,18 +680,70 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 				{
 					by=bottomy;
 				}
-
-				c.drawCircle(bx, by, 2.5f, blackpaint);
+				
+				if(mode.equals("AvatarMove"))
+				{
+					c.drawCircle(bx, by, 4f, redPaintHighlight);
+				
+				}
+				
+				c.drawCircle(bx, by, 2.5f, blackPaint);
 				if(b.inspect)
 				{
 					c.drawCircle(bx, by, 50, redPaintHighlight);
 				}
 
 				c.drawLine(bx, by, bx+b.vel.x*100, by+b.vel.y*100, greenPaint);
+				
+				int nv =  (int) map(bbc.neighborBound, 0, 640, 0, this.w);
 				if(b.vel.x==0)
 				{
-					c.drawCircle(bx, by, 25, redPaintHighlight);
+					c.drawCircle(bx, by, nv, whitePaintStroke);
 				}
+				else
+				{
+					c.drawCircle(bx, by, nv, greenPaintHighlight);
+				}
+				
+				c.drawLine(bx, by, (float) (bx+nv*Math.cos(Math.toRadians(b.camang))),(float) ( by+nv*Math.sin(Math.toRadians(b.camang))), whitePaintStroke);
+				
+
+				
+				//////////////////////////////////
+				
+				PVector p1 = new PVector(b.x,b.y);
+				b.numN=0;
+				for(int j=0;j<bbc.allBots.size();j++)
+				{
+					Bot b2 = (Bot) bbc.allBots.get(j);
+					PVector p2 = new PVector(b2.x,b2.y);			
+					
+					float d = PVector.dist(p1, p2);				
+					int b2x=(int) map(b2.x,0,640,leftx,rightx);
+					int b2y=(int) map(b2.y,0,480,topy,bottomy);
+					if(d< bbc.neighborBound+20   && !b.equals(b2))
+					{
+						
+						b.numN+=1;
+						if(d< (bbc.neighborBound +20) && d>bbc.neighborBound)
+						{
+							c.drawLine(bx, by, b2x, b2y, yellowPaint);
+						}
+						else
+						{
+							c.drawLine(bx, by, b2x, b2y, redPaintHighlight);
+						}
+						 
+					}
+				}
+				
+				/////////////////////////////////
+				
+				
+				c.drawText("" + b.ID, bx, by+10, whitePaintText);
+				c.drawText("" + b.numN, bx, by+35, blackPaintText);
+				
+				
 			}
 
 			if(mode.equals("drawn")||mode.equals("Path"))
@@ -622,7 +755,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 					for(int i=0;i< thread.lines.size()-1;i++)
 					{
 						p1 = (PVector) thread.lines.get(i);
-						c.drawCircle(p1.x, p1.y, 2, blackpaint);
+						c.drawCircle(p1.x, p1.y, 2, blackPaint);
 						if(thread.lines.size()>1)
 						{
 							p2 = (PVector) thread.lines.get(i+1);
@@ -633,7 +766,7 @@ public class ArenaView extends SurfaceView implements OnTouchListener , SurfaceH
 						}
 						if(p2!=null && p1!=null)
 						{
-							c.drawLine(p1.x, p1.y, p2.x, p2.y, blackpaint);
+							c.drawLine(p1.x, p1.y, p2.x, p2.y, blackPaint);
 						}
 
 

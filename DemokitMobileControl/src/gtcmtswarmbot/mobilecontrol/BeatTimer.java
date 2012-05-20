@@ -125,6 +125,7 @@ public class BeatTimer extends Thread{
 			 */
 			if(bbc!=null)
 			{
+				//bbc.numberOfNeigbhors();
 				if(bbc.sequencerMode)
 				{
 					boolean test=true;

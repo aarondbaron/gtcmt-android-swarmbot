@@ -1229,7 +1229,7 @@ public class Client implements OnClickListener{
 						}
 
 					}
-
+					//Log.d("numberOfNeigbhors", "ne ");
 					//bbc.numberOfNeigbhors();
 
 					//Log.d("ClientActivity", line);
