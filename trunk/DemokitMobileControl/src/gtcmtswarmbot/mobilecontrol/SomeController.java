@@ -2,6 +2,8 @@ package gtcmtswarmbot.mobilecontrol;
 
 import java.util.Vector;
 
+import android.util.Log;
+
 public class SomeController {
 
 	public Vector allBots;
@@ -30,6 +32,9 @@ public class SomeController {
 	
 	BeatTimer bt;
 	
+	
+	long logTimer;
+	
 	SomeController(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
 		
@@ -43,6 +48,8 @@ public class SomeController {
 		receivedSequence = new boolean[SEQUENCERLENGTH];
 		
 		behavior = new Behavior();
+		
+		neighborBound=75;
 		
 	}
 
@@ -203,6 +210,50 @@ public class SomeController {
 	{
 		b[this.currentIndex]=true;
 	}
+
+	public void numberOfNeigbhors() {
+		// TODO Auto-generated method stub
+		
+		boolean doThing=false;
+		if(System.currentTimeMillis()-logTimer>1000)
+		{
+			
+			logTimer=System.currentTimeMillis();
+			doThing=true;
+		}
+		
+		for(int i=0;i<allBots.size();i++)
+		{
+			Bot b = (Bot)allBots.get(i);
+			b.numN=0;
+			PVector p1 = new PVector(b.x,b.y);
+			for(int j=0;j<allBots.size();j++)
+			{
+				Bot b2 = (Bot) allBots.get(j);
+				PVector p2 = new PVector(b2.x,b2.y);
+				
+				
+				float d = PVector.dist(p1, p2);
+				
+				if(doThing)
+				{
+					Log.d("distance," ,  "b1 " + b.ID+ " b2: " + b2.ID + " d:" +d + " neigbhorbound " + this.neighborBound);
+				}
+				if(d< this.neighborBound   && !b.equals(b2))
+				{
+					
+					b.numN+=1;
+					 
+				}
+			}
+		}
+		doThing=false;
+		
+		//Log.d("dfdf","");
+		
+	}
+
+	 
 	
 	
 	

@@ -1,5 +1,7 @@
 package gtcmtswarmbot.mobilecontrol;
 
+ 
+
 //a class for keeping track of other bots
 public class Bot
 {
@@ -21,14 +23,20 @@ public class Bot
 	boolean inspect=false;
 	public boolean vibrateOnce;
 	
+	int numN;
+	
 	Bot()
 	{
 		vel = new PVector();
+		 
+		
 	}
 
 	Bot(int x, int y)
 	{
 		vel = new PVector();
+		
+		 
 	}
 
 	int[] getPos()
