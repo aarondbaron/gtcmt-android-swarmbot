@@ -103,7 +103,7 @@ public class BeatTimer extends Thread{
 					{
 						mActivity.client.doStuff();					
 						mActivity.client.initialConnect=true;
-						bbc.stopAll();
+						//bbc.stopAll();
 					}
 				}
 			}
@@ -767,22 +767,31 @@ public class BeatTimer extends Thread{
 						for(int i=0;i<bbc.otherBots.size();i++)
 						{
 							Bot b = (Bot) bbc.otherBots.get(i);
-							if(b.isNeighbor)
+							if(b.distToMe-20<bbc.neighborBound)
 							{
 								//notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
-								notesToFind.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
+								//notesToFind.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
+								notesToFind.add( new Integer(bbc.getFightSongNote(b.ID) ));
 							}							
 
 						}
 
-						if(!bbc.findOnce)
+						if(!bbc.findOnce)//find once is necessary if using random numbers
 						{
 
 							possibleMeasures=bbc.mySong.getMeasuresWithTheseNotes(notesToFind);
 
 							if(possibleMeasures.size()!=0)
 							{
-								currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
+								
+								if(bbc.numNeighbors==0)
+								{
+									currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
+								}
+								else
+								{																	
+									currentMeasure  = (Measure) possibleMeasures.get((int) (generalIndex%possibleMeasures.size()) );
+								}
 								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
 
 								bbc.findOnce=true;//ok if here ?
@@ -813,7 +822,8 @@ public class BeatTimer extends Thread{
 								if(b.isNeighbor)
 								{
 									//ntf.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
-									ntf.add( new Integer( bbc.getMSDegree(b.ID)+72 ) );
+									//ntf.add( new Integer( bbc.getMSDegree(b.ID)+72 ) );
+									ntf.add( new Integer( bbc.getFightSongNote(b.ID) ));
 								}							
 
 							}
@@ -855,7 +865,8 @@ public class BeatTimer extends Thread{
 							if(b.isNeighbor)
 							{
 								//notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
-								nnttff.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
+								//nnttff.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
+								nnttff.add( new Integer(bbc.getFightSongNote(b.ID) ));
 							}							
 
 						}
@@ -978,7 +989,7 @@ public class BeatTimer extends Thread{
 
 						break;
 
-					case 122: // choose the subset to follow each other in line// the ones that dont play dont move.//play according t angle
+					case 122: // choreographed angle 1 choose the subset to follow each other in line// the ones that dont play dont move.//play according t angle
 						Vector measures2 = bbc.mySong.getMeasures(measureInd,measureInd+1);
 						boolean allSilent2=true;
 						for(int i=0;i<measures2.size();i++)
@@ -1013,7 +1024,7 @@ public class BeatTimer extends Thread{
 
 					case 123:  ///this is one in which angles ar eused...//ones that are in it move..ones that are not in measure dont
 
-
+						//get 2 phrases to make a measure (fight song)
 						possibleMeasures = bbc.mySong.getMeasures(measureInd, measureInd+1);
 
 
@@ -1070,8 +1081,9 @@ public class BeatTimer extends Thread{
 						{
 							Bot b = (Bot) bbc.otherBots.get(i);
 
-							int botsnote= bbc.getMSDegree(b.ID);
-							int bnote = botsnote+72; // got to get appropriate note
+							//int botsnote= bbc.getMSDegree(b.ID);
+							//int bnote = botsnote+72; // got to get appropriate note
+							int bnote = bbc.getFightSongNote(b.ID);
 							if (notebots.contains(new Integer(bnote)))
 							{
 								botsToFollow.add(b);
@@ -1217,16 +1229,83 @@ public class BeatTimer extends Thread{
 						
 						break;
 						
-					case 125: //
+					case 125: // simple speed
+						
+						
+						//temporary solution
+						
+						//not moving
+						if(bbc.lbyte==128&&bbc.rbyte==128)
+						{
+							 bbc.clearRhythm(bbc.instrumentseq);
+							 bbc.clearRhythm(bbc.sfxrseq);
+						}
+
+						//full forward
+						if(bbc.rbyte==128-20 && bbc.lbyte==128+20)
+						{
+							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure));
+							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+							bbc.setRhythm(testMeasure);
+						}
+						
+						//might not need the ones below???
+						
+						
+						//turning one way
+						if(bbc.rbyte>128-20 && bbc.lbyte==128+20)
+						{
+							
+							/*
+							for(int i=0;i<bbc.mySong.numMeasures()/4;i++)
+							{
+								bbc.shiftRhythmLeft(testMeasure);
+							}
+							*/
+							
+							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+4));
+							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+							
+							bbc.setRhythm(testMeasure);
+						}
+
+						 // turning another 
+						if(bbc.rbyte==128-20 && bbc.lbyte<128+20)
+						{
+							/*
+							for(int i=0;i<bbc.mySong.numMeasures()/4;i++)
+							{
+								bbc.shiftRhythmRight(testMeasure);
+							}
+							*/
+							
+							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+8));
+							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+							bbc.setRhythm(testMeasure);
+						}
+						
+
 						
 						
 						break;
+						
+					case 126: // choreographed neighbor // follow  subset freeze tag
+						
+						
+						break;
+						
+					case 127: //choreographed speed /  foollow subset freeze
+						
+						break;
+						
 
 					case 199: 
 
 
 						break;
 
+						
+					////////////////////testing headwriting
 					case 200:
 
 						int mmval=20;
@@ -1318,6 +1397,18 @@ public class BeatTimer extends Thread{
 
 					default: ; break;
 
+					}
+					
+					if(bbc.headMove)
+					{
+						if(!bbc.isSilent(bbc.instrumentseq))
+						{
+							
+						}
+						else
+						{
+							
+						}
 					}
 
 					if(bbc.danceSequencer)

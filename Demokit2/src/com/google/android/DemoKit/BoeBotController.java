@@ -151,7 +151,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	Vector distances;
 
-	boolean useSFXR=true;
+	boolean useSFXR=false;
 
 	boolean directControl=false;
 
@@ -289,14 +289,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		distances=new Vector();
 
 		nComTimer =System.currentTimeMillis();
-		setnComEnable(true);
+		setnComEnable(false);
 		queue = new LinkedHashSet();
 		
 		//mySong= new FightSong();
 		//mySong = new OldMacDonald();
 		//mySong = new Joyful();
 		//mySong = new LionSleeps(); 
-		chooseSong(10);
+		chooseSong(0);
 		
 		//this.setMapping(204);
 		
@@ -425,6 +425,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public int myNote=72;
 	public int[] MSDeg;
 	public boolean avatarMoving;
+	public boolean usingController;
+	public boolean headMove;
 	
 
 	/////??
@@ -2895,12 +2897,60 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		
 		return MSDeg[n%MSDeg.length];
 	}
+	
+	public int getFightSongNote( int n)
+	{
+		
+		int res=72;
+		 
+		
+		switch (n)
+		{
+		case 0:
+			res=71;
+			break;
+		case 1:
+			res=72+0;
+			break;
+		case 2:
+			res=72+2;
+			break;
+		case 3:
+			res=72+4;
+			break;
+		case 4:
+			res=72+5;
+			break;
+		case 5:
+			res=72+7;
+			break;
+		case 6:
+			res=72+9;
+			break;
+		case 7:
+			res=72+12;
+			break;
+		 
+		default:
+			res=72;
+			break;
+		
+		
+		}
+		
+	   return res;
+	}
 
 	public void setAvatarMode(boolean b) {
 		// TODO Auto-generated method stub
 		
 		this.avatarMode=b;
 		
+	}
+
+	public void usingController(boolean b) {
+		// TODO Auto-generated method stub
+		this.usingController=b;
 	}
 
 
