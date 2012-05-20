@@ -837,8 +837,17 @@ public class Behavior extends Thread
 			//parameters for circle equispaced
 			PVector start = new PVector(w, h);
 			float r=200;
-
-			float frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+			
+			float frac=0;
+			if(bbc.usingController)
+			{
+				frac = (float)(2*Math.PI) / (bbc.otherBots.size());
+			}
+			else
+			{
+				frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+			}
+			 
 
 			float x = (float) (r*Math.sin( (float)(bbc.ID+formationOffset)*frac  ));
 			float y= (float) (-r*Math.cos( (float)(bbc.ID+formationOffset)*frac  ));

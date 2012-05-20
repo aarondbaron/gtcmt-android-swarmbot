@@ -310,8 +310,9 @@ public class ClientCode implements OnClickListener{
 							}
 						}
 
-						//bbc.setMyNote(    bbc.MSDeg[bbc.ID]+72);
-						bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
+						 
+						//bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
+						bbc.setMyNote(bbc.getFightSongNote(bbc.ID));
 
 						///
 						handler.post(new Runnable() {
@@ -1031,6 +1032,8 @@ public class ClientCode implements OnClickListener{
 					{
 						Log.d("client","controller move");
 						String test [] = line.split(",");
+						
+						bbc.usingController(true);
 
 
 						//just do this for now....
@@ -1170,6 +1173,22 @@ public class ClientCode implements OnClickListener{
 										bbc.myBehavior.setFollowMouse(false);
 									}
 								}
+								else
+								{
+									//else follow avatar or follow in line???
+									if(test.length==4)
+									{
+										bbc.myBehavior.setFollowInLine(true);
+									
+									}
+									if(test.length==2)
+									{
+										bbc.moveToLoc(false);
+										bbc.myBehavior.setFollowMouse(false);
+										bbc.myBehavior.setFollowInLine(false);
+									}
+									
+								}
 							}
 							if(code==99879)
 							{
@@ -1225,6 +1244,14 @@ public class ClientCode implements OnClickListener{
 							{
 								int map = (int) Float.parseFloat(test[2]);
 								bbc.setMapping(map);
+								
+								/*
+								if(map==0)
+								{
+									bbc.clearRhythm(bbc.instrumentseq);
+									bbc.clearRhythm(bbc.sfxrseq);
+								}
+								*/
 
 								Log.d("client","  controller map" + map);
 								handler.post(new Runnable() {
