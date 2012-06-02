@@ -30,7 +30,7 @@ import com.android.future.usb.UsbManager;
 public class DemokitMobileControlActivity extends Activity {
 	
 
-	ArenaView arenaView;
+	DrawView arenaView;
 	
 	Client client;
 
@@ -44,6 +44,8 @@ public class DemokitMobileControlActivity extends Activity {
 	
 	File file;
 	FileOutputStream fos;
+	
+	long startTime;
 	
 	
     /** Called when the activity is first created. */
@@ -60,7 +62,7 @@ public class DemokitMobileControlActivity extends Activity {
         beatTimer.bbc=sc;
         
 		
-        arenaView = new ArenaView(this,sc);
+        arenaView = new DrawView(this,sc);
         setContentView(arenaView);
         arenaView.requestFocus(); 
         
@@ -131,6 +133,7 @@ public class DemokitMobileControlActivity extends Activity {
 		}
 		
 
+		startTime=System.currentTimeMillis();
          
 
     }
@@ -177,7 +180,7 @@ public class DemokitMobileControlActivity extends Activity {
     {
  
  
-    	s +=  "\ntime: " +System.currentTimeMillis() + " \ntime2: " +  "\n";
+    	s +=  "\ttime\t" + (System.currentTimeMillis()-startTime) + "\n" ;
     	if(fos==null)
     	{
     		Log.d("fos is null","fos is null");
@@ -287,6 +290,7 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Alignment");
 		menu.add("Cohesion");
 		*/
+    	menu.add("Problem?");
 		menu.add("Quit");
 		return true;
 	}
@@ -295,7 +299,7 @@ public class DemokitMobileControlActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		Log.d("item selected",""+item.getTitle());
-		this.writeToFile("item" + item.getTitle() );
+		this.writeToFile("item\t" + item.getTitle() );
 		
 		if (item.getTitle() == "ViewCursor") {
 			//showControls();
