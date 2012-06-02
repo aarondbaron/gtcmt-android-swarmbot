@@ -1083,6 +1083,7 @@ public class ClientCode implements OnClickListener{
 							{
 								if(test.length>=3)
 								{
+									bbc.myBehavior.setOrbitCenter(false);
 									bbc.myBehavior.formationType=test[2];
 									int d = (int) Float.parseFloat(  test[3] );
 									bbc.myBehavior.setFormation(true);
@@ -1109,6 +1110,7 @@ public class ClientCode implements OnClickListener{
 
 								bbc.myBehavior.orbitDist=dist;
 								bbc.myBehavior.setOrbitCenter(true);
+								bbc.myBehavior.setFormation(false);
 								Log.d("client","controller orbit center: " + dist);
 							}
 							if(code==9988) //tug move

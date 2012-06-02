@@ -154,6 +154,14 @@ class FdView extends SampleCvViewBase {
     protected Bitmap processFrame(VideoCapture capture) {
         capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
+        
+        Mat tmp = new Mat();
+        Core.transpose(mRgba, tmp);
+        Core.flip(tmp, mRgba, 0) ;
+        
+        Mat tmp2 = new Mat();
+        Core.transpose(mGray, tmp);
+        Core.flip(tmp, mGray, 0) ;
 
         if (mCascade != null) {
             int height = mGray.rows();
@@ -171,13 +179,16 @@ class FdView extends SampleCvViewBase {
                     , new Size(faceSize, faceSize), new Size());
             
             //for (Rect r : faces)
+            int nface=0;
             for (Rect r : faces.toArray())
             {
                 Core.rectangle(mRgba, r.tl(), r.br(), new Scalar(0, 255, 0, 255), 3);
                 x=r.x;
                 y=r.y;
                 sz=r.width;
+                nface++;
             }
+            numFaces=nface;
         }
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);

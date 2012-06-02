@@ -1240,7 +1240,14 @@ public class BeatTimer extends Thread{
 							 bbc.clearRhythm(bbc.instrumentseq);
 							 bbc.clearRhythm(bbc.sfxrseq);
 						}
+						else
+						{
+							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure));
+							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
+							bbc.setRhythm(testMeasure);
+						}
 
+						/*
 						//full forward
 						if(bbc.rbyte==128-20 && bbc.lbyte==128+20)
 						{
@@ -1252,16 +1259,12 @@ public class BeatTimer extends Thread{
 						//might not need the ones below???
 						
 						
+						
 						//turning one way
 						if(bbc.rbyte>128-20 && bbc.lbyte==128+20)
 						{
 							
-							/*
-							for(int i=0;i<bbc.mySong.numMeasures()/4;i++)
-							{
-								bbc.shiftRhythmLeft(testMeasure);
-							}
-							*/
+							 
 							
 							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+4));
 							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
@@ -1272,18 +1275,13 @@ public class BeatTimer extends Thread{
 						 // turning another 
 						if(bbc.rbyte==128-20 && bbc.lbyte<128+20)
 						{
-							/*
-							for(int i=0;i<bbc.mySong.numMeasures()/4;i++)
-							{
-								bbc.shiftRhythmRight(testMeasure);
-							}
-							*/
+							 
 							
 							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+8));
 							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
 							bbc.setRhythm(testMeasure);
 						}
-						
+						*/
 
 						
 						
