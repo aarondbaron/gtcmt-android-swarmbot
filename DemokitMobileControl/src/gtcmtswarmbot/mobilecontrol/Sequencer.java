@@ -9,12 +9,12 @@ public class Sequencer {
 
 	boolean[] seq;
 	PVector loc;
-	ArenaView v;
+	DrawView v;
 
 	Paint p,p2,p3;
 	int sz=60;
 
-	Sequencer(ArenaView v)
+	Sequencer(DrawView v)
 	{
 
 
