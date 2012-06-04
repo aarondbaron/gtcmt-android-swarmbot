@@ -166,17 +166,17 @@ public class BeatTimer extends Thread{
 				generalTimingFlag=false;
 				if(bbc!=null)
 				{
-					if(mActivity.arenaView!=null)
+					if(mActivity.drawView!=null)
 					{
-						if(mActivity.arenaView.surfCreated)
+						if(mActivity.drawView.surfCreated)
 						{
 
 
-							if(mActivity.arenaView.thread.sequencer.seq[bbc.currentIndex%mActivity.arenaView.thread.sequencer.seq.length])
+							if(mActivity.drawView.thread.sequencer.seq[bbc.currentIndex%mActivity.drawView.thread.sequencer.seq.length])
 							{
-								if(mActivity.arenaView.thread.showSequencer)
+								if(mActivity.drawView.thread.showSequencer)
 								{
-									mActivity.arenaView.vib.vibrate(globalTimeInterval/2);
+									mActivity.drawView.vib.vibrate(globalTimeInterval/2);
 								}
 							}
 						}
