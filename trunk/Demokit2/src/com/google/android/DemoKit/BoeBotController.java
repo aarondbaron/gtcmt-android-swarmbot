@@ -2299,6 +2299,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		return s;
 	}
+	
+	String notesToString(int[] b)
+	{
+	  String s = "";
+
+	  for (int i=0; i < b.length; i++)
+	  {
+	    s+=b[i]+",";
+	  }
+
+	  return s;
+	}
 
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));

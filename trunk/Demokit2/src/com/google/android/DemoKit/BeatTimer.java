@@ -1459,7 +1459,8 @@ public class BeatTimer extends Thread{
 							//mActivity.aTest.setFrequencyRP();
 							if(!bbc.useSong)
 							{
-								mActivity.aTest.setFrequencyAP();
+								//mActivity.aTest.setFrequencyAP();
+								mActivity.aTest.setNote(bbc.myNote);
 							}
 							else
 							{

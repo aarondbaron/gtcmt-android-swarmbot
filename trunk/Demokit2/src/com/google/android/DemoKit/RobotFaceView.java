@@ -330,6 +330,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						if(bbc!=null)
 						{
 							c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
+							c.drawText("id: " + bbc.ID , 0, getHeight()-getHeight()/7, blackpaintText);
 						
 						}
 						if(jiggle)
