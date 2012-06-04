@@ -9,13 +9,16 @@ import android.util.Log;
 public class SongMaker {
 
 
-	Paint blackPaint, yellowPaint, redPaint, greenPaint, whitePaint;
+	Paint blackPaint, yellowPaint, redPaint, greenPaint, whitePaint, blackOutline;
 
 	DrawView v;
-	
+
 	Grid g;
 	boolean trigVal, trigValLock;
+	Scroll scroll;
 	
+	int TRUELENGTH=48;
+
 	SongMaker(DrawView myDrawView)
 	{
 
@@ -26,6 +29,7 @@ public class SongMaker {
 		redPaint= new Paint();
 		greenPaint= new Paint();
 		whitePaint= new Paint();
+		blackOutline = new Paint();
 
 		greenPaint.setColor(Color.GREEN);
 		greenPaint.setAntiAlias(true);
@@ -33,10 +37,14 @@ public class SongMaker {
 		yellowPaint.setColor(Color.YELLOW);
 		redPaint.setColor(Color.RED);
 		whitePaint.setColor(Color.WHITE);
+		blackOutline.setColor(Color.BLACK);
+		blackOutline.setStyle(Paint.Style.STROKE);
 
 
-		
+
 		g = new Grid();
+		
+		scroll= new Scroll();
 	}
 
 	void run(Canvas c)
@@ -62,22 +70,26 @@ public class SongMaker {
 	{
 		int nx=48;
 		int ny=8;
-		int width=500;
+		int width,height;
 		float sz=width/ (float) nx ;
-		
+		float szx;
+		float szy;
 		Rect rr;
 
 		boolean[][] gridVals;
 		Grid()
 		{
-			gridVals = new boolean[nx][ny];
-			
+			gridVals = new boolean[ny][nx];
+
 			width=v.screenWidth;
-			sz=width/ (float) nx ;
-			
+			height=v.screenHeight;
+			//sz=width/ (float) nx ;
+			szx=width/ (float) nx ;
+			szy=height/ (float) ny;
+
 			rr = new Rect();
 			//rr.set(left, top, right, bottom);
-			
+
 		}
 
 		void run(Canvas c)
@@ -98,15 +110,21 @@ public class SongMaker {
 			for (int i=0;i<gridVals.length;i++)
 			{
 
-				
+
 				for (int j = 0;j<gridVals[i].length; j++)
 				{
 					//Log.d("songmaker","ij " + i + "," + j);
+					/*
 					int left = (int) (i*sz-sz/2);
 					int top = (int) (j*sz-sz/2);
 					int right = (int) (i*sz+sz/2);
 					int bottom = (int) (j*sz+sz/2);
-					
+					 */				
+					int left = (int) (j*szx-szx/2);
+					int top = (int) (i*szy-szy/2);
+					int right = (int) (j*szx+szx/2);
+					int bottom = (int) (i*szy+szy/2);
+
 
 					if (gridVals[i][j])
 					{
@@ -115,7 +133,7 @@ public class SongMaker {
 
 						//Rect r = new Rect((int) (i*sz-sz/2), (int)(j*sz-sz/2),(int)(i*sz+sz/2),(int)(j*sz+sz/2) );
 
-						
+
 						rr.set(left, top, right, bottom);
 						c.drawRect(rr, greenPaint);
 						//rect(i*sz+sz/2, j*sz+sz/2, sz, sz);
@@ -128,7 +146,7 @@ public class SongMaker {
 						//rect(i*sz+sz/2, j*sz+sz/2, sz, sz);
 						//Rect r = new Rect((int) (i*sz-sz/2), (int)(j*sz-sz/2),(int)(i*sz+sz/2),(int)(j*sz+sz/2) );
 
-						
+
 						rr.set(left, top, right, bottom);
 						c.drawRect(rr, whitePaint);
 						//Log.d("songmaker","ij " + i + "," + j);
@@ -145,6 +163,8 @@ public class SongMaker {
 						rr.set(left, top, right, bottom);
 						c.drawRect(rr, redPaint);
 					}
+					rr.set(left, top, right, bottom);
+					c.drawRect(rr, blackOutline);
 				}
 			}
 
@@ -160,12 +180,14 @@ public class SongMaker {
 			float y= p.y;
 
 			//x=i*sz+sz/2;
-			float i= (x-sz/2)/sz;
+			//float i= (x-sz/2)/sz;
+			float i= (y-szy/2)/szy;
 			//i=i/48;
 
 
 			//y=j*sz+sz/2;
-			float j=(y-sz/2)/sz;
+			//float j=(y-sz/2)/sz;
+			float j=(x-szx/2)/szx;
 			//j=j/8;
 
 			res[0]=i;
@@ -179,20 +201,24 @@ public class SongMaker {
 
 			return res;
 		}
-		
+
 		float[] pointInside(float x, float y)
 		{
 			float[] res = new float[2];
 
-			 
+
 
 			//x=i*sz+sz/2;
-			float i= (x-sz/2)/sz;
+			//float i= (x-sz/2)/sz;
+			//float i= (x-szx/2)/szx;
+			float i= (y-szy/2)/szy;
 			//i=i/48;
 
 
 			//y=j*sz+sz/2;
-			float j=(y-sz/2)/sz;
+			//float j=(y-sz/2)/sz;
+			//float j=(y-szy/2)/szy;
+			float j=(x-szx/2)/szx;
 			//j=j/8;
 
 			res[0]=i;
@@ -206,13 +232,77 @@ public class SongMaker {
 
 			return res;
 		}
-		
+
 
 		void setGridCell(int i, int j, boolean value)
 		{
 			gridVals[i][j]=value;
 		}
 	}
+
+	class Button
+	{
+		Button()
+		{
+
+		}
+	}
+	
+	class Scroll
+	{
+		
+		int offset=30;
+		
+		Scroll()
+		{
+			
+		}
+		
+		void run()
+		{
+			
+		}
+		
+		void update()
+		{
+			
+		}
+		
+		void render()
+		{
+			
+		}
+	}
+	
+	
+	int[] toIntArray()
+	{
+		int[] result = new int[this.TRUELENGTH];
+		
+		int factor = this.TRUELENGTH/this.g.gridVals.length;
+		
+		for (int i=0;i<this.g.gridVals.length;i++)
+		{
+			
+			
+
+			
+			for (int j = 0;j<this.g.gridVals[i].length; j++)
+			{
+			   
+				int noteVal = 72+j;
+				if(this.g.gridVals[i][j])
+				{
+					
+				}
+			
+			}
+		}
+		
+		return result;
+	}
+	
+	
 
 
 }

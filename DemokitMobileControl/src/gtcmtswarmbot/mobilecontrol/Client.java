@@ -194,7 +194,7 @@ public class Client implements OnClickListener{
 							if(whatToDo=="query")
 							{
 								//assume just rhythm query for now
-								sendMessage("com," + tome+ "," + from + "," + "response," + mActivity.arenaView.thread.sequencer.getMySequence());
+								sendMessage("com," + tome+ "," + from + "," + "response," + mActivity.drawView.thread.sequencer.getMySequence());
 
 								char[] a= data.toCharArray();
  
@@ -206,7 +206,7 @@ public class Client implements OnClickListener{
 								Log.d("response , " , " from: " + from );
 								char[] a= data.toCharArray();
 								boolean[] b  = new boolean[bbc.instrumentseq.length];
-								mActivity.arenaView.thread.showSequencer=true;
+								mActivity.drawView.thread.showSequencer=true;
 								for(int i=0;i<bbc.instrumentseq.length;i++)
 								{
 									if(i<a.length)
@@ -215,7 +215,7 @@ public class Client implements OnClickListener{
 										{
 											b[i] = false;
 											bbc.receivedSequence[i]=false;
-											mActivity.arenaView.thread.sequencer.seq[i]=false;
+											mActivity.drawView.thread.sequencer.seq[i]=false;
 											
 											//bbc.instrumentseq[i]=false;
 											//bbc.sfxrseq[i]=false;
@@ -227,7 +227,7 @@ public class Client implements OnClickListener{
 										{
 											b[i]=true;
 											bbc.receivedSequence[i]=true;
-											mActivity.arenaView.thread.sequencer.seq[i]=true;
+											mActivity.drawView.thread.sequencer.seq[i]=true;
 										 
 										}
 									}

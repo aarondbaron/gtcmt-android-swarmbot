@@ -60,6 +60,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 	int screenWidth;
 	int screenHeight;
 	
+	
+	boolean touching;
 	int touchX,touchY;
 
 	public DrawView(Context context, SomeController bbc) {
@@ -174,6 +176,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 		if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) 
 		{
+			touching=true;
 
 			float x = event.getX();
 			float y = event.getY();
@@ -192,17 +195,17 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			    {
 			      i=0;
 			    }
-			    if (i>thread.songMaker.g.nx-1)
+			    if (i>thread.songMaker.g.ny-1)
 			    {
-			      i=thread.songMaker.g.nx-1;
+			      i=thread.songMaker.g.ny-1;
 			    }
 			    if (j<0)
 			    {
 			      j=0;
 			    }
-			    if (j>thread.songMaker.g.ny-1)
+			    if (j>thread.songMaker.g.nx-1)
 			    {
-			      j=thread.songMaker.g.ny-1;
+			      j=thread.songMaker.g.nx-1;
 			    }
 				
 				
@@ -351,6 +354,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			touchX=(int) x;
 			touchY=(int) y;
 			
+			touching=false;
+			
 			if(this.thread.arenaSongmaker)
 			{
 				this.thread.songMaker.trigValLock=false;
@@ -497,7 +502,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 		public boolean showSequencer;
 		public boolean addLock;
 
-		public boolean arenaSongmaker=true;
+		public boolean arenaSongmaker=false;
 
 		SongMaker songMaker;
 

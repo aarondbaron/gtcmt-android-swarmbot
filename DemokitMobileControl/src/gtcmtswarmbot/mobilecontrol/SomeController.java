@@ -34,6 +34,7 @@ public class SomeController {
 	
 	
 	long logTimer;
+	public int[] MSDeg;
 	
 	SomeController(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
@@ -50,6 +51,18 @@ public class SomeController {
 		behavior = new Behavior();
 		
 		neighborBound=75;
+		
+		
+
+		MSDeg = new int[8];
+		MSDeg[0]=0;
+		MSDeg[1]=2;
+		MSDeg[2]=4;
+		MSDeg[3]=5;
+		MSDeg[4]=7;
+		MSDeg[5]=9;
+		MSDeg[6]=11;
+		MSDeg[7]=12;
 		
 	}
 
@@ -76,6 +89,18 @@ public class SomeController {
 		}
 
 		return s;
+	}
+	
+	String notesToString(int[] b)
+	{
+	  String s = "";
+
+	  for (int i=0; i < b.length; i++)
+	  {
+	    s+=b[i]+",";
+	  }
+
+	  return s;
 	}
 	
 	
@@ -254,7 +279,54 @@ public class SomeController {
 	}
 
 	 
+	public int getMSDegree(int n)
+	{
+		
+		return MSDeg[n%MSDeg.length];
+	}
 	
+	public int getFightSongNote( int n)
+	{
+		
+		int res=72;
+		 
+		
+		switch (n)
+		{
+		case 0:
+			res=71;
+			break;
+		case 1:
+			res=72+0;
+			break;
+		case 2:
+			res=72+2;
+			break;
+		case 3:
+			res=72+4;
+			break;
+		case 4:
+			res=72+5;
+			break;
+		case 5:
+			res=72+7;
+			break;
+		case 6:
+			res=72+9;
+			break;
+		case 7:
+			res=72+12;
+			break;
+		 
+		default:
+			res=72;
+			break;
+		
+		
+		}
+		
+	   return res;
+	}
 	
 	
 }
