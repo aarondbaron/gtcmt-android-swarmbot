@@ -190,7 +190,7 @@ public class ClientCode implements OnClickListener{
 								sendMessage("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
 								//sendMessage2("com," + bbc.ID+ "," + from + "," + "response," + bbc.patternToString(bbc.instrumentseq));
 
-								 
+
 
 
 							}
@@ -241,9 +241,9 @@ public class ClientCode implements OnClickListener{
 							/*
 							if(whatToDo.equals("songmode"))
 							{
-								
+
 							}
-							*/
+							 */
 
 						}
 					}
@@ -255,7 +255,7 @@ public class ClientCode implements OnClickListener{
 						{						
 						}						
 					}
-					
+
 					if(line.contains("setAvatar"))
 					{
 						String test [] = line.split(",");
@@ -268,7 +268,7 @@ public class ClientCode implements OnClickListener{
 						{
 							bbc.setAvatarMode(false);
 						}
-						 
+
 					}
 
 					if(line.contains("djembe"))
@@ -310,7 +310,7 @@ public class ClientCode implements OnClickListener{
 							}
 						}
 
-						 
+
 						//bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
 						bbc.setMyNote(bbc.getFightSongNote(bbc.ID));
 
@@ -328,7 +328,7 @@ public class ClientCode implements OnClickListener{
 					if(line.contains("setNComEnable"))
 					{
 						bbc.setnComEnable(!bbc.nComEnable);
-						
+
 						Log.d("client ncom", "balue: " + bbc.nComEnable);
 					}
 
@@ -462,7 +462,7 @@ public class ClientCode implements OnClickListener{
 						}
 
 					}
-					*/
+					 */
 
 					if(line.contains("clearRhythm"))
 					{
@@ -774,14 +774,14 @@ public class ClientCode implements OnClickListener{
 
 						Log.d("LINE","calibration done");
 					}
-					
+
 					if(line.contains("headMotor,"))
 					{
 						String test [] = line.split(",");
 						int i = Integer.parseInt(test[1]);
-						
+
 						bbc.writeHead(i);
-						
+
 					}
 
 					if(line.contains("calibrateAll"))
@@ -1032,7 +1032,7 @@ public class ClientCode implements OnClickListener{
 					{
 						Log.d("client","controller move");
 						String test [] = line.split(",");
-						
+
 						bbc.usingController(true);
 
 
@@ -1159,7 +1159,7 @@ public class ClientCode implements OnClickListener{
 										bbc.target.x=x;
 										bbc.target.y=y;
 										Log.d("controller avatar TUG move"," :"+x+"y:"+y);
-										
+
 										if(bbc.ID==0)
 										{
 											bbc.avatarMoving=true;
@@ -1181,7 +1181,7 @@ public class ClientCode implements OnClickListener{
 									if(test.length==4)
 									{
 										bbc.myBehavior.setFollowInLine(true);
-									
+
 									}
 									if(test.length==2)
 									{
@@ -1189,17 +1189,17 @@ public class ClientCode implements OnClickListener{
 										bbc.myBehavior.setFollowMouse(false);
 										bbc.myBehavior.setFollowInLine(false);
 									}
-									
+
 								}
 							}
 							if(code==99879)
 							{
-								
+
 								//follow   avatar
 								//bbc.myBehavior.follow((Bot)bbc.otherBots.get(0));
 								bbc.myBehavior.botTarget=bbc.currentAvatar;
 								bbc.myBehavior.setFollowAvatar(true);
-								
+
 							}
 							if(code==99878)
 							{
@@ -1209,13 +1209,13 @@ public class ClientCode implements OnClickListener{
 							if(code==99877)
 							{
 								//evade avatar
-								
+
 								bbc.myBehavior.setEvadeAvatar(true);
-								
+
 							}
 							if(code==99876)
 							{
-								
+
 							}
 							if(code==9986) // move relative
 							{
@@ -1230,11 +1230,11 @@ public class ClientCode implements OnClickListener{
 								bbc.myBehavior.phase1move=true;
 								bbc.myBehavior.phase2move=false;
 								bbc.moveToLoc(true);
-								
+
 								//should we just make a move relative behavior?
-								
+
 							}
-							
+
 							if(code==995) //wander
 							{
 								bbc.setWanderVector(true);
@@ -1246,14 +1246,14 @@ public class ClientCode implements OnClickListener{
 							{
 								int map = (int) Float.parseFloat(test[2]);
 								bbc.setMapping(map);
-								
+
 								/*
 								if(map==0)
 								{
 									bbc.clearRhythm(bbc.instrumentseq);
 									bbc.clearRhythm(bbc.sfxrseq);
 								}
-								*/
+								 */
 
 								Log.d("client","  controller map" + map);
 								handler.post(new Runnable() {
@@ -1263,52 +1263,65 @@ public class ClientCode implements OnClickListener{
 									}
 								});
 							}
+							if(code==802)
+							{
+								//bbc.mActivity.beatTimer.currentMeasure;
+								Measure m = new Measure();
+
+							}
 							if(code==801)
-							{								 
-								
-								char[] a= test[2].toCharArray();
-								boolean[] b  = new boolean[bbc.instrumentseq.length];
-								for(int i=0;i<bbc.instrumentseq.length;i++)
+							{		
+								Log.d("clientCode","received from controller a sequence");
+								Log.d("clientCode","it is: " + test[3]);
+								int id = (int) Float.parseFloat(test[2]);
+								if(id==bbc.ID)
 								{
-									if(i<a.length)
+									char[] a= test[3].toCharArray();
+									boolean[] b  = new boolean[bbc.instrumentseq.length];
+									for(int i=0;i<bbc.instrumentseq.length;i++)
 									{
-										if(a[i]=='0')
+										if(i<a.length)
 										{
-											b[i] = false;
-											bbc.receivedSequence[i]=false;
-											//bbc.instrumentseq[i]=false;
-											//bbc.sfxrseq[i]=false;
+											if(a[i]=='0')
+											{
+												b[i] = false;
+												bbc.receivedSequence[i]=false;
+												//bbc.instrumentseq[i]=false;
+												//bbc.sfxrseq[i]=false;
 
-											//temporary only
-											//bbc.avatarseq[i]=false;
-										}
-										else
-										{
-											b[i]=true;
-											bbc.receivedSequence[i]=true;
-											//bbc.instrumentseq[i]=true;
-											//bbc.sfxrseq[i]=true;
+												//temporary only
+												//bbc.avatarseq[i]=false;
+											}
+											else
+											{
+												b[i]=true;
+												bbc.receivedSequence[i]=true;
+												//bbc.instrumentseq[i]=true;
+												//bbc.sfxrseq[i]=true;
 
-											//temporary only
-											//bbc.avatarseq[i]=true;
+												//temporary only
+												//bbc.avatarseq[i]=true;
+											}
 										}
+
 									}
 
+									bbc.setRhythm(bbc.receivedSequence);
+
+
+									handler.post(new Runnable() {
+										@Override
+										public void run() {
+											Toast.makeText(mActivity.getApplicationContext(), "sequence-- "  , Toast.LENGTH_LONG).show();
+										}
+									});
 								}
 								
-								bbc.setRhythm(bbc.receivedSequence);
 								
-								
-								handler.post(new Runnable() {
-									@Override
-									public void run() {
-										Toast.makeText(mActivity.getApplicationContext(), "sequence-- "  , Toast.LENGTH_LONG).show();
-									}
-								});
-							}
+							}//end code==801
 						}
 
-					}
+					}//end controller
 
 					if(line.contains("move"))
 					{
@@ -1781,7 +1794,7 @@ public class ClientCode implements OnClickListener{
 		bbc.myBehavior.setBreath2(false);
 		bbc.myBehavior.setFormation(false);
 		bbc.myBehavior.setWanderVector(false);
-		
+
 		bbc.myBehavior.setFollowAvatar(false);
 		bbc.myBehavior.setEvadeAvatar(false);
 		bbc.myBehavior.setOrbitAvatar(false);
