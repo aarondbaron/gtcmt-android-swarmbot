@@ -22,8 +22,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.View.OnLongClickListener;
 
-public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHolder.Callback{
+public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHolder.Callback, OnLongClickListener{
 
 	private Paint paint1;
 	private Paint paint2;
@@ -59,10 +60,16 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 	int screenWidth;
 	int screenHeight;
-	
-	
+
+
 	boolean touching;
 	int touchX,touchY;
+	int prevTouchX,prevTouchY;
+	int deltaTouchX,deltaTouchY;
+	int initialTouchX,initialTouchY;
+
+	int selectedI,selectedJ;
+	long longTouchTimer;
 
 	public DrawView(Context context, SomeController bbc) {
 		//super(context);
@@ -73,6 +80,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 		super(context);
 
 		mActivity = (DemokitMobileControlActivity) context;
+		mActivity.registerForContextMenu(this);	
 
 		this.bbc=bbc;
 
@@ -174,6 +182,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
 
+		boolean defaultResult = v.onTouchEvent(event);
+
 		if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) 
 		{
 			touching=true;
@@ -183,52 +193,67 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			thread.arena.cursor.x=(int) x;
 			thread.arena.cursor.y=(int) y;
 
+
+			prevTouchX=touchX;
+			prevTouchY=touchY;
 			touchX=(int) x;
 			touchY=(int) y;
+			deltaTouchX=touchX-prevTouchX;
+			deltaTouchY=touchY-prevTouchY;
+			if(event.getAction() == MotionEvent.ACTION_DOWN)
+			{
+				initialTouchX=touchX;
+				initialTouchY=touchY;
+			}
+			
+			//Log.d("xy","touch:"+ touchX + "," + touchY+ " prevTouch:"+ prevTouchX + "," + prevTouchY+ " delta:"+ deltaTouchX + "," + deltaTouchY);
 
 			if(this.thread.arenaSongmaker)
 			{
 				float[] fff= thread.songMaker.g.pointInside(touchX,touchY);
-			    int i =Math.round( fff[0]);
-			    int j = Math.round( fff[1]);
-			    if (i<0)
-			    {
-			      i=0;
-			    }
-			    if (i>thread.songMaker.g.ny-1)
-			    {
-			      i=thread.songMaker.g.ny-1;
-			    }
-			    if (j<0)
-			    {
-			      j=0;
-			    }
-			    if (j>thread.songMaker.g.nx-1)
-			    {
-			      j=thread.songMaker.g.nx-1;
-			    }
-				
-				
+				int i =Math.round( fff[0]);
+				int j = Math.round( fff[1]);
+				if (i<0)
+				{
+					i=0;
+				}
+				if (i>thread.songMaker.g.ny-1)
+				{
+					i=thread.songMaker.g.ny-1;
+				}
+				if (j<0)
+				{
+					j=0;
+				}
+				if (j>thread.songMaker.g.nx-1)
+				{
+					j=thread.songMaker.g.nx-1;
+				}
+
+				selectedI=i;
+				selectedJ=j;
+
+
 				////
 				if (!this.thread.songMaker.trigValLock)
-			    {
-			      if (this.thread.songMaker.g.gridVals[i][j])
-			      {
-			    	  this.thread.songMaker.trigVal=false;
-			    	  this.thread.songMaker.trigValLock=true;
-			      }
-			      else
-			      {
-			    	  this.thread.songMaker.trigVal=true;
-			    	  this.thread.songMaker.trigValLock=true;
-			      }
-			    }
+				{
+					if (this.thread.songMaker.g.gridVals[i][j])
+					{
+						this.thread.songMaker.trigVal=false;
+						this.thread.songMaker.trigValLock=true;
+					}
+					else
+					{
+						this.thread.songMaker.trigVal=true;
+						this.thread.songMaker.trigValLock=true;
+					}
+				}
 				this.thread.songMaker.g.setGridCell(i, j, this.thread.songMaker.trigVal);
-				
-				
-				
+
+
+
 			}
-			
+
 			if(mode.equals("drawn")||mode.equals("Path"))
 			{
 				if(event.getAction() == MotionEvent.ACTION_DOWN)
@@ -350,17 +375,21 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 		{
 			float x = event.getX();
 			float y = event.getY();
-			
+
+			prevTouchX=touchX;
+			prevTouchY=touchY;
 			touchX=(int) x;
 			touchY=(int) y;
-			
+			deltaTouchX=touchX-prevTouchX;
+			deltaTouchY=touchY-prevTouchY;
+
 			touching=false;
-			
+
 			if(this.thread.arenaSongmaker)
 			{
 				this.thread.songMaker.trigValLock=false;
 			}
-			
+
 			thread.arena.fixCursor();
 
 			inspecting=false;
@@ -477,6 +506,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 		thread = new DrawViewThread(holder, context);
 		this.setOnTouchListener(this);
+		this.setOnLongClickListener(this);
 	}
 
 
@@ -545,8 +575,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 							songMaker.run(c);
 							//Log.d("drawview","songmker running");
 						}
-						
-						
+
+
 						if(showSequencer)
 						{
 							sequencer.run(c);
@@ -889,6 +919,39 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 	static public final float map(float value, float istart, float istop, float ostart, float ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		// TODO Auto-generated method stub
+		//double dist = Math.sqrt(     Math.pow(this.deltaTouchX,2)+Math.pow(this.deltaTouchY,2)    );
+		double dist = Math.sqrt(     Math.pow(this.touchX-this.initialTouchX,2)+Math.pow(this.touchY-this.initialTouchY,2)    );
+		Log.d("onlongclick","dist: " + dist);
+		if(this.thread.arenaSongmaker)
+		{
+			//double dist = Math.sqrt(     Math.pow(this.deltaTouchX,2)+Math.pow(this.deltaTouchY,2)    );
+			if( dist < this.thread.songMaker.g.szx)
+			{
+				Log.d("onlongclick","it worked: " + dist);
+				//this.mActivity.makeTrackMenu();
+				
+				//this.mActivity.openContextMenu(this);
+				this.mActivity.doTrackMenu=true;				
+				this.mActivity.openOptionsMenu();
+
+				return true;
+			} 
+		}
+		return false;
+	}
+
+	/*
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+	// TODO Auto-generated method stub
+	return super.onTouchEvent(event);
+	}
+	 */
+
 
 
 }

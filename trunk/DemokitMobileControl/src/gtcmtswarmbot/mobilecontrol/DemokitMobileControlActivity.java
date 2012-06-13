@@ -48,6 +48,8 @@ public class DemokitMobileControlActivity extends Activity {
 
 	long startTime;
 
+	boolean doTrackMenu;
+
 
 	/** Called when the activity is first created. */
 	@Override
@@ -226,77 +228,9 @@ public class DemokitMobileControlActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		SubMenu sub = menu.addSubMenu(0,1,0, "Music Mappings");
-		sub.add("noMapping");
-		sub.add("FightSong_Angle");
-		sub.add("FightSong_Neighbor");
-		sub.add("FightSong_Speed");
-		sub.add("broadcastSequence");
-		sub.add("angle");
-		sub.add("neighbor");
-		sub.add("speed");
-		sub.add("angle_embellish");
-		sub.add("neighbor_embellish");
-		sub.add("speed_embellish");
-		sub.add("proximity1");
 
-
-		SubMenu sub2 = menu.addSubMenu(0,1,0, "Movement Behaviors");
-		sub2.add("TugMove");
-		sub2.add("AvatarMove");
-		sub2.add("Orbit");
-		sub2.add("Wander");
-
-		sub2.add("ViewCursor");
-		sub2.add("Move");
-		sub2.add("MoveRelative");
-
-		sub2.add("Breath1");
-		sub2.add("Breath2");
-		sub2.add("OrbitLine");
-		sub2.add("FollowLine");
-
-		sub2.add("Path");
-		sub2.add("Separation");
-		sub2.add("Alignment");
-		sub2.add("Cohesion");
-
-		sub2.add("followAvatar");
-		sub2.add("followAvatarInLine");
-		sub2.add("evadeAvatar");
-		sub2.add("orbitAvatar");
-		sub2.add("StopAll");
-		//sub2.add("Formation");
-
-		//SubMenu sub3 = sub2.addSubMenu(0,1,0, "formations");//this does not work
-		SubMenu sub3 = menu.addSubMenu(0,1,0, "formations");
-		sub3.add("circle");
-		sub3.add("square");
-		sub3.add("horizontal");
-		sub3.add("vertical");
-		sub3.add("diagonal");
-		sub3.add("drawn");
-
-		menu.add("StopAll");
-		menu.add("Connect");
-		menu.add("Sync");
-		menu.add("Inspect");
-		/*
-		menu.add("ViewCursor");
-		menu.add("Move");
-		menu.add("Orbit");
-		menu.add("Breath1");
-		menu.add("Breath2");
-		menu.add("OrbitLine");
-		menu.add("FollowLine");
-		menu.add("Wander");
-		menu.add("Separation");
-		menu.add("Alignment");
-		menu.add("Cohesion");
-		 */
-		menu.add("Problem?");
-		menu.add("ToSongMaker");
-		menu.add("Quit");
+		this.makeArenaMenu(menu);
+		 
 		return true;
 	}
 
@@ -435,10 +369,27 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.FIGHTSONG_NEIGHBOR.getMap());
 		}else if (item.getTitle() == "FightSong_Speed") {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.FIGHTSONG_SPEED.getMap());
+		}else if (item.getTitle() == "Gil_V1") {
+			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.GIL_V1.getMap());
+		}else if (item.getTitle() == "Gil_V2") {
+			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.GIL_V2.getMap());
 		}else if(item.getTitle() == "ToSongMaker")		{
 			this.drawView.thread.arenaSongmaker=true;
 		}else if(item.getTitle() == "ToArena")		{
 			this.drawView.thread.arenaSongmaker=false;
+		}else if(item.getTitle() == "Clear")		{
+			if(this.drawView.thread.arenaSongmaker)
+			{
+				boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
+				int ind =this.drawView.selectedI; 
+				if(ind<gridVals.length)
+				{
+					for (int j = 0;j<gridVals[ind].length; j++)
+					{
+						gridVals[ind][j]=false;
+					}
+				}
+			}
 		}else if(item.getTitle() == "ClearAll")		{
 			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
 			for (int i=0;i<gridVals.length;i++)
@@ -448,13 +399,13 @@ public class DemokitMobileControlActivity extends Activity {
 					gridVals[i][j]=false;
 				}
 			}
-			
+
 			HandleStuffThread h = new HandleStuffThread(this);
 
 			h.start();
-			
-			
-			
+
+
+
 		}else if(item.getTitle() == "RandomEuclid")		{
 
 			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
@@ -462,6 +413,55 @@ public class DemokitMobileControlActivity extends Activity {
 			{
 				this.drawView.bbc.fillEuclid((int) (Math.random()*gridVals[i].length/4 +1), gridVals[i]);
 			}
+		}else if(item.getTitle() == "RndEuclid")		{
+
+			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
+			int ind =this.drawView.selectedI; 
+			this.drawView.bbc.fillEuclid((int) (Math.random()*gridVals[ind].length/4 +1), gridVals[ind]);
+
+		}else if(item.getTitle() == "Embellish")		{
+
+			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
+			int ind =this.drawView.selectedI; 
+			
+			int ae2 = (int) (Math.random()* gridVals[ind].length);
+			int ae = (int)( Math.random() *10);
+
+			this.drawView.bbc.embellish2(gridVals[ind], ae2, 4);
+			this.drawView.bbc.embellish(gridVals[ind], ae, 0);
+			
+			//this.drawView.bbc.embellish(gridVals[ind], number);
+			//this.drawView.bbc.fillEuclid((int) (Math.random()*gridVals[ind].length/4 +1), gridVals[ind]);
+
+		}else if(item.getTitle() == "EmbellishAll")		{
+
+			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
+			
+			for (int i=0;i<gridVals.length;i++)
+			{
+				int ae2 = (int) (Math.random()* gridVals[i].length);
+				int ae = (int)( Math.random() *10);
+
+				this.drawView.bbc.embellish2(gridVals[i], ae2, 4);
+				this.drawView.bbc.embellish(gridVals[i], ae, 0);
+				
+			}
+			 
+		}else if(item.getTitle() == "Fill")		{
+
+			if(this.drawView.thread.arenaSongmaker)
+			{
+				boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
+				int ind =this.drawView.selectedI; 
+				if(ind<gridVals.length)
+				{
+					for (int j = 0;j<gridVals[ind].length; j++)
+					{
+						gridVals[ind][j]=true;
+					}
+				}
+			}
+
 		}else if(item.getTitle() == "BroadcastMeasure")	{
 
 			/*
@@ -535,6 +535,14 @@ public class DemokitMobileControlActivity extends Activity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
+
+		if(this.doTrackMenu)
+		{
+			makeTrackMenu(menu);
+			doTrackMenu=false;
+			return true;
+
+		}
 		if(this.drawView.thread.arenaSongmaker)
 		{
 			makeSongMakerMenu( menu);
@@ -556,12 +564,28 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("BroadcastMeasure");
 		menu.add("ClearAll");
 		menu.add("RandomEuclid");
+		menu.add("EmbellishAll");
 		menu.add("StopAll");		
 		menu.add("Connect");
 		menu.add("Sync");		
 		menu.add("Inspect");
 		menu.add("Problem?");		
 		menu.add("Quit");
+
+	}
+
+	public void makeTrackMenu(Menu menu)
+	{
+
+		menu.clear();
+
+		menu.add("Clear");
+		menu.add("RndEuclid");
+		menu.add("Fill");
+		menu.add("Embellish");
+		menu.add("Double");
+		menu.add("Half");		
+
 
 	}
 	public void makeArenaMenu(Menu menu)
@@ -572,6 +596,8 @@ public class DemokitMobileControlActivity extends Activity {
 		sub.add("FightSong_Angle");
 		sub.add("FightSong_Neighbor");
 		sub.add("FightSong_Speed");
+		sub.add("Gil_V1");
+		sub.add("Gil_V2");
 		sub.add("broadcastSequence");
 		sub.add("angle");
 		sub.add("neighbor");
@@ -619,6 +645,7 @@ public class DemokitMobileControlActivity extends Activity {
 		sub3.add("drawn");
 
 		menu.add("StopAll");
+		menu.add("ToSongMaker");
 		menu.add("Connect");
 		menu.add("Sync");
 		menu.add("Inspect");
@@ -635,8 +662,7 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Alignment");
 		menu.add("Cohesion");
 		 */
-		menu.add("Problem?");
-		menu.add("ToSongMaker");
+		menu.add("Problem?");		
 		menu.add("Quit");
 
 	}

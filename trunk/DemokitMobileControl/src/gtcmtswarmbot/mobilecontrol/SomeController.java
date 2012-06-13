@@ -235,6 +235,213 @@ public class SomeController {
 	{
 		b[this.currentIndex]=true;
 	}
+	
+	int[] getHits(boolean[] b)
+	{
+		Vector h= new Vector();
+		for(int i=0;i< b.length;i++)
+		{
+			if(b[i])
+			{
+				h.add(new Integer(i));
+			} 
+
+		}
+
+		int [] hits = new int[h.size()];
+		for(int i=0;i<hits.length;i++)
+		{
+			Integer dd=(Integer)h.get(i);
+			hits[i]=(int) dd.intValue(); 
+		}
+
+
+		return hits;
+
+	}
+
+	/*
+	void embellish1(boolean[] b)
+	{
+		int[] hits = getHits( b );
+
+		int c1 = (int) (Math.random()*hits.length);
+
+		int choice = hits[c1];	
+
+		if(choice==0)
+		{
+			b[choice]=true;
+			b[choice+1]=true;
+			b[b.length-1]=true;
+			return;
+		}
+
+		if(choice==b.length-1)
+		{
+			b[choice]=true;
+			b[0]=true;
+			b[choice-1]=true;
+			return;
+		}
+
+		b[choice]=true;
+		b[choice+1]=true;
+		b[choice-1]=true;
+
+	}
+	 */
+
+	//////embellish by putting a number of repeated hits somehwere where there is at least one hit
+	void embellish(boolean[] b, int number)
+	{
+
+		if (number<=0)
+		{
+			return;
+		}
+
+		if (number%2!=0 )
+		{
+			number++;
+		}
+
+		int[] things = new int[number];
+		int[] hits = getHits(b);
+
+		if (hits.length==0)
+		{
+			hits = new int[] { 0  };
+		}
+
+		int c1 = (int) (Math.random()*hits.length);	  
+		int choice = hits[c1];
+		for (int i=0;i<things.length;i++)
+		{
+			if (i%2==1)
+			{
+				int index=(int)Math.ceil( (float)i/2 );
+				things[i]=choice+(index);
+			} 
+			if (i%2==0)
+			{
+				int index=(int) Math.ceil( (float)i/2 );
+				things[i]=choice-(index+1);
+			}
+			if (things[i]<0)
+			{
+				things[i]+=b.length;
+			}
+			if (things[i]>b.length-1)
+			{
+				things[i]=things[i]%b.length;
+			}
+
+
+		}
+
+		for(int i=0;i<things.length;i++)
+		{
+			if(things[i]>=0&&things[i]<b.length)
+			{
+				b[things[i]]=true; 
+			}
+		}
+	}
+
+	// embellish, but also specifiy a skip width
+	void embellish(boolean[] b, int number, int skip)
+	{
+
+		if (number<=0)
+		{
+			return;
+		}
+
+		if (number%2!=0 )
+		{
+			number++;
+		}
+
+		int[] things = new int[number];
+		int[] hits = getHits(b);
+
+		if (hits.length==0)
+		{
+			hits = new int[] { 0  };
+		}
+
+		int c1 = (int) (Math.random()*hits.length);	  
+		int choice = hits[c1];
+		for (int i=0;i<things.length;i++)
+		{
+			if (i%2==1)
+			{
+				int index=(int)Math.ceil( (float)i/2 );
+				things[i]=choice+(index + i*skip);
+			} 
+			if (i%2==0)
+			{
+				int index=(int) Math.ceil( (float)i/2 );
+				things[i]=choice-(index+1 +  (i+1)* skip );
+			}
+			if (things[i]<0)
+			{
+				things[i]+=b.length;
+			}
+			if (things[i]>b.length-1)
+			{
+				things[i]=things[i]%b.length;
+			}
+
+
+		}
+
+		for(int i=0;i<things.length;i++)
+		{
+			if(things[i]>=0&&things[i]<b.length)
+			{
+				b[things[i]]=true; 
+			}
+		}
+	}
+
+	////////////////embellish by making a section of repeated hits
+	void embellish2(boolean[] b, int section, int step)
+	{
+
+		int stop=section+ 3*step + (int) (Math.random()*6*step);
+		if (stop>=b.length)
+		{
+			stop=b.length-1;
+		}
+
+		int m=section%step;
+		for (int i=section;i<stop;i++)
+		{
+			if (i%step==m)
+			{
+				b[i]=true;
+			}
+			else
+			{
+				b[i]=false;
+			}
+		}
+	}
+
+ 
+
+	boolean isSilent(boolean b[])
+	{
+		boolean f=false;
+		for (int i=0; i < b.length;i++)
+		{
+			f = f || b[i];
+		}  
+
+		return !f;
+	}
 
 	public void numberOfNeigbhors() {
 		// TODO Auto-generated method stub
