@@ -9,7 +9,7 @@ import android.util.Log;
 public class SongMaker {
 
 
-	Paint blackPaint, yellowPaint, redPaint, greenPaint, whitePaint, blackOutline;
+	Paint blackPaint, yellowPaint, redPaint, greenPaint, whitePaint, blackOutline, bluePaint;
 
 	DrawView v;
 
@@ -30,6 +30,7 @@ public class SongMaker {
 		greenPaint= new Paint();
 		whitePaint= new Paint();
 		blackOutline = new Paint();
+		bluePaint = new Paint();
 
 		greenPaint.setColor(Color.GREEN);
 		greenPaint.setAntiAlias(true);
@@ -39,6 +40,8 @@ public class SongMaker {
 		whitePaint.setColor(Color.WHITE);
 		blackOutline.setColor(Color.BLACK);
 		blackOutline.setStyle(Paint.Style.STROKE);
+		
+		bluePaint.setColor(Color.BLUE);
 
 
 
@@ -75,6 +78,10 @@ public class SongMaker {
 		float szx;
 		float szy;
 		Rect rr;
+		
+		int factor;
+		
+		float offx,offy;
 
 		boolean[][] gridVals;
 		Grid()
@@ -85,10 +92,19 @@ public class SongMaker {
 			height=v.screenHeight;
 			//sz=width/ (float) nx ;
 			szx=width/ (float) nx ;
+			
 			szy=height/ (float) ny;
-
+			szy=szy/2;
+			
+			
 			rr = new Rect();
 			//rr.set(left, top, right, bottom);
+			
+			
+			offx= szx/2;
+			offy= szy/2;
+			
+			factor = TRUELENGTH/nx;
 
 		}
 
@@ -120,10 +136,10 @@ public class SongMaker {
 					int right = (int) (i*sz+sz/2);
 					int bottom = (int) (j*sz+sz/2);
 					 */				
-					int left = (int) (j*szx-szx/2);
-					int top = (int) (i*szy-szy/2);
-					int right = (int) (j*szx+szx/2);
-					int bottom = (int) (i*szy+szy/2);
+					int left = (int) (j*szx-szx/2 + offx);
+					int top = (int) (i*szy-szy/2 + offy);
+					int right = (int) (j*szx+szx/2 + offx);
+					int bottom = (int) (i*szy+szy/2 + offy);
 
 
 					if (gridVals[i][j])
@@ -161,8 +177,15 @@ public class SongMaker {
 						//Rect r = new Rect((int) (i*sz-sz/2), (int)(j*sz-sz/2),(int)(i*sz+sz/2),(int)(j*sz+sz/2) );
 
 						rr.set(left, top, right, bottom);
+						c.drawRect(rr, bluePaint);
+					}
+					
+					if( (j*factor)  ==v.bbc.currentIndex)
+					{
+						rr.set(left, top, right, bottom);
 						c.drawRect(rr, redPaint);
 					}
+					
 					rr.set(left, top, right, bottom);
 					c.drawRect(rr, blackOutline);
 				}
@@ -181,13 +204,13 @@ public class SongMaker {
 
 			//x=i*sz+sz/2;
 			//float i= (x-sz/2)/sz;
-			float i= (y-szy/2)/szy;
+			float i= (y-szy/2-offy)/szy;
 			//i=i/48;
 
 
 			//y=j*sz+sz/2;
 			//float j=(y-sz/2)/sz;
-			float j=(x-szx/2)/szx;
+			float j=(x-szx/2-offx)/szx;
 			//j=j/8;
 
 			res[0]=i;
