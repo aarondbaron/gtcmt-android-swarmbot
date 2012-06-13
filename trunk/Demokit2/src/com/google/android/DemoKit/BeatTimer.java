@@ -17,7 +17,7 @@ public class BeatTimer extends Thread{
 	long globalTimer;
 
 	long globalTimeInterval;
-	long div=2;
+	float div=2;
 
 	boolean generalTimingFlag;
 	boolean generalMeasureFlag;
@@ -61,6 +61,7 @@ public class BeatTimer extends Thread{
 	boolean wanderVector;
 
 	Measure currentMeasure;
+	Vector possibleNotes;
 	Vector possibleMeasures;
 	boolean possibleMeasuresSilent;
 	boolean [] testMeasure;
@@ -73,6 +74,22 @@ public class BeatTimer extends Thread{
 
 	int gilcounter=0;
 
+	int currentGilNeighbors, prevGilNeighbors;
+	boolean noChangeNeighbors;
+	public int myBiggerPlaySessionCount;
+	public int myPlaySessionCount;
+	boolean gilSeparate;
+	long gilSeparateTimer;
+	int timesLoop;
+
+	public long hasCompletedGilsTimer;
+
+	public boolean myPlayFlag;
+
+	public int myGeneralPlaySessionCount;
+
+	public int completedGilsCount;
+
 
 	BeatTimer()
 	{
@@ -84,6 +101,7 @@ public class BeatTimer extends Thread{
 
 		currentMeasure = new Measure();
 		possibleMeasures = new Vector();
+		possibleNotes = new Vector();
 	}
 
 	@Override
@@ -783,7 +801,7 @@ public class BeatTimer extends Thread{
 
 							if(possibleMeasures.size()!=0)
 							{
-								
+
 								if(bbc.numNeighbors==0)
 								{
 									currentMeasure  = (Measure) possibleMeasures.get((int) (Math.random()*possibleMeasures.size()) );
@@ -819,7 +837,8 @@ public class BeatTimer extends Thread{
 							for(int i=0;i<bbc.otherBots.size();i++)
 							{
 								Bot b = (Bot) bbc.otherBots.get(i);
-								if(b.isNeighbor)
+								//if(b.isNeighbor)
+								if(b.distToMe-20<bbc.neighborBound)
 								{
 									//ntf.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
 									//ntf.add( new Integer( bbc.getMSDegree(b.ID)+72 ) );
@@ -862,7 +881,8 @@ public class BeatTimer extends Thread{
 						for(int i=0;i<bbc.otherBots.size();i++)
 						{
 							Bot b = (Bot) bbc.otherBots.get(i);
-							if(b.isNeighbor)
+							//if(b.isNeighbor)
+							if(b.distToMe-20<bbc.neighborBound)
 							{
 								//notesToFind.add( new Integer( bbc.MSDeg[b.ID]+72 ) );
 								//nnttff.add( new Integer(bbc.getMSDegree(b.ID)+72 ));
@@ -1074,7 +1094,7 @@ public class BeatTimer extends Thread{
 							while (itr.hasNext ())
 								System.out.println(itr.next());
 						}
-						*/
+						 */
 
 						Vector botsToFollow = new Vector();
 						for (int i=0; i<bbc.otherBots.size(); i++)
@@ -1088,12 +1108,12 @@ public class BeatTimer extends Thread{
 							{
 								botsToFollow.add(b);
 
-							 
+
 							}
 							else
 							{
 								bbc.myBehavior.setSeparation(true);
-								
+
 								/*
 								PVector bloc = new PVector(b.x,b.y);
 								PVector loc = new PVector(bbc.myposx,bbc.myposy);
@@ -1101,8 +1121,8 @@ public class BeatTimer extends Thread{
 								{
 									bbc.myBehavior.evade(bloc);
 								}
-								*/
-								
+								 */
+
 							}
 
 
@@ -1125,7 +1145,7 @@ public class BeatTimer extends Thread{
 								{
 									bbc.myBehavior.setOrbitCenter(true);
 									bbc.myBehavior.orbitClockwise=false;	
-									
+
 									Log.d("","orbitting because to follow is" + toFollow.ID);
 									//this.orbit(new PVector(width/2, height/2), 200, false);
 									//println("orbitting because to follow is" + toFollow.ID);
@@ -1150,8 +1170,8 @@ public class BeatTimer extends Thread{
 						{
 							cang=360+cang;
 						}
-						
-						 
+
+
 						int angShift= (int) bbc.map(cang, 0, 360, 0, bbc.SEQUENCERLENGTH/2);
 
 						bbc.setRhythm(this.testMeasure );
@@ -1190,10 +1210,10 @@ public class BeatTimer extends Thread{
 
 
 						break;
-						
-						
+
+
 					case 124:  //map all measure(two "measures") to an angle (simple)
-						
+
 						cang = bbc.camang;
 						if(cang<0)
 						{
@@ -1201,12 +1221,12 @@ public class BeatTimer extends Thread{
 						}
 
 						int mshift= (int) bbc.map(cang, 0, 360, 0, bbc.mySong.numMeasures());
-						
+
 						if(mshift%2==1)
 						{
 							mshift-=1;							
 						}
-						
+
 						/*
 						possibleMeasures = bbc.mySong.getMeasures(mshift, mshift+1);
 
@@ -1220,25 +1240,25 @@ public class BeatTimer extends Thread{
 								possibleMeasuresSilent=false;
 							}
 						}
-						*/
+						 */
 
 						currentMeasure= bbc.mySong.getMeasure((int) (mshift+generalMeasure%2));
 						testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
-						
+
 						bbc.setRhythm(testMeasure);					
-						
+
 						break;
-						
+
 					case 125: // simple speed
-						
-						
+
+
 						//temporary solution
-						
+
 						//not moving
 						if(bbc.lbyte==128&&bbc.rbyte==128)
 						{
-							 bbc.clearRhythm(bbc.instrumentseq);
-							 bbc.clearRhythm(bbc.sfxrseq);
+							bbc.clearRhythm(bbc.instrumentseq);
+							bbc.clearRhythm(bbc.sfxrseq);
 						}
 						else
 						{
@@ -1255,55 +1275,436 @@ public class BeatTimer extends Thread{
 							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
 							bbc.setRhythm(testMeasure);
 						}
-						
+
 						//might not need the ones below???
-						
-						
-						
+
+
+
 						//turning one way
 						if(bbc.rbyte>128-20 && bbc.lbyte==128+20)
 						{
-							
-							 
-							
+
+
+
 							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+4));
 							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
-							
+
 							bbc.setRhythm(testMeasure);
 						}
 
 						 // turning another 
 						if(bbc.rbyte==128-20 && bbc.lbyte<128+20)
 						{
-							 
-							
+
+
 							currentMeasure= bbc.mySong.getMeasure((int) ( generalMeasure+8));
 							testMeasure =currentMeasure.toBellRhythm( bbc.myNote);
 							bbc.setRhythm(testMeasure);
 						}
-						*/
+						 */
 
-						
-						
+
+
 						break;
-						
+
 					case 126: // choreographed neighbor // follow  subset freeze tag
-						
-						
+
+
 						break;
-						
+
 					case 127: //choreographed speed /  foollow subset freeze
-						
+
 						break;
-						
+
+					case 128: //gil's function v1 as it was...
+
+						break;
+
+					case 129: //gil's function v1 modified for stopping instead of cohesion.
+						timesLoop=2;
+
+						possibleNotes.clear();
+						possibleNotes.add(new Integer( bbc.myNote));
+						Vector ne = new Vector();
+
+						for (int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);
+							if(b.distToMe-20<bbc.neighborBound)//coudl be same thing as is neighbor
+							{
+								ne.add(b);
+								possibleNotes.add( new Integer(bbc.getFightSongNote(b.ID) ));
+							}	
+						}
+
+						currentGilNeighbors=ne.size();
+
+						if (currentGilNeighbors!=prevGilNeighbors)
+						{
+							noChangeNeighbors=false;
+
+							prevGilNeighbors=currentGilNeighbors;
+						}
+						else
+						{
+							noChangeNeighbors=true; 
+							//println("no change: " + noChangeNeighbors + " id:" + ID);
+						}
+
+						possibleMeasures= bbc.mySong.getMeasuresWithTheseNotes(possibleNotes);
+
+						if (gilSeparate)
+						{
+
+							bbc.myBehavior.setSeparation(true);
+							bbc.myBehavior.setWanderVector(true);
+
+
+							for (int i=0;i<ne.size();i++)
+							{
+								Bot b = (Bot) ne.get(i);
+								//bbc.myBehavior.evade(new PVector(b.x,b.y), false);
+							}
+
+							if (System.currentTimeMillis()-gilSeparateTimer>4000)
+							{
+
+								 
+								bbc.myBehavior.setSeparation(false);
+
+								gilSeparate=false;
+							}
+						}
+
+
+						if (!hasCompletedGils())
+						{
+							if (possibleMeasures.size()!=0 && myPlaySessionCount<timesLoop)
+							{
+								if(!gilSeparate)
+								{
+									//if(bbc.numNeighbors!=0)
+									if(ne.size()!=0)
+									{
+										bbc.stop();
+										bbc.myBehavior.doStop();
+										bbc.myBehavior.setSeparation(false);
+									}
+									else
+									{
+										bbc.setWanderVector(true);
+									}
+								}
+
+
+
+								currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure+generalMeasure%2)%possibleMeasures.size()  ) );
+								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
+
+								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+
+								if (!this.myPlayFlag)
+								{
+									myPlaySessionCount++;
+									myGeneralPlaySessionCount++;
+									this.myPlayFlag=true;
+								}
+							}
+							else
+							{
+
+								if (possibleMeasures.size()==0)
+								{
+									bbc.myBehavior.setSeparation(true);
+									bbc.myBehavior.setWanderVector(true);
+								}
+
+								bbc.clearRhythm(bbc.sfxrseq);
+								bbc.clearRhythm(bbc.instrumentseq);
+							}
+						}
+						else //has completed gils
+						{
+							bbc.doRhythmMove=true;
+							 
+							bbc.myBehavior.setWanderVector(false);
+							bbc.myBehavior.setSeparation(true);
+
+							currentMeasure = bbc.mySong.getMeasure((int) generalMeasure);
+							bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));						
+							
+
+							if (bbc.ID!=0)
+							{
+								
+								/*
+								Bot bbb= (Bot) bbc.otherBots.get(0);
+								//bbc.myBehavior.seek(new PVector(bbb.x, bbb.y));
+								bbc.targetx=bbb.x;
+								bbc.targety=bbb.y;
+								bbc.moveToLoc(true);
+								*/
+								
+								bbc.myBehavior.setFollowInLine(true);
+							}
+							else
+							{
+								//bbc.myBehavior.orbit(new PVector(640/2, 480/2), 200, true);
+								bbc.myBehavior.setOrbitCenter(true);
+								
+							}
+						}
+
+
+						// boolean noChangeNeighbors=true;   
+						if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						{
+							myBiggerPlaySessionCount++;
+							myPlaySessionCount=0;
+
+							gilSeparate=true;
+							gilSeparateTimer=System.currentTimeMillis();
+						}
+						else
+						{
+							if (!noChangeNeighbors)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+
+
+						if (ne.size()==0 && !hasCompletedGils())
+						{
+							bbc.myBehavior.setWanderVector(true);
+							bbc.clearRhythm(bbc.sfxrseq);
+							bbc.clearRhythm(bbc.instrumentseq);
+
+							if (myPlaySessionCount<2)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+
+
+
+						break;
+
+					case 130: // gil's version 2 as is
+
+						break;
+
+					case 131: // gil's version 2 modified for stopping
+
+						timesLoop=2;
+
+						this.possibleNotes = new Vector();
+						possibleNotes.add(new Integer( bbc.myNote));
+						Vector ne2 = new Vector();
+
+						//Vector botsToFollow  = new Vector();
+						//Vector botsToEvade = new Vector();
+
+						for (int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);    
+							if(b.distToMe-20<bbc.neighborBound)//coudl be same thing as is neighbor
+							{
+								ne2.add(b); 
+								possibleNotes.add( new Integer(bbc.getFightSongNote(b.ID) ));
+ 
+							}
+						}
+ 
+						currentGilNeighbors=ne2.size();
+
+						if (currentGilNeighbors!=prevGilNeighbors)
+						{
+							noChangeNeighbors=false;
+
+							prevGilNeighbors=currentGilNeighbors;
+						}
+						else
+						{
+							noChangeNeighbors=true; 
+						}
+
+						possibleMeasures= bbc.mySong.getMeasuresWithTheseNotes( possibleNotes);
+
+						if (gilSeparate)
+						{
+							 
+							bbc.myBehavior.setSeparation(true);
+							bbc.setWanderVector(true);
+
+
+							for (int i=0;i<ne2.size();i++)
+							{
+								Bot b = (Bot) ne2.get(i);
+							}
+
+
+							if (System.currentTimeMillis()-gilSeparateTimer>4000)
+							{
+
+								bbc.myBehavior.setSeparation(false);
+
+								gilSeparate=false;
+							}
+						}
+
+						if (hasCompletedGils())
+						{
+							if (completedGilsCount>bbc.mySong.numMeasures()*2)
+							{
+								resetGil();
+							}
+						}
+
+						if (myBiggerPlaySessionCount<2 )
+							//if (!hasCompletedGils())
+						{
+							if (possibleMeasures.size()!=0 && myPlaySessionCount<timesLoop)
+							{
+								//if(bbc.numNeighbors!=0)
+								if(ne2.size()!=0)
+								{
+									bbc.stop();
+									bbc.myBehavior.doStop();
+									bbc.myBehavior.setSeparation(false);
+								}
+								else
+								{
+									bbc.setWanderVector(true);
+								}
+
+								currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure+generalMeasure%2)%possibleMeasures.size()  ) );
+								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
+
+								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+
+								if (!myPlayFlag)
+								{
+									myPlaySessionCount++;
+									myGeneralPlaySessionCount++;
+									myPlayFlag=true;
+								}
+
+								if (ne2.size()==0)
+								{
+									// wander();
+									bbc.setWanderVector(true);
+									bbc.clearRhythm(bbc.instrumentseq);
+									bbc.clearRhythm(bbc.sfxrseq);
+								}
+							}
+							else
+							{
+
+								if (possibleMeasures.size()==0)
+								{
+									//wander();
+									bbc.myBehavior.setWanderVector(true);
+								}
+
+
+								bbc.clearRhythm(bbc.sfxrseq);
+								bbc.clearRhythm(bbc.instrumentseq);
+							}
+						}
+						else
+						{
+
+							currentMeasure = bbc.mySong.getMeasure((int) generalMeasure);
+							bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+
+
+							//G doesn't work well so do formation
+							bbc.myBehavior.formationType="circle";
+							bbc.myBehavior.setFormation(true);
+							bbc.doRhythmMove=true;
+
+						}
+
+						// boolean noChangeNeighbors=true;   
+						if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						{
+							myBiggerPlaySessionCount++;
+							myPlaySessionCount=0;
+
+							gilSeparate=true;
+							gilSeparateTimer=System.currentTimeMillis();
+						}
+						else
+						{
+							if (!noChangeNeighbors)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+ 
+
+						if (ne2.size()==0)
+						{
+ 
+
+							if (myPlaySessionCount<2)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+
+						//Vector measures = mySong.getMeasures(measureInd, measureInd+1);
+
+
+
+						break;
+
+					case 150:  //shift ...  based on angle
+
+						//boolean[] t = bbc.receivedSequence.clone();
+						int numdiv=6;
+						int per=(int) (360.0/angle1);
+
+						int shifts=per*numdiv;
+
+						bbc.setRhythm(bbc.receivedSequence);
+						for(int i=0; i <shifts; i++)
+						{
+							bbc.shiftRhythmRight(bbc.instrumentseq);
+							bbc.shiftRhythmRight(bbc.sfxrseq);
+						}
+
+
+						//int sh = (int) bbc.map(angle1, 0, 360, 1, bbc.instrumentseq.length/3);
+
+
+						break;
+
+					case 151:  //shift ... based on neighbors
+
+						int perN=6;
+						int shiftneighbor=perN*bbc.numNeighbors;
+						bbc.setRhythm(bbc.receivedSequence);
+						for(int i=0; i <shiftneighbor; i++)
+						{
+							bbc.shiftRhythmRight(bbc.instrumentseq);
+							bbc.shiftRhythmRight(bbc.sfxrseq);
+						}
+
+						break;
+
+					case 152:  //shift ... based on speed
+
+						break;
 
 					case 199: 
 
 
 						break;
 
-						
-					////////////////////testing headwriting
+
+						////////////////////testing headwriting
 					case 200:
 
 						int mmval=20;
@@ -1396,16 +1797,16 @@ public class BeatTimer extends Thread{
 					default: ; break;
 
 					}
-					
+
 					if(bbc.headMove)
 					{
 						if(!bbc.isSilent(bbc.instrumentseq))
 						{
-							
+
 						}
 						else
 						{
-							
+
 						}
 					}
 
@@ -1583,6 +1984,12 @@ public class BeatTimer extends Thread{
 				bbc.swapOnce =false;
 
 				bbc.findOnce=false;
+				this.myPlayFlag=false;
+
+				if(hasCompletedGils())
+				{
+					this.completedGilsCount++;
+				}
 			}
 
 		}
@@ -1601,6 +2008,40 @@ public class BeatTimer extends Thread{
 		generalMeasure=0;
 		Log.d("beattimer","restting indices");
 	}
+
+
+	boolean hasCompletedGils()
+	{
+		if(System.currentTimeMillis()-this.hasCompletedGilsTimer>120*1000)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
+	void resetGil()
+	{
+		completedGilsCount=0;
+
+		bbc.doRhythmMove=false;
+		
+		hasCompletedGilsTimer=System.currentTimeMillis();
+
+		bbc.myBehavior.sacWeights[0]=1;
+		bbc.myBehavior.sacWeights[1]=1;
+		bbc.myBehavior.sacWeights[2]=1;
+
+
+		myBiggerPlaySessionCount=0;
+		myGeneralPlaySessionCount=0;
+		myPlaySessionCount=0;
+
+	}
+
 
 
 }

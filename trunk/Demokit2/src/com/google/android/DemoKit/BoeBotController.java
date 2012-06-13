@@ -48,7 +48,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private RectView view1;
 	private Paint paint;
 
-	public boolean[] fseq,bseq,rseq,lseq, sfxrseq, instrumentseq;
+	public boolean[] fseq,bseq,rseq,lseq, sfxrseq, instrumentseq, movementseq;
 	//SurfaceView sv;
 	Thread svthread;
 
@@ -169,6 +169,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	Song mySong;
 	
+	public boolean doRhythmMove;
+	
 	 
 	
 	public boolean isnComEnable() {
@@ -197,6 +199,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		bseq = new boolean[SEQUENCERLENGTH];
 		rseq = new boolean[SEQUENCERLENGTH];
 		lseq = new boolean[SEQUENCERLENGTH];
+		
+		movementseq= new boolean[SEQUENCERLENGTH];
 
 		sfxrseq = new boolean[SEQUENCERLENGTH];
 		instrumentseq = new boolean[SEQUENCERLENGTH];
@@ -204,6 +208,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		avatarseq = new boolean[SEQUENCERLENGTH];
 		
 		receivedSequence = new boolean[SEQUENCERLENGTH];
+		
+		
 
 
 		djembe0 = new boolean[SEQUENCERLENGTH];
@@ -403,6 +409,24 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		MSDeg[5]=9;
 		MSDeg[6]=11;
 		MSDeg[7]=12;
+		
+		int numDivisions=8	;
+		
+		int cnt=0;
+		for(int i=0;i<this.SEQUENCERLENGTH;i++)
+		{
+			 int val = (int) ((Math.floor(i / (this.movementseq.length/numDivisions)) + 1)) ;
+			 
+			 if(val%2==0)
+			 {
+				 this.movementseq[i]=true;
+			 }
+			 else
+			 {
+				 this.movementseq[i]=false;
+			 }
+			
+		}
 
 	}
 
@@ -628,7 +652,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		return mActivity.beatTimer.globalTimeInterval;
 	}
 
-	public long getDiv()
+	public float getDiv()
 	{
 
 		return mActivity.beatTimer.div;
@@ -646,6 +670,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			mActivity.beatTimer.div--;
 		}
 
+	}
+	
+	public void divUpFloat()
+	{
+		mActivity.beatTimer.div+=.05;
+	}
+	public void divDownFloat()
+	{
+		if(mActivity.beatTimer.div>1)
+	    	mActivity.beatTimer.div-=.05;
 	}
 
 
@@ -1970,7 +2004,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
 
 			b.distToMe=(float) dist;
-			if( dist < neighborBound )	
+			//if( dist < neighborBound )	
+			if(b.distToMe-20<neighborBound)
 			{
 				numNeighbors++;
 
@@ -2264,7 +2299,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	void setMapping(int a)
 	{
 		//this.avatarMode=false;
+		if(a==129|| a==131)
+		{
+			mActivity.beatTimer.hasCompletedGilsTimer=System.currentTimeMillis();
+			mActivity.beatTimer.resetGil();
+		}
+		
 		mActivity.beatTimer.mapping=a;
+		
 
 
 	}
@@ -2965,5 +3007,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.usingController=b;
 	}
 
+	
+	
+	
+	
+	void resetGil()
+	{
+	  //completedGilsCount=0;
+ 
+	    this.myBehavior.sacWeights[0] = 1; //separation
+	    this.myBehavior.sacWeights[0] = 0; // alignment
+	    this.myBehavior.sacWeights[0] = 0;// cohesion
+	    //b.desiredseparation=getDefaultSeparation();
+
+	    mActivity.beatTimer.myBiggerPlaySessionCount=0;
+	    mActivity.beatTimer.myPlaySessionCount=0;
+	   
+	}
 
 }

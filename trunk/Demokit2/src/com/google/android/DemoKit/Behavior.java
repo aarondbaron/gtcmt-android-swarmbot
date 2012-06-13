@@ -78,7 +78,7 @@ public class Behavior extends Thread
 	public boolean alignment;
 	public boolean cohesion;
 	public boolean followInLine;
-	
+
 	public boolean followAvatar;
 
 	public Handler handler =new Handler();
@@ -109,12 +109,12 @@ public class Behavior extends Thread
 	public boolean wtfilFinalTargetReached;
 	public boolean wtoilInitial;
 	public boolean wtoilFinalTargetReached;
-	
+
 	public boolean moveForward;
 	public boolean moveBackward;
 	public boolean rotateLeft;
 	public boolean rotateRight;
-	
+
 	float[] sacWeights;
 	private boolean breath1;
 	private boolean breath2;
@@ -149,11 +149,11 @@ public class Behavior extends Thread
 		vmtimer=System.currentTimeMillis();
 		wanderVectorTimer =vmtimer;
 		wanderVectorTemp = new PVector();
-		
+
 		sacWeights = new float[]{1,1,1};
-		
+
 		distFormation = 80;
-		
+
 	}
 
 	public void run()
@@ -371,18 +371,18 @@ public class Behavior extends Thread
 				Log.d("behavior","orbitInLine " + desiredVel);
 				orbitInLine();
 			}
-			
-			 
-			
+
+
+
 			if(followAvatar)
 			{
-				
-			   if(bbc.currentAvatar!=null && bbc.ID!=0)
-			   {
-				   follow(bbc.currentAvatar);
-			   }
+
+				if(bbc.currentAvatar!=null && bbc.ID!=0)
+				{
+					follow(bbc.currentAvatar);
+				}
 			}
-			
+
 
 			if(followMouse)
 			{
@@ -400,14 +400,14 @@ public class Behavior extends Thread
 				Log.d("behavior","orbitAvatar " + desiredVel);
 				orbitAvatar();
 			}
-			
+
 			if(moveForward)
 			{
 				this.forwardVector();
 			}
 			if(moveBackward)
 			{
-				
+
 			}
 			if(rotateLeft)
 			{
@@ -427,7 +427,14 @@ public class Behavior extends Thread
 				if(!bbc.directControl)
 				{
 					avoidBoundary3();
-					doSteer2();
+					if(bbc.doRhythmMove)
+					{
+						this.doSteerDance();
+					}
+					else
+					{
+						doSteer2();
+					}
 					desiredVel.mult(0f);
 				}
 			}
@@ -435,53 +442,53 @@ public class Behavior extends Thread
 	}
 
 
-	 
+
 
 	public PVector forwardVector() {
 		// TODO Auto-generated method stub
-		
- 
+
+
 		int angle1=(int)bbc.camang;
 		if(angle1<0)
 		{
 			angle1=360+angle1;
 		}
- 
-		
+
+
 		int r=10;
 		float xx=(float) (r*Math.cos(Math.toRadians(angle1)));
 		float yy= (float) (r*Math.sin(Math.toRadians(angle1)));		
 		PVector res = new PVector(xx,yy);
 		res.normalize();
 		return res;
-		
-		
+
+
 	}
-	
+
 	private void turnRightVector() {
 		// TODO Auto-generated method stub
-		
+
 		PVector loc = new PVector(bbc.myposx,bbc.myposy);
-		
+
 		float angle1 = bbc.camang;
 		if(angle1<0)
 		{
 			angle1=360+angle1;
 		}
 
-		
-		
-		
+
+
+
 		PVector v2 = new PVector();
 		float offset=30;
 		//v2.x= (float) (perpToTarget.mag()*Math.cos(h-offset));
 		//v2.y=(float) (perpToTarget.mag()*Math.sin(h-offset));
-		
+
 	}
 
 	private void turnLeftVector() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void breath1()
@@ -623,16 +630,16 @@ public class Behavior extends Thread
 							if(b.ID<bbc.ID)
 							{
 								wtfilTarget=b;
-								
+
 								if(wtfilTarget.ID==bbc.ID-1)
 								{
 									wtfilFinalTargetReached=true;
 									break;
 								}
-								
+
 							}
 
-							
+
 						}
 						else
 						{
@@ -737,14 +744,14 @@ public class Behavior extends Thread
 
 
 	}
-	
+
 	//idea is that robot ID 0 orbits. and then everyone else will follow it if they come in contact
 	// if ID comes along that is less than ID..it will try to follow the correct id.
 	public void wanderThenOrbitInLine()
 	{
 		int w=640/2;
 		int h=480/2;
-		
+
 		if(bbc.ID==0)
 		{
 			this.orbit(new PVector(w,h));
@@ -755,11 +762,11 @@ public class Behavior extends Thread
 			{
 				this.wtoilInitial=false;
 			}
-			
-			
+
+
 			if(!wtoilFinalTargetReached)
 			{
-				
+
 				for(int i=0;i<bbc.otherBots.size();i++)
 				{
 					Bot b = (Bot) bbc.otherBots.get(i);
@@ -770,7 +777,7 @@ public class Behavior extends Thread
 							if(b.ID<bbc.ID)
 							{
 								wtoilTarget=b;
-								
+
 								if(wtoilTarget.ID==bbc.ID-1)
 								{
 									wtoilFinalTargetReached=true;
@@ -778,7 +785,7 @@ public class Behavior extends Thread
 								}
 							}
 
-							
+
 						}
 						else
 						{
@@ -795,11 +802,11 @@ public class Behavior extends Thread
 						}					
 					}	
 				}
-				
+
 			}
-			
-			
-			
+
+
+
 			if(this.wtoilInitial)
 			{
 				this.wanderVector();
@@ -815,11 +822,11 @@ public class Behavior extends Thread
 					this.wanderVector();
 				}
 			}
-			
-			
-			
+
+
+
 		}
-		
+
 	}
 
 
@@ -837,7 +844,7 @@ public class Behavior extends Thread
 			//parameters for circle equispaced
 			PVector start = new PVector(w, h);
 			float r=200;
-			
+
 			float frac=0;
 			if(bbc.usingController)
 			{
@@ -847,7 +854,7 @@ public class Behavior extends Thread
 			{
 				frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
 			}
-			 
+
 
 			float x = (float) (r*Math.sin( (float)(bbc.ID+formationOffset)*frac  ));
 			float y= (float) (-r*Math.cos( (float)(bbc.ID+formationOffset)*frac  ));
@@ -856,7 +863,7 @@ public class Behavior extends Thread
 			this.moveTo(targ);
 			//Log.d("behavior","formation move to targ: " + targ);
 			return;
-			
+
 
 
 
@@ -868,8 +875,8 @@ public class Behavior extends Thread
 			s= (int) Math.round(Math.sqrt(s));
 
 			//PVector start = new PVector(width/4,height/4);
-			
-			 
+
+
 
 			PVector start = new PVector(w, h);
 			int row = (bbc.ID+formationOffset)/s;
@@ -881,8 +888,8 @@ public class Behavior extends Thread
 		}
 		if(formationType.equals("horizontal"))
 		{
-			 
-			
+
+
 			PVector start = new PVector(w - (bbc.otherBots.size()/2*distFormation), h);
 			PVector targ = new PVector(start.x+distFormation*(bbc.ID ), start.y);
 
@@ -891,8 +898,8 @@ public class Behavior extends Thread
 		}
 		if(formationType.equals("vertical"))
 		{
-			 
-			
+
+
 			PVector start = new PVector(w, h-(bbc.otherBots.size()/2*distFormation)  );
 			PVector targ = new PVector(start.x, start.y+distFormation*(bbc.ID ));
 
@@ -902,8 +909,8 @@ public class Behavior extends Thread
 		}
 		if(formationType.equals("diagonal"))
 		{
-			 
-			
+
+
 			PVector start = new PVector(55, 55);
 			PVector targ = new PVector(start.x+distFormation*bbc.ID, start.y+distFormation*bbc.ID);
 
@@ -1132,7 +1139,7 @@ public class Behavior extends Thread
 			this.wanderVector();
 			return;
 		}
-		
+
 		for(int i=0;i<bbc.otherBots.size();i++)
 		{
 			Bot b = (Bot) bbc.otherBots.get(i);
@@ -1140,7 +1147,7 @@ public class Behavior extends Thread
 			{
 				follow(b);
 			}
-			
+
 		}
 	}
 
@@ -2085,6 +2092,69 @@ public class Behavior extends Thread
 
 	}
 
+
+	public void doSteerDance()
+	{
+
+		float currentangle = bbc.camang;
+		float ang = (float)Math.toDegrees(Math.atan2(this.desiredVel.y,this.desiredVel.x));
+
+		int angle1=(int)currentangle;
+		int angle2=(int)ang;
+
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+		if(angle2<0)
+		{
+			angle2=360+angle2;
+		}	
+
+		bbc.modDistance=ModularDistance(angle1,angle2,360);
+		int result=ModularDistance2(angle1,angle2,360);
+
+		//look at desired vel
+		PVector v=new PVector(this.desiredVel.x,this.desiredVel.y);	
+		v.normalize();//must check this
+
+		// now start to change motor speed to adjust to new 
+		// -1 means need to turn right
+		// 1 means need to turn left
+
+		if(System.currentTimeMillis()-vmtimer>vmInterval)
+		{
+			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
+			vmtimer=System.currentTimeMillis();
+		}
+
+		if(bbc.movementseq[bbc.currentIndex])
+		{
+			if(bbc.modDistance>10)
+			{
+				if(result==-1)
+				{
+					bbc.writeL((int) (128+20*v.mag()));
+					bbc.writeR((int) (128-20*v.mag()*.1f));
+				}
+				else
+				{
+					bbc.writeL((int) (128+20*v.mag()*.1f));
+					bbc.writeR((int) (128-20*v.mag()));
+				}
+			}
+			else
+			{
+				bbc.forwardReal();
+			}
+		}
+		else
+		{
+			bbc.stop();
+		}
+
+	}
+
 	public void doMove()
 	{
 		float maxspeed = 2;
@@ -2349,11 +2419,11 @@ public class Behavior extends Thread
 		{
 			myAng=360+myAng;
 		}
-		
+
 		//float neighbordist = 50.0f;
 		float neighbordist = bbc.neighborBound;
 		PVector steer = new PVector(0, 0, 0);
-		
+
 		int count = 0;
 		for (int i = 0 ; i < bbc.otherBots.size(); i++) {
 			Bot other = (Bot) bbc.otherBots.get(i);
@@ -2363,17 +2433,17 @@ public class Behavior extends Thread
 			{
 				otherAng=360+otherAng;
 			}
-			
+
 			float d = PVector.dist(loc, otherloc);
 			if ((d > 0) && (d < neighbordist)) {
-				
+
 				float r=5;
 				float xx=(float) (r*Math.cos(Math.toRadians(otherAng)));
 				float yy= (float) (r*Math.sin(Math.toRadians(otherAng)));
 				PVector n=new PVector(xx,yy);
 				n.normalize();
 				steer.add(n);
-				
+
 				//steer.add(otherloc);//this was original
 				//steer.add(PVector.sub(otherloc,loc));//this was kindof like cohesion
 				count++;
@@ -2508,7 +2578,7 @@ public class Behavior extends Thread
 		//this.wtfilTarget=null;
 		this.wtfilInitial=true;
 		this.wtfilFinalTargetReached=false;
-		
+
 		if(b==false)
 		{
 			this.wtfilTarget=null;
@@ -2521,7 +2591,7 @@ public class Behavior extends Thread
 		//this.wtoilTarget=null;
 		this.wtoilInitial=true;
 		this.wtoilFinalTargetReached=false;
-		
+
 		if(b==false)
 		{
 			this.wtoilTarget=null;
@@ -2529,14 +2599,14 @@ public class Behavior extends Thread
 
 	}
 
-	
+
 
 	public void setBreath1(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		this.breath1=b;
 		this.breath1Timer1=System.currentTimeMillis();
-		
+
 	}
 
 	public void setBreath2(boolean b) {
@@ -2548,19 +2618,51 @@ public class Behavior extends Thread
 	public void setWanderVector(boolean b) {
 		// TODO Auto-generated method stub
 		wanderVector=b;
-		
+
 	}
 
 	public void setFollowAvatar(boolean b) {
 		// TODO Auto-generated method stub
 		followAvatar=b;
-		
+
 	}
 
 	public void setEvadeAvatar(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		evadeAvatar=b;
+
+	}
+	
+	public void doStop()
+	{
+		
+		
+		bbc.stop();
+		bbc.moveToLoc(false);
+		bbc.setWander(false);
+		bbc.setWanderDance(false);
+		bbc.setWanderVector(false);
+		setFollowInLine(false);		
+		setOrbitCenter(false);
+		setFollowMouse(false);
+		setOrbitInLine(false);
+		setWanderThenFollow(false);
+		setWanderThenOrbit(false);
+		setWanderThenFollowInLine(false);
+		setWanderThenOrbitInLine(false);
+		setBreath1(false);
+		setBreath2(false);
+		setFormation(false);
+		setWanderVector(false);
+
+		setFollowAvatar(false);
+		setEvadeAvatar(false);
+		setOrbitAvatar(false);
+
+		setSeparation(false);
+		setAlignment(false);
+		setCohesion(false);
 		
 	}
 
