@@ -767,6 +767,20 @@ public class ClientCode implements OnClickListener{
 						Log.d("LINE","rightmotor");
 						bbc.danceSequencer=false;
 					}
+					
+					if(line.contains("doRhythmMove"))
+					{
+						bbc.doRhythmMove=!bbc.doRhythmMove;
+					}
+					
+					if(line.contains("divUp"))
+					{
+						bbc.divUpFloat();
+					}
+					if(line.contains("divDown"))
+					{
+						bbc.divDownFloat();
+					}
 
 					if(line.contains("calibrate"+myID))
 					{

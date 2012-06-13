@@ -322,15 +322,18 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						
 						arena.run(c);
 						
-						c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
-						//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
-						c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
-						
 						
 						if(bbc!=null)
 						{
+							c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
+							//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
+							c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
 							c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
 							c.drawText("id: " + bbc.ID , 0, getHeight()-getHeight()/7, blackpaintText);
+							c.drawText("nn: " + bbc.numNeighbors , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
+							c.drawText("div: " + new DecimalFormat("#.##").format( bbc.mActivity.beatTimer.div) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/7, blackpaintText);
+							c.drawText("mpsc " +  bbc.mActivity.beatTimer.myPlaySessionCount + "," + bbc.mActivity.beatTimer.myGeneralPlaySessionCount, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
+							
 						
 						}
 						if(jiggle)
