@@ -1654,7 +1654,7 @@ public class ClientCode implements OnClickListener{
 								if(bbc.otherBots.size()==0)
 								{
 									Log.d("clientcode", "adding new bot: " + ID);
-									Bot newBot = new Bot();
+									Bot newBot = new Bot(bbc);
 									newBot.setPos(newx, newy);
 									newBot.camang=newang;
 									newBot.ID=ID;
@@ -1708,7 +1708,7 @@ public class ClientCode implements OnClickListener{
 								if(cnew)
 								{
 									Log.d("clientcode", "new bot -- b.id!=id  " + ID);
-									Bot newBot = new Bot();
+									Bot newBot = new Bot(bbc);
 									if(!posLost)
 									{
 										newBot.setPos(newx, newy);

@@ -1,8 +1,13 @@
 package com.google.android.DemoKit;
 
+ 
+
+ 
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import com.google.android.DemoKit.RobotFaceView.Arena;
 
@@ -25,7 +30,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		SurfaceHolder.Callback, Runnable {
 
 	Paint paint1, paint2, blackpaint, blackpaintText, redPaintHighlight,
-			greenPaint, yellowPaint, goldPaint;
+			greenPaint, yellowPaint, goldPaint, coralPaint;
 
 	private SurfaceHolder mHolder;
 
@@ -39,7 +44,9 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 
 	RobotFaceViewThread thread;
 	int cnt;
-
+	
+	public boolean simulateVel;
+	public Vector simulatedVels;
 	public boolean jiggleBigger;
 
 	public RobotFaceView(Context context) {
@@ -73,6 +80,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		greenPaint = new Paint();
 		yellowPaint = new Paint();
 		goldPaint = new Paint();
+		
+		coralPaint = new Paint();
 
 		paint1.setColor(Color.WHITE);
 		paint1.setAntiAlias(true);
@@ -99,6 +108,8 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		yellowPaint.setAntiAlias(true);
 		
 		goldPaint.setColor(Color.rgb(255,215,0));
+		
+		coralPaint.setColor(Color.rgb(240,128,128));
 		 
 		
 		thread = new RobotFaceViewThread(holder, context);
@@ -252,8 +263,63 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		thread.start();
 
 		Log.d("SURFACECREATED", "W:" + getWidth() + "  H:" + getHeight());
+		
+		
+		
+		///
+		//doTest();
 
 	}
+	
+	//////test
+	void doTest()
+	{
+		this.simulateVel=true;
+		/*
+		Bot testBot = new Bot();
+		testBot.x=640/4;
+		testBot.y=480/4;
+		testBot.ID=0;
+		bbc.allBots.add(testBot);
+
+		testBot = new Bot();
+		testBot.x=640-640/4;
+		testBot.y=480-480/4;
+		testBot.ID=1;
+		bbc.allBots.add(testBot);
+		 */
+
+
+
+		for(int i=0;i<8;i++)
+		{
+			Bot testBot = new Bot(bbc);
+			testBot.x=(int) (Math.random()*640);
+			testBot.y=(int) (Math.random()*480);
+			testBot.ID=i;
+			testBot.camang=(float) ((  2*Math.random()-1  ) *180 );
+			bbc.otherBots.add(testBot);
+		}
+
+		 
+
+		if(simulateVel)
+		{
+			simulatedVels = new Vector();
+			for(int i=0;i<bbc.otherBots.size();i++)
+			{
+				PVector v = new PVector((float)Math.random(),(float)Math.random());
+				v.normalize();
+				v.mult(2);
+				simulatedVels.add(v);
+			}
+		}
+
+
+	}
+	
+	
+	/////endtest
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -327,10 +393,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						{
 							c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
 							//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
-							c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
+							//c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
 							c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
 							c.drawText("id: " + bbc.ID , 0, getHeight()-getHeight()/7, blackpaintText);
-							c.drawText("nn: " + bbc.numNeighbors , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
+							c.drawText("nn: " + bbc.numNeighbors +"," + bbc.myExtendedNeighbors.size(), getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
 							c.drawText("div: " + new DecimalFormat("#.##").format( bbc.mActivity.beatTimer.div) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/7, blackpaintText);
 							c.drawText("mpsc " +  bbc.mActivity.beatTimer.myPlaySessionCount + "," + bbc.mActivity.beatTimer.myGeneralPlaySessionCount, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
 							
@@ -1228,7 +1294,64 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			
 			for(int i=0; i<bbc.otherBots.size(); i ++)
 			{
-				Bot b= (Bot) bbc.otherBots.get(i);
+				Bot b=  bbc.otherBots.get(i);
+				/////////////////
+				if(simulateVel)
+				{
+					if(simulateVel && simulatedVels!=null)
+					{
+						//Log.d("","did it get");
+						
+						
+						
+						PVector simV = (PVector) simulatedVels.get(i);
+						b.x+=simV.x;
+						b.y+=simV.y;
+
+						
+						/*
+						if(touching)
+						{
+							PVector l = new PVector(bx,by);
+							PVector t = new PVector(touchX,touchY);
+							PVector d= PVector.sub(t,l);
+							d.normalize();
+							d.mult(1);
+							
+						  simV.add(d);	
+						  simV.limit(2);
+						}
+						*/
+						 
+
+						if(b.x<0)
+						{
+							b.x=0;
+							simV.x*=-1;
+						}
+						if(b.y<0)
+						{
+							//b.y+=1;
+							b.y=0;
+							simV.y*=-1;
+						}
+						if(b.x>640)
+						{
+							//b.x-=1;
+							b.x=640;
+							simV.x*=-1;
+						}
+						if(b.y>480)
+						{
+							//b.y-=1;
+							b.y=480;
+							simV.y*=-1;
+						}
+						
+
+					}
+				}
+				////////////
 				
 				int bx=(int) map(b.x,0,640,leftx,rightx);
 				int by=(int) map(b.y,0,480,topy,bottomy);
@@ -1250,6 +1373,17 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				}
 				
 				c.drawCircle(bx, by, 2.5f, blackpaint);
+				
+				if(bbc.myNeighbors.contains(b))
+				{
+					c.drawCircle(bx, by, 3.5f, redPaintHighlight);
+				}
+				if(bbc.myExtendedNeighbors.contains(b))
+				{
+					c.drawCircle(cx, cy, 3.0f, coralPaint);
+				}
+				
+				
 			}
 			
 			
@@ -1636,6 +1770,11 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				* ((value - istart) / (istop - istart));
 	}
 	
+	
+	public void doSim()
+	{
+		
+	}
 	
 
 }
