@@ -1417,10 +1417,11 @@ public class BeatTimer extends Thread{
 								{
 									bbc.myBehavior.setSeparation(true);
 									bbc.myBehavior.setWanderVector(true);
+									bbc.clearRhythm(bbc.sfxrseq);
+									bbc.clearRhythm(bbc.instrumentseq);
 								}
 
-								bbc.clearRhythm(bbc.sfxrseq);
-								bbc.clearRhythm(bbc.instrumentseq);
+								
 							}
 						}
 						else //has completed gils

@@ -1,5 +1,7 @@
 package com.google.android.DemoKit;
 
+ 
+
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -17,6 +19,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.content.Context;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -160,19 +163,26 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	long nComTimer;
 	boolean nComEnable;
- 
-	
+
+
 	LinkedHashSet queue;
 	boolean[] receivedSequence ;
-	
+
 	int servo3;
-	
+
 	Song mySong;
-	
+
 	public boolean doRhythmMove;
+
+
+	public Vector<Bot> myNeighbors;
+	public Vector<Bot> myExtendedNeighbors;
+	public long extendedNeighborsTimer;
 	
-	 
 	
+	NeighborThread neighborThread;
+
+
 	public boolean isnComEnable() {
 		return nComEnable;
 	}
@@ -187,9 +197,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		bbs1 = servo1;
 		bbs2 = servo2;
 		instrument = 3;
-		
+
 		servo3=3;
-		
+
 		mCommandTarget1 = (byte) (bbs1 - 1 + 0x10);
 		mCommandTarget2 = (byte) (bbs2 - 1 + 0x10);
 		mCommandTarget3 = (byte) (instrument - 1 + 0x10);
@@ -199,17 +209,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		bseq = new boolean[SEQUENCERLENGTH];
 		rseq = new boolean[SEQUENCERLENGTH];
 		lseq = new boolean[SEQUENCERLENGTH];
-		
+
 		movementseq= new boolean[SEQUENCERLENGTH];
 
 		sfxrseq = new boolean[SEQUENCERLENGTH];
 		instrumentseq = new boolean[SEQUENCERLENGTH];
 
 		avatarseq = new boolean[SEQUENCERLENGTH];
-		
+
 		receivedSequence = new boolean[SEQUENCERLENGTH];
-		
-		
+
+
 
 
 		djembe0 = new boolean[SEQUENCERLENGTH];
@@ -297,16 +307,25 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		nComTimer =System.currentTimeMillis();
 		setnComEnable(false);
 		queue = new LinkedHashSet();
-		
+
 		//mySong= new FightSong();
 		//mySong = new OldMacDonald();
 		//mySong = new Joyful();
 		//mySong = new LionSleeps(); 
 		chooseSong(0);
-		
+
 		//this.setMapping(204);
+
+
+
+		myNeighbors = new Vector<Bot>();
+		myExtendedNeighbors = new Vector<Bot>();
+		extendedNeighborsTimer = System.currentTimeMillis();
 		
+		neighborThread = new NeighborThread(this);
+		neighborThread.start();
 		
+
 	}
 
 	private void initializeReggaeton() {
@@ -399,7 +418,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		vest = new PVector();
 
 		mActivity.aTest.bbc=this;
-		
+
 		MSDeg = new int[8];
 		MSDeg[0]=0;
 		MSDeg[1]=2;
@@ -409,23 +428,23 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		MSDeg[5]=9;
 		MSDeg[6]=11;
 		MSDeg[7]=12;
-		
+
 		int numDivisions=8	;
-		
+
 		int cnt=0;
 		for(int i=0;i<this.SEQUENCERLENGTH;i++)
 		{
-			 int val = (int) ((Math.floor(i / (this.movementseq.length/numDivisions)) + 1)) ;
-			 
-			 if(val%2==0)
-			 {
-				 this.movementseq[i]=true;
-			 }
-			 else
-			 {
-				 this.movementseq[i]=false;
-			 }
-			
+			int val = (int) ((Math.floor(i / (this.movementseq.length/numDivisions)) + 1)) ;
+
+			if(val%2==0)
+			{
+				this.movementseq[i]=true;
+			}
+			else
+			{
+				this.movementseq[i]=false;
+			}
+
 		}
 
 	}
@@ -451,7 +470,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean avatarMoving;
 	public boolean usingController;
 	public boolean headMove;
-	
+
 
 	/////??
 
@@ -671,7 +690,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		}
 
 	}
-	
+
 	public void divUpFloat()
 	{
 		mActivity.beatTimer.div+=.05;
@@ -679,7 +698,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public void divDownFloat()
 	{
 		if(mActivity.beatTimer.div>1)
-	    	mActivity.beatTimer.div-=.05;
+			mActivity.beatTimer.div-=.05;
 	}
 
 
@@ -842,7 +861,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.LED_SERVO_COMMAND,
 				mCommandTarget1, (byte)b);
 	}
-	
+
 	public void writeHead(int b)
 	{
 		headbyte=b;
@@ -1997,8 +2016,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		for(int i =0 ; i < otherBots.size();i++)
 		{
-			
-			 
+
+
 			Bot b = otherBots.get(i);
 
 			double dist=Math.sqrt( Math.pow((myposx-b.x),2) + Math.pow((myposy-b.y),2) ) ;
@@ -2009,36 +2028,125 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			{
 				numNeighbors++;
 
+				if (!myNeighbors.contains(b))
+				{
+					myNeighbors.add(b);
+				}
+
+
 				b.isNeighbor=true;
 
 				//communicate to neighbor
 				if(isnComEnable())
 				{
-					
+
 					queue.add(b);
 					mActivity.client.sendMessage2("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
 					/*
 					if(System.currentTimeMillis()-nComTimer >350 + (long)Math.random()*50)
 					{
 						//mActivity.client.sendMessage("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
-						
+
 						queue.add(b);
 						mActivity.client.sendMessage2("com,"+ mActivity.client.myID + "," + b.ID + "," + "query" + "," + "nnnn");
-						
+
 						nComTimer = System.currentTimeMillis();
 					}
-					*/
+					 */
 				}
 
 			}
 			else
 			{
 				b.isNeighbor=false;
+				myNeighbors.remove(b);
 			}
+			
+			
+			
+			//b.getNeighbors();
+		}
+		
+		
+		/*
+		if(System.currentTimeMillis()-this.extendedNeighborsTimer>250)
+		{
+			Bot b = new Bot(this.myposx,this.myposy,this);
+			this.myExtendedNeighbors=b.getExtendedNeighbors();
+			
+			//this.myExtendedNeighbors=getExtendedNeighbors();
+			this.resetQuery();
+			Log.d("bbc","extended neighbors");
+			this.extendedNeighborsTimer+=250;
+		}
+		*/
+		
 
+
+	}
+	
+	public Vector<Bot> getExtendedNeighbors()
+	{
+
+		
+		Vector<Bot> ext = new Vector<Bot>();	
+		//ext.add(new Bot(bbc.myposx,bbc.myposy,bbc)); //do you need this?
+		for (int i=0;i<myNeighbors.size();i++)
+		{
+			Bot  b = myNeighbors.get(i);
+			if (!b.queried)
+			{
+				b.queried=true;
+				ext.addAll(b.getExtendedNeighbors());
+			}
+			else
+			{
+				ext.addAll(myNeighbors);
+			}
+		}
+
+		return new Vector<Bot>(new LinkedHashSet<Bot>(ext));
+	}
+
+	public Vector getNeighborHood()
+	{
+		Vector res = new Vector();
+
+		for(int i=0;i<otherBots.size();i++)
+		{
+			Bot b = (Bot) otherBots.get(i);
+			if(b.isNeighbor)
+			{
+				res.add(b);
+				for(int j=0;j<otherBots.size();j++)
+				{
+					Bot b2 = (Bot) otherBots.get(j);
+					if(!b2.equals(b))
+					{
+						PVector d1 = new PVector(b.x,b.y);
+						PVector d2 = new PVector(b2.x,b2.y);
+						if(d1.dist(d2)-20<this.neighborBound)
+						{
+							if(!res.contains(b2))
+							{
+								res.add(b2);
+							}
+						}
+
+					}
+
+				}
+			}
+			else
+			{
+				continue;
+			}
 		}
 
 
+
+
+		return res;
 	}
 
 
@@ -2304,9 +2412,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			mActivity.beatTimer.hasCompletedGilsTimer=System.currentTimeMillis();
 			mActivity.beatTimer.resetGil();
 		}
-		
+
 		mActivity.beatTimer.mapping=a;
-		
+
 
 
 	}
@@ -2341,17 +2449,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		return s;
 	}
-	
+
 	String notesToString(int[] b)
 	{
-	  String s = "";
+		String s = "";
 
-	  for (int i=0; i < b.length; i++)
-	  {
-	    s+=b[i]+",";
-	  }
+		for (int i=0; i < b.length; i++)
+		{
+			s+=b[i]+",";
+		}
 
-	  return s;
+		return s;
 	}
 
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
@@ -2841,20 +2949,20 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	public void swapRandomPortion(boolean[] seq1,boolean[] seq2) {
 		// TODO Auto-generated method stub
-		
+
 		if(seq1.length==0||seq2.length==0)
 		{
 			return;
 		}
 		int sz=Math.min(seq1.length,seq2.length);
-		
+
 		int start = (int) Math.random()*sz/2;
-		
+
 		int stop = start + (int) (Math.random()*(sz-start));
-		
+
 		for(int i=start;i<stop;i++)
 		{
-			 
+
 			if(i<sz-1)
 			{
 				boolean temp = seq1[i];
@@ -2862,10 +2970,10 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				seq2[i]=temp;
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	public void swapPortion(boolean[] seq1,boolean[] seq2, int start, int stop)
 	{
 		if(seq1.length!=seq2.length)
@@ -2876,22 +2984,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			return;
 		}
-		
+
 		if(start>seq1.length-1 || stop > seq1.length-1)
 		{
 			return;
 		}
-		
+
 		if(start>stop)
 		{
 			return;
 		}
-		
+
 		int sz= seq1.length;
-		
+
 		for(int i=start;i<stop;i++)
 		{
-			
+
 			if(i<sz-1)
 			{
 				boolean temp = seq1[i];
@@ -2899,17 +3007,17 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				seq2[i]=temp;
 			}
 		}
-		
-		
-		
-		
+
+
+
+
 	}
 
 
 	//if 48, what euclid works?  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 	// 1, 2, 3, 4, 6, 8, 12, 16
-	
-	
+
+
 	void chooseSong(int i)
 	{
 		switch(i)
@@ -2933,31 +3041,31 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		case 10: 
 			this.mySong = new TestSong();
 			break;
-			
+
 		default:
 			this.mySong=new TestSong();
-		
-		
+
+
 		}
 	}
-	
+
 	public void setMyNote(int n)
 	{
 		this.myNote=n;	
 	}
-	
+
 	public int getMSDegree(int n)
 	{
-		
+
 		return MSDeg[n%MSDeg.length];
 	}
-	
+
 	public int getFightSongNote( int n)
 	{
-		
+
 		int res=72;
-		 
-		
+
+
 		switch (n)
 		{
 		case 0:
@@ -2984,22 +3092,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		case 7:
 			res=72+12;
 			break;
-		 
+
 		default:
 			res=72;
 			break;
-		
-		
+
+
 		}
-		
-	   return res;
+
+		return res;
 	}
 
 	public void setAvatarMode(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		this.avatarMode=b;
-		
+
 	}
 
 	public void usingController(boolean b) {
@@ -3007,22 +3115,33 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.usingController=b;
 	}
 
-	
-	
-	
-	
+
+
+
+
 	void resetGil()
 	{
-	  //completedGilsCount=0;
- 
-	    this.myBehavior.sacWeights[0] = 1; //separation
-	    this.myBehavior.sacWeights[0] = 0; // alignment
-	    this.myBehavior.sacWeights[0] = 0;// cohesion
-	    //b.desiredseparation=getDefaultSeparation();
+		//completedGilsCount=0;
 
-	    mActivity.beatTimer.myBiggerPlaySessionCount=0;
-	    mActivity.beatTimer.myPlaySessionCount=0;
-	   
+		this.myBehavior.sacWeights[0] = 1; //separation
+		this.myBehavior.sacWeights[0] = 0; // alignment
+		this.myBehavior.sacWeights[0] = 0;// cohesion
+		//b.desiredseparation=getDefaultSeparation();
+
+		mActivity.beatTimer.myBiggerPlaySessionCount=0;
+		mActivity.beatTimer.myPlaySessionCount=0;
+
+	}
+	
+	
+	
+	public void resetQuery()
+	{
+		for(int i=0;i<otherBots.size();i++)
+		{
+			Bot b = otherBots.get(i);
+			b.queried=false;			
+		}		
 	}
 
 }
