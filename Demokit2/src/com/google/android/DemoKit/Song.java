@@ -180,12 +180,27 @@ public class Song {
 		{
 			Measure m= (Measure)measures.get(i%measures.size());
 			n.addAll(m.uniqueNotes());
-			 
+
 		}
 
 
 		return n;
 
+	}
+
+
+	public int[] divArray(int[] array)
+	{
+		int[] arr = new int[array.length];
+		for(int i=0;i<array.length;i++)
+		{
+			if(i%2==0)
+			{
+				arr[i/2]=array[i];
+			}
+		}
+		
+		return arr;
 	}
 
 
@@ -833,6 +848,70 @@ class TestSong extends Song
 
 
 	}
+
+
+}
+
+
+class HalfFightSong extends FightSong
+{
+
+	HalfFightSong()
+	{
+
+		super();
+
+		divide();
+
+	}
+
+	public void divide()
+	{
+		Vector result = new Vector();
+		for(int i=0;i<measures.size();i++)
+		{
+
+			if(i+1<measures.size())
+			{
+				Measure m1 = (Measure) measures.get(i);
+				Measure m2 = (Measure) measures.get(i+1);
+
+				Measure m3 = new Measure();
+
+				int[] a1=divArray(m1.notes);
+				int[] a2=divArray(m2.notes);
+
+				for(int j=0;j<a1.length;j++)
+				{
+					m3.notes[j]=a1[j];
+				}
+
+				for(int j=0;j<a2.length;j++)
+				{
+					if(j+m3.SEQUENCERLENGTH/2 < m3.SEQUENCERLENGTH)
+					{
+						m3.notes[j+m3.SEQUENCERLENGTH/2] = a2[j];
+					}
+				}
+				
+				result.add(m3);
+
+
+
+			}
+
+			i++;
+
+		}
+		
+		this.measures=result;
+	}
+
+
+
+	 
+
+
 }
 
 

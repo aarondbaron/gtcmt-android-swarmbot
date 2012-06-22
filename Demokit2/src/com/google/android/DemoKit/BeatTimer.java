@@ -15,9 +15,10 @@ public class BeatTimer extends Thread{
 	int generalIndex, previousIndex;
 
 	long globalTimer;
+	long globalHalfTimer;
 
 	long globalTimeInterval;
-	float div=2;
+	float div=1.10f;
 
 	boolean generalTimingFlag;
 	boolean generalMeasureFlag;
@@ -76,11 +77,15 @@ public class BeatTimer extends Thread{
 
 	int currentGilNeighbors, prevGilNeighbors;
 	boolean noChangeNeighbors;
+	
+	int currentExtendedNeighbors,prevExtendedNeighbors;
+	boolean noChangeExtendedNeighbors;
+	
 	public int myBiggerPlaySessionCount;
 	public int myPlaySessionCount;
 	boolean gilSeparate;
 	long gilSeparateTimer;
-	int timesLoop;
+	int timesLoop=4;
 
 	public long hasCompletedGilsTimer;
 
@@ -89,19 +94,26 @@ public class BeatTimer extends Thread{
 	public int myGeneralPlaySessionCount;
 
 	public int completedGilsCount;
+	
+	public long gilTime;
 
 
 	BeatTimer()
 	{
-		globalTimeInterval=50;
-
+		//globalTimeInterval=50;
+		globalTimeInterval=75;
+		
 		globalTimer=System.currentTimeMillis();
+		globalHalfTimer=System.currentTimeMillis();
+		
 		appStartTimeMillis=globalTimer;
 		Log.d("beatTimer created", "checking here ");
 
 		currentMeasure = new Measure();
 		possibleMeasures = new Vector();
 		possibleNotes = new Vector();
+		
+		gilTime=120*1000;
 	}
 
 	@Override
@@ -122,6 +134,12 @@ public class BeatTimer extends Thread{
 						mActivity.client.doStuff();					
 						mActivity.client.initialConnect=true;
 						//bbc.stopAll();
+						//bbc.myBehavior.doStop();
+						//bbc.myBehavior.desiredVel.mult(0);
+					}
+					else
+					{
+						 
 					}
 				}
 			}
@@ -170,7 +188,7 @@ public class BeatTimer extends Thread{
 			}
 			 */
 
-
+			globalHalfTimer=globalTimer;
 			globalTimer += globalTimeInterval;
 			incrementGeneralIndex();
 			//allowedToFire=true;
@@ -1320,8 +1338,8 @@ public class BeatTimer extends Thread{
 
 						break;
 
-					case 129: //gil's function v1 modified for stopping instead of cohesion.
-						timesLoop=2;
+					case 129: //gil's function v1 modified for stopping instead of cohesion/and using extended neighbors
+						//timesLoop=4;
 
 						possibleNotes.clear();
 						possibleNotes.add(new Integer( bbc.myNote));
@@ -1337,8 +1355,10 @@ public class BeatTimer extends Thread{
 							}	
 						}
 
-						currentGilNeighbors=ne.size();
-
+						
+						
+						//currentGilNeighbors=ne.size();
+						/*
 						if (currentGilNeighbors!=prevGilNeighbors)
 						{
 							noChangeNeighbors=false;
@@ -1350,6 +1370,20 @@ public class BeatTimer extends Thread{
 							noChangeNeighbors=true; 
 							//println("no change: " + noChangeNeighbors + " id:" + ID);
 						}
+						*/
+						
+						currentExtendedNeighbors = bbc.myExtendedNeighbors.size();
+						if (currentExtendedNeighbors!=prevExtendedNeighbors)
+						{
+							noChangeExtendedNeighbors=false;
+							prevExtendedNeighbors=currentExtendedNeighbors;
+						}
+						else
+						{
+							noChangeExtendedNeighbors=true; 
+							//println("no change: " + noChangeNeighbors + " id:" + ID);
+						}
+						
 
 						possibleMeasures= bbc.mySong.getMeasuresWithTheseNotes(possibleNotes);
 
@@ -1389,6 +1423,7 @@ public class BeatTimer extends Thread{
 										bbc.stop();
 										bbc.myBehavior.doStop();
 										bbc.myBehavior.setSeparation(false);
+										bbc.setWanderVector(false);
 									}
 									else
 									{
@@ -1397,8 +1432,8 @@ public class BeatTimer extends Thread{
 								}
 
 
-
-								currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure+generalMeasure%2)%possibleMeasures.size()  ) );
+								currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
+								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure+generalMeasure%2)%possibleMeasures.size()  ) );
 								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
 
 								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
@@ -1410,7 +1445,7 @@ public class BeatTimer extends Thread{
 									this.myPlayFlag=true;
 								}
 							}
-							else
+							else///posibiles measures ==0 or playsessioncount>=timeslopps
 							{
 
 								if (possibleMeasures.size()==0)
@@ -1419,6 +1454,13 @@ public class BeatTimer extends Thread{
 									bbc.myBehavior.setWanderVector(true);
 									bbc.clearRhythm(bbc.sfxrseq);
 									bbc.clearRhythm(bbc.instrumentseq);
+									gilSeparate=true;
+									gilSeparateTimer=System.currentTimeMillis();
+								}
+								
+								if(this.myPlaySessionCount>=timesLoop)//??
+								{
+									
 								}
 
 								
@@ -1458,7 +1500,8 @@ public class BeatTimer extends Thread{
 
 
 						// boolean noChangeNeighbors=true;   
-						if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						//if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						if (myPlaySessionCount>=timesLoop&&noChangeExtendedNeighbors)
 						{
 							myBiggerPlaySessionCount++;
 							myPlaySessionCount=0;
@@ -1468,7 +1511,8 @@ public class BeatTimer extends Thread{
 						}
 						else
 						{
-							if (!noChangeNeighbors)
+							//if (!noChangeNeighbors)
+							if (!noChangeExtendedNeighbors)
 							{
 								myPlaySessionCount=0;
 							}
@@ -1497,7 +1541,7 @@ public class BeatTimer extends Thread{
 
 					case 131: // gil's version 2 modified for stopping
 
-						timesLoop=2;
+						//timesLoop=4;
 
 						this.possibleNotes = new Vector();
 						possibleNotes.add(new Integer( bbc.myNote));
@@ -1517,8 +1561,8 @@ public class BeatTimer extends Thread{
 							}
 						}
  
+						/*
 						currentGilNeighbors=ne2.size();
-
 						if (currentGilNeighbors!=prevGilNeighbors)
 						{
 							noChangeNeighbors=false;
@@ -1528,6 +1572,18 @@ public class BeatTimer extends Thread{
 						else
 						{
 							noChangeNeighbors=true; 
+						}
+						*/
+						currentExtendedNeighbors = bbc.myExtendedNeighbors.size();
+						if (currentExtendedNeighbors!=prevExtendedNeighbors)
+						{
+							noChangeExtendedNeighbors=false;
+							prevExtendedNeighbors=currentExtendedNeighbors;
+						}
+						else
+						{
+							noChangeExtendedNeighbors=true; 
+							//println("no change: " + noChangeNeighbors + " id:" + ID);
 						}
 
 						possibleMeasures= bbc.mySong.getMeasuresWithTheseNotes( possibleNotes);
@@ -1628,7 +1684,8 @@ public class BeatTimer extends Thread{
 						}
 
 						// boolean noChangeNeighbors=true;   
-						if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						//if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						if (myPlaySessionCount>=timesLoop&&noChangeExtendedNeighbors)
 						{
 							myBiggerPlaySessionCount++;
 							myPlaySessionCount=0;
@@ -1638,7 +1695,8 @@ public class BeatTimer extends Thread{
 						}
 						else
 						{
-							if (!noChangeNeighbors)
+							//if (!noChangeNeighbors)
+							if (!noChangeExtendedNeighbors)
 							{
 								myPlaySessionCount=0;
 							}
@@ -1696,9 +1754,74 @@ public class BeatTimer extends Thread{
 						break;
 
 					case 152:  //shift ... based on speed
+						
+						
+						
 
 						break;
+						
+					case 153: //shift song measure based on angle
+						
+						
+						
+						int songShiftAngle = (int) bbc.map(angle1,0,360,-bbc.mySong.numMeasures()/2,bbc.mySong.numMeasures()/2);
 
+						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + songShiftAngle)%bbc.mySong.numMeasures());
+						 
+						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
+						
+						break;
+						
+					case 154: //shift song measure based on (extended) neigbhor
+						
+
+						int songShiftNeighbor = (int) bbc.map(bbc.myExtendedNeighbors.size(),0,360,0,bbc.mySong.numMeasures()-1);
+
+						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + songShiftNeighbor)%bbc.mySong.numMeasures());
+						 
+						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
+						break;
+						
+					case 155: // shift song measure  based on speed
+						
+						break;
+
+					case 160: //shift song measre based on distance from a target (circle)
+						
+						//get circle target
+						PVector targ = new PVector();
+						if(bbc.myBehavior.formationType.equals("circle"))
+						{
+							PVector start = new PVector(640/2, 480/2);
+							float r=200;
+
+							float frac=0;
+							if(bbc.usingController)
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size());
+							}
+							else
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+							}
+
+
+							float x = (float) (r*Math.sin( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							float y= (float) (-r*Math.cos( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							targ = new PVector(start.x+x, start.y+y);
+						}
+						
+						PVector loc = new PVector(bbc.myposx,bbc.myposy);
+						int thin = (int) bbc.map(PVector.dist(loc, targ),0,640,0,bbc.mySong.numMeasures());
+						
+						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + thin)%bbc.mySong.numMeasures());
+						
+						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
+						break;
+						
 					case 199: 
 
 
@@ -1881,7 +2004,10 @@ public class BeatTimer extends Thread{
 					if(bbc.instrumentseq[bbc.currentIndex])
 					{
 						test=false;
-						bbc.playInstrument();
+						if(bbc.useInstrument)
+						{
+							bbc.playInstrument();
+						}
 						bbc.rfv.doJiggle();
 						bbc.rfv.doJiggleBigger();
 					}
@@ -1926,9 +2052,11 @@ public class BeatTimer extends Thread{
 		}
 		else
 		{
-			if(System.currentTimeMillis() - globalTimer> globalTimeInterval/div)
+			if(System.currentTimeMillis() - globalTimer> (float)globalTimeInterval/div)
+			//if(System.currentTimeMillis() - globalHalfTimer> globalTimeInterval+globalTimeInterval/div)
 			{////////////////////////////////
 				//allowedToFire=false;
+				//globalHalfTimer += globalTimeInterval;
 				generalTimingFlag=false;
 				if(bbc!=null)
 				{
@@ -2013,7 +2141,7 @@ public class BeatTimer extends Thread{
 
 	boolean hasCompletedGils()
 	{
-		if(System.currentTimeMillis()-this.hasCompletedGilsTimer>120*1000)
+		if(System.currentTimeMillis()-this.hasCompletedGilsTimer>gilTime)
 		{
 			return true;
 		}
