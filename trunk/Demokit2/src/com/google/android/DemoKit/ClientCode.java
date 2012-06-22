@@ -475,6 +475,11 @@ public class ClientCode implements OnClickListener{
 						bbc.useSFXR=!bbc.useSFXR;
 
 					}
+					if(line.contains("useInstrument"))
+					{
+						bbc.useInstrument=!bbc.useInstrument;
+
+					}
 					if(line.contains("useSong"))
 					{
 						bbc.useSong=!bbc.useSong;
@@ -768,6 +773,42 @@ public class ClientCode implements OnClickListener{
 						bbc.danceSequencer=false;
 					}
 					
+					if(line.contains("rotateTo"))
+					{
+						String test [] = line.split(",");
+						if(test.length==1)
+						{
+							bbc.myBehavior.setRotate(true);
+						}
+						else
+						{
+							if(test.length==2)
+							{
+								float i = Float.parseFloat(test[1]);
+								bbc.myBehavior.orientationTarget = i;
+								
+								bbc.myBehavior.setRotate(true);
+							}
+							else
+							{
+								if(test.length==3)							
+								{
+									int x = Integer.parseInt(test[1]);
+									int y = Integer.parseInt(test[2]);
+									bbc.targetx=x;
+									bbc.targety=y;
+									bbc.myBehavior.setRotate(true);
+									bbc.moveToLoc(true);
+									
+								}
+							
+							}
+							
+						}
+						
+						
+					}
+					
 					if(line.contains("doRhythmMove"))
 					{
 						bbc.doRhythmMove=!bbc.doRhythmMove;
@@ -921,6 +962,14 @@ public class ClientCode implements OnClickListener{
 						int song = (int) Float.parseFloat(test[1]);
 						bbc.chooseSong(song);
 					}
+					
+					if(line.contains("timesloop"))
+					{
+						String test [] = line.split(",");
+						int s = (int) Float.parseFloat(test[1]);
+						bbc.mActivity.beatTimer.timesLoop=s;
+					}
+					
 					if(line.contains("mapping"))
 					{
 						String test [] = line.split(",");
@@ -1741,7 +1790,7 @@ public class ClientCode implements OnClickListener{
 
 					}
 
-					bbc.numberOfNeigbhors();
+					//bbc.numberOfNeigbhors();
 
 					//Log.d("ClientActivity", line);
 				}
@@ -1786,6 +1835,12 @@ public class ClientCode implements OnClickListener{
 				Thread cThread = new Thread(new ClientThread());
 				cThread.start();
 			}
+			
+			if(bbc!=null)
+			{
+				bbc.stop();
+				bbc.myBehavior.doStop();
+			}
 		}
 	}
 
@@ -1819,6 +1874,8 @@ public class ClientCode implements OnClickListener{
 
 
 		bbc.directControl=false;
+		
+		bbc.myBehavior.setRotate(false);
 
 
 		Log.d("LINE","stop");

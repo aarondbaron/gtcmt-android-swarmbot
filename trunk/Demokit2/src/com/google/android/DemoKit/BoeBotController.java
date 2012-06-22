@@ -181,6 +181,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	
 	NeighborThread neighborThread;
+	boolean allowedToCheck;
 
 
 	public boolean isnComEnable() {
@@ -312,9 +313,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		//mySong = new OldMacDonald();
 		//mySong = new Joyful();
 		//mySong = new LionSleeps(); 
-		chooseSong(0);
+		chooseSong(4);
 
-		//this.setMapping(204);
+		//this.setMapping(101);
 
 
 
@@ -324,6 +325,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		
 		neighborThread = new NeighborThread(this);
 		neighborThread.start();
+		
+		myposx=640/2;
+		myposy=480/2;
 		
 
 	}
@@ -470,6 +474,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean avatarMoving;
 	public boolean usingController;
 	public boolean headMove;
+	public boolean useInstrument=true;
 
 
 	/////??
@@ -575,7 +580,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 
-				this.setMapping(1);
+				//this.setMapping(1);
 
 			}
 
@@ -654,14 +659,14 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		if(mActivity.beatTimer.globalTimeInterval>25)
 		{
-			mActivity.beatTimer.globalTimeInterval-=25;
+			mActivity.beatTimer.globalTimeInterval-=5;
 			et.setText("" + mActivity.beatTimer.globalTimeInterval);
 			sequencerMode=true;
 		}
 	}
 	public void tempoDown()
 	{
-		mActivity.beatTimer.globalTimeInterval+=25;
+		mActivity.beatTimer.globalTimeInterval+=5;
 		et.setText("" + mActivity.beatTimer.globalTimeInterval);
 		sequencerMode=true;
 	}
@@ -697,7 +702,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	}
 	public void divDownFloat()
 	{
-		if(mActivity.beatTimer.div>1)
+		if(mActivity.beatTimer.div>1+.01)
 			mActivity.beatTimer.div-=.05;
 	}
 
@@ -3036,7 +3041,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			break;
 		case 4: 
 			//this.mySong = new Tetris();
-			this.mySong = new TestSong();
+			this.mySong = new HalfFightSong();
 			break;
 		case 10: 
 			this.mySong = new TestSong();

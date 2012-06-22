@@ -47,8 +47,16 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	
 	public boolean simulateVel;
 	public Vector simulatedVels;
+	public PVector mySimulatedVel;
 	public boolean jiggleBigger;
 
+	
+	public boolean touching;
+	public int touchX,touchY;
+	public int prevTouchX,prevTouchY;
+	public int deltaTouchX,deltaTouchY;
+	public int initialTouchX,initialTouchY;
+	
 	public RobotFaceView(Context context) {
 		super(context);
 		mHolder = getHolder();
@@ -109,7 +117,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 		
 		goldPaint.setColor(Color.rgb(255,215,0));
 		
-		coralPaint.setColor(Color.rgb(240,128,128));
+		coralPaint.setColor(Color.rgb(240,220,255));
 		 
 		
 		thread = new RobotFaceViewThread(holder, context);
@@ -275,6 +283,12 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	void doTest()
 	{
 		this.simulateVel=true;
+		
+		mySimulatedVel = new PVector((float)Math.random(),(float)Math.random());
+		mySimulatedVel.normalize();
+		mySimulatedVel.mult(2);
+		bbc.myposx=640/2;
+		bbc.myposy=480/2;
 		/*
 		Bot testBot = new Bot();
 		testBot.x=640/4;
@@ -380,10 +394,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						//cameraButton.run(c);
 						danceButton.run(c);
 						modeButton.run(c);
-						//tempup.run(c);
-						//tempdown.run(c);
-						//divup.run(c);
-						//divdown.run(c);
+						tempup.run(c);
+						tempdown.run(c);
+						divup.run(c);
+						divdown.run(c);
 						message.run(c);
 						
 						arena.run(c);
@@ -399,6 +413,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 							c.drawText("nn: " + bbc.numNeighbors +"," + bbc.myExtendedNeighbors.size(), getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
 							c.drawText("div: " + new DecimalFormat("#.##").format( bbc.mActivity.beatTimer.div) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/7, blackpaintText);
 							c.drawText("mpsc " +  bbc.mActivity.beatTimer.myPlaySessionCount + "," + bbc.mActivity.beatTimer.myGeneralPlaySessionCount, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
+							c.drawText("pm " +  bbc.mActivity.beatTimer.possibleMeasures.size() , getWidth()/2, getHeight()-getHeight()/28, blackpaintText);
+							
+							c.drawText("vel: " + new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.x) + ","+ new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.y) , getWidth()/3, getHeight()-getHeight()/14, blackpaintText);
+							c.drawText("lr: " +  bbc.lbyte + ","+  bbc.rbyte , getWidth()/3, getHeight()-getHeight()/7, blackpaintText);
 							
 						
 						}
@@ -1292,6 +1310,37 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			}
 			c.drawCircle(cx, cy, 3, greenPaint);
 			
+			
+			if(simulateVel)
+			{
+				bbc.myposx+=mySimulatedVel.x;
+				bbc.myposy+=mySimulatedVel.y;
+				
+				if(bbc.myposx<0)
+				{
+					bbc.myposx=0;
+					mySimulatedVel.x*=-1;
+				}
+				if(bbc.myposy<0)
+				{
+					//b.y+=1;
+					bbc.myposy=0;
+					mySimulatedVel.y*=-1;
+				}
+				if(bbc.myposx>640)
+				{
+					//b.x-=1;
+					bbc.myposx=640;
+					mySimulatedVel.x*=-1;
+				}
+				if(bbc.myposy>480)
+				{
+					//b.y-=1;
+					bbc.myposy=480;
+					mySimulatedVel.y*=-1;
+				}
+				
+			}
 			for(int i=0; i<bbc.otherBots.size(); i ++)
 			{
 				Bot b=  bbc.otherBots.get(i);
@@ -1309,10 +1358,10 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						b.y+=simV.y;
 
 						
-						/*
+						
 						if(touching)
 						{
-							PVector l = new PVector(bx,by);
+							PVector l = new PVector(b.x,b.y);
 							PVector t = new PVector(touchX,touchY);
 							PVector d= PVector.sub(t,l);
 							d.normalize();
@@ -1321,7 +1370,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 						  simV.add(d);	
 						  simV.limit(2);
 						}
-						*/
+						
 						 
 
 						if(b.x<0)
@@ -1374,14 +1423,20 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 				
 				c.drawCircle(bx, by, 2.5f, blackpaint);
 				
+				
+				//int nv =  (int) map(bbc.neighborBound, 0, 640, 0, this.w);
+				//c.drawCircle(bx, by, nv, redPaintHighlight);
+				
 				if(bbc.myNeighbors.contains(b))
 				{
-					c.drawCircle(bx, by, 3.5f, redPaintHighlight);
+					c.drawCircle(bx, by, 3.0f, redPaintHighlight);
 				}
 				if(bbc.myExtendedNeighbors.contains(b))
 				{
-					c.drawCircle(cx, cy, 3.0f, coralPaint);
+					c.drawCircle(bx, by, 3.0f, coralPaint);
 				}
+				
+				
 				
 				
 			}
@@ -1525,9 +1580,32 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
 		//Log.d("onTouch","called");
+		
+		if(event.getAction() == MotionEvent.ACTION_MOVE)
+		{
+			float x = event.getX();
+			float y = event.getY();
+			
+			touching=true;
+			prevTouchX=touchX;
+			prevTouchY=touchY;
+			touchX=(int) x;
+			touchY=(int) y;
+			deltaTouchX=touchX-prevTouchX;
+			deltaTouchY=touchY-prevTouchY;
+			
+		}
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			float x = event.getX();
 			float y = event.getY();
+			
+			touching=true;
+			prevTouchX=touchX;
+			prevTouchY=touchY;
+			touchX=(int) x;
+			touchY=(int) y;
+			deltaTouchX=touchX-prevTouchX;
+			deltaTouchY=touchY-prevTouchY;
 			/*
 			 * Point point = new Point(); point.x = event.getX(); point.y =
 			 * event.getY(); point.vx = (float) (Math.random()-.5); point.vy =
@@ -1700,7 +1778,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			*/
 			
 			
-			/*
+			
 			if(thread.tempdown.inButton(x, y))
 			{
 			
@@ -1715,16 +1793,16 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			
 			if(thread.divup.inButton(x, y))
 			{
-				bbc.divUp();
+				bbc.divUpFloat();
 				thread.message.displayMessage("div: " + bbc.getDiv());
 			}
 			
 			if(thread.divdown.inButton(x, y))
 			{
-				bbc.divDown();
+				bbc.divDownFloat();
 				thread.message.displayMessage("div: " + bbc.getDiv());
 			}
-			*/
+			
 
 			return true;
 
@@ -1742,6 +1820,19 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 			
 			Log.d("robotfaceView", "motionUP: " + thread.robotTeeth.state);
 			this.thread.robotNose.pressed = false;
+			
+			float x = event.getX();
+			float y = event.getY();
+			prevTouchX=touchX;
+			prevTouchY=touchY;
+			touchX=(int) x;
+			touchY=(int) y;
+			deltaTouchX=touchX-prevTouchX;
+			deltaTouchY=touchY-prevTouchY;
+
+			touching=false;
+			
+			
 
 			return true;
 

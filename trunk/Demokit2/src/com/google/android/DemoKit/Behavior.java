@@ -115,6 +115,9 @@ public class Behavior extends Thread
 	public boolean rotateLeft;
 	public boolean rotateRight;
 
+	public boolean rotateTo;
+	public float orientationTarget;
+
 	float[] sacWeights;
 	private boolean breath1;
 	private boolean breath2;
@@ -173,44 +176,47 @@ public class Behavior extends Thread
 			{
 				orient();
 			}
-			if(wander)
-			{
 
-				Log.d("behavior", "wander");
-				if(boundaryReached())
-				{
-					//bbc.myBehavior.fullWander();
 
-					//if they get near a neigbhor?
-					if(!initWanderComplete)
-					{
-						initWander();
-						initWanderComplete=true;
-					}
-					wander();
-				}
-				else
-				{						
-					/*
-						////////////////////////////////////////
-						bbc.stop();
-						bbc.myBehavior.initWanderComplete=false;
-						//////////////////////////////////////////
-					 */
-
-					//slow down
-					//do forwardreal once
-					if(!bbc.myBehavior.avBoundFwdReal)
-					{
-						bbc.forwardReal();
-						avBoundFwdReal=!avBoundFwdReal;							
-					}
-
-					avoidBoundary();	
-
-				}
-
-			}
+			//			
+			//			if(wander)
+			//			{
+			//
+			//				Log.d("behavior", "wander");
+			//				if(boundaryReached())
+			//				{
+			//					//bbc.myBehavior.fullWander();
+			//
+			//					//if they get near a neigbhor?
+			//					if(!initWanderComplete)
+			//					{
+			//						initWander();
+			//						initWanderComplete=true;
+			//					}
+			//					wander();
+			//				}
+			//				else
+			//				{						
+			//					/*
+			//						////////////////////////////////////////
+			//						bbc.stop();
+			//						bbc.myBehavior.initWanderComplete=false;
+			//						//////////////////////////////////////////
+			//					 */
+			//
+			//					//slow down
+			//					//do forwardreal once
+			//					if(!bbc.myBehavior.avBoundFwdReal)
+			//					{
+			//						bbc.forwardReal();
+			//						avBoundFwdReal=!avBoundFwdReal;							
+			//					}
+			//
+			//					avoidBoundary();	
+			//
+			//				}
+			//
+			//			}
 
 			if(wanderDance)
 			{
@@ -297,6 +303,10 @@ public class Behavior extends Thread
 			}
 
 
+			if(this.rotateTo)
+			{
+				rotateTo();
+			}
 			if(move2Loc)
 			{
 				//Log.d("behavior", "move2Loc ");
@@ -442,6 +452,43 @@ public class Behavior extends Thread
 	}
 
 
+	public void rotateTo()
+	{
+		float currentangle = bbc.camang;
+		float ang = this.orientationTarget;
+
+		int angle1=(int)currentangle;
+		int angle2=(int)ang;
+
+		if(angle1<0)
+		{
+			angle1=360+angle1;
+		}
+		if(angle2<0)
+		{
+			angle2=360+angle2;
+		}	
+		bbc.modDistance=ModularDistance(angle1,angle2,360);
+		int result=ModularDistance2(angle1,angle2,360);
+
+		if(bbc.modDistance>10)
+		{
+			if(result==-1)
+			{
+				bbc.writeL((int) (128+20));
+				bbc.writeR((int) (128-20));
+			}
+			else
+			{
+				bbc.writeL((int) (128+20));
+				bbc.writeR((int) (128-20));
+			}
+		}
+		else
+		{
+			bbc.stop();			 
+		}
+	}
 
 
 	public PVector forwardVector() {
@@ -2067,13 +2114,48 @@ public class Behavior extends Thread
 		writeL(lbyte);
 		/////////////
 		 */
+
+
+
+		if( this.rotateTo)
+		{
+			if(bbc.modDistance>10)
+			{
+
+
+				if(result==-1)
+				{
+					bbc.writeL((int) (128+20));
+					bbc.writeR((int) (128-20));
+				}
+				else
+				{
+					bbc.writeL((int) (128+20));
+					bbc.writeR((int) (128-20));
+				}
+
+				
+			}
+			else
+			{
+				bbc.stop();
+			}
+			return;
+		}
+
 		if(System.currentTimeMillis()-vmtimer>vmInterval)
 		{
 			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
 			vmtimer=System.currentTimeMillis();
 		}
+
 		if(bbc.modDistance>10)
 		{
+
+
+
+
+
 			if(result==-1)
 			{
 				bbc.writeL((int) (128+20*v.mag()));
@@ -2087,7 +2169,15 @@ public class Behavior extends Thread
 		}
 		else
 		{
-			bbc.forwardReal();
+			//Log.d("forward real being called"," behavior dosteer2");
+			if(desiredVel.x==0 && desiredVel.y==0)
+			{
+				bbc.stop();
+			}
+			else
+			{
+				bbc.forwardReal();
+			}
 		}
 
 	}
@@ -2633,11 +2723,11 @@ public class Behavior extends Thread
 		evadeAvatar=b;
 
 	}
-	
+
 	public void doStop()
 	{
-		
-		
+
+
 		bbc.stop();
 		bbc.moveToLoc(false);
 		bbc.setWander(false);
@@ -2663,7 +2753,15 @@ public class Behavior extends Thread
 		setSeparation(false);
 		setAlignment(false);
 		setCohesion(false);
+
+		setRotate(false);
 		
+	}
+
+	public void setRotate(boolean b) {
+		// TODO Auto-generated method stub
+		this.rotateTo=b;
+
 	}
 
 }
