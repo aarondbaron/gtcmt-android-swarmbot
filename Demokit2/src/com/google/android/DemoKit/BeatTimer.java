@@ -2004,7 +2004,7 @@ public class BeatTimer extends Thread{
 						
 						//get circle target
 						PVector targ = new PVector();
-						if(bbc.myBehavior.formationType.equals("circle")||true)
+						if( true)//
 						{
 							PVector start = new PVector(640/2, 480/2);
 							float r=200;
@@ -2028,7 +2028,7 @@ public class BeatTimer extends Thread{
 						PVector loc = new PVector(bbc.myposx,bbc.myposy);
 						int thin = (int) bbc.map(PVector.dist(loc, targ),0,50,0,1);//every distance of 50 shift by 1
 						
-						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + thin)%bbc.mySong.numMeasures());
+						this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure + thin)%bbc.mySong.numMeasures()));
 						
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
 						
@@ -2038,7 +2038,7 @@ public class BeatTimer extends Thread{
 						
 						
 						PVector targ2 = new PVector();
-						if(bbc.myBehavior.formationType.equals("circle")||true)
+						if( true)
 						{
 							PVector start = new PVector(640/2, 480/2);
 							float r=200;
