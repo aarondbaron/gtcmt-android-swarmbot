@@ -246,6 +246,10 @@ public class BeatTimer extends Thread{
 						bbc.fillEuclid(bbc.numNeighbors*2+4, bbc.sfxrseq);
 						bbc.fillEuclid(bbc.numNeighbors*2+4, bbc.instrumentseq);
 						break;
+					case 222999: //extended neighbor
+						bbc.fillEuclid(bbc.myExtendedNeighbors.size()*2+4, bbc.sfxrseq);
+						bbc.fillEuclid(bbc.myExtendedNeighbors.size()*2+4, bbc.instrumentseq);
+						break;
 					case 3: //speed 
 
 						//temporary solution
@@ -1718,8 +1722,215 @@ public class BeatTimer extends Thread{
 
 
 						break;
+						
+					case 132: // gils v1 modified for rotate to an angle instead of stopping
+						
+						//timesLoop=4;
 
-					case 150:  //shift ...  based on angle
+						possibleNotes.clear();
+						possibleNotes.add(new Integer( bbc.myNote));
+						Vector nene = new Vector();
+
+						for (int i=0;i<bbc.otherBots.size();i++)
+						{
+							Bot b = (Bot) bbc.otherBots.get(i);
+							if(b.distToMe-20<bbc.neighborBound)//coudl be same thing as is neighbor
+							{
+								nene.add(b);
+								possibleNotes.add( new Integer(bbc.getFightSongNote(b.ID) ));
+							}	
+						}
+
+						
+						
+						//currentGilNeighbors=ne.size();
+						/*
+						if (currentGilNeighbors!=prevGilNeighbors)
+						{
+							noChangeNeighbors=false;
+
+							prevGilNeighbors=currentGilNeighbors;
+						}
+						else
+						{
+							noChangeNeighbors=true; 
+							//println("no change: " + noChangeNeighbors + " id:" + ID);
+						}
+						*/
+						
+						currentExtendedNeighbors = bbc.myExtendedNeighbors.size();
+						if (currentExtendedNeighbors!=prevExtendedNeighbors)
+						{
+							noChangeExtendedNeighbors=false;
+							prevExtendedNeighbors=currentExtendedNeighbors;
+						}
+						else
+						{
+							noChangeExtendedNeighbors=true; 
+							//println("no change: " + noChangeNeighbors + " id:" + ID);
+						}
+						
+
+						possibleMeasures= bbc.mySong.getMeasuresWithTheseNotes(possibleNotes);
+
+						if (gilSeparate)
+						{
+
+							bbc.myBehavior.setSeparation(true);
+							bbc.myBehavior.setWanderVector(true);
+							bbc.myBehavior.setRotate(false);
+
+
+							for (int i=0;i<nene.size();i++)
+							{
+								Bot b = (Bot) nene.get(i);
+								//bbc.myBehavior.evade(new PVector(b.x,b.y), false);
+							}
+
+							if (System.currentTimeMillis()-gilSeparateTimer>4000)
+							{
+
+								 
+								bbc.myBehavior.setSeparation(false);
+								gilSeparate=false;
+							}
+						}
+
+
+						if (!hasCompletedGils())
+						{
+							if (possibleMeasures.size()!=0 && myPlaySessionCount<timesLoop)
+							{
+								if(!gilSeparate)
+								{
+									//if(bbc.numNeighbors!=0)
+									if(nene.size()!=0)
+									{
+										//bbc.stop();
+										bbc.myBehavior.setRotate(true);
+										//bbc.myBehavior.doStop();
+										bbc.myBehavior.setSeparation(false);
+										bbc.moveToLoc(true);
+										bbc.targetx=bbc.myposx;
+										bbc.targety=bbc.myposy-100;
+									}
+									else
+									{
+										bbc.setWanderVector(true);
+										bbc.moveToLoc(false);
+										bbc.myBehavior.setRotate(false);
+										
+									}
+								}
+
+
+								currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
+								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure+generalMeasure%2)%possibleMeasures.size()  ) );
+								//currentMeasure  = (Measure) possibleMeasures.get( (int) (  (generalMeasure)%possibleMeasures.size()  ) );
+
+								bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+
+								if (!this.myPlayFlag)
+								{
+									myPlaySessionCount++;
+									myGeneralPlaySessionCount++;
+									this.myPlayFlag=true;
+								}
+							}
+							else///posibiles measures ==0 or playsessioncount>=timeslopps
+							{
+
+								if (possibleMeasures.size()==0)
+								{
+									bbc.myBehavior.setSeparation(true);
+									bbc.myBehavior.setWanderVector(true);
+									bbc.clearRhythm(bbc.sfxrseq);
+									bbc.clearRhythm(bbc.instrumentseq);
+									gilSeparate=true;
+									gilSeparateTimer=System.currentTimeMillis();
+								}
+								
+								if(this.myPlaySessionCount>=timesLoop)//??
+								{
+									
+								}
+
+								
+							}
+						}
+						else //has completed gils
+						{
+							bbc.doRhythmMove=true;
+							 
+							bbc.myBehavior.setWanderVector(false);
+							bbc.myBehavior.setSeparation(true);
+
+							currentMeasure = bbc.mySong.getMeasure((int) generalMeasure);
+							bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));						
+							
+
+							if (bbc.ID!=0)
+							{
+								
+								/*
+								Bot bbb= (Bot) bbc.otherBots.get(0);
+								//bbc.myBehavior.seek(new PVector(bbb.x, bbb.y));
+								bbc.targetx=bbb.x;
+								bbc.targety=bbb.y;
+								bbc.moveToLoc(true);
+								*/
+								
+								bbc.myBehavior.setFollowInLine(true);
+							}
+							else
+							{
+								//bbc.myBehavior.orbit(new PVector(640/2, 480/2), 200, true);
+								bbc.myBehavior.setOrbitCenter(true);
+								
+							}
+						}
+
+
+						// boolean noChangeNeighbors=true;   
+						//if (myPlaySessionCount>=timesLoop&&noChangeNeighbors)
+						if (myPlaySessionCount>=timesLoop&&noChangeExtendedNeighbors)
+						{
+							myBiggerPlaySessionCount++;
+							myPlaySessionCount=0;
+
+							gilSeparate=true;
+							gilSeparateTimer=System.currentTimeMillis();
+						}
+						else
+						{
+							//if (!noChangeNeighbors)
+							if (!noChangeExtendedNeighbors)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+
+
+						if (nene.size()==0 && !hasCompletedGils())
+						{
+							bbc.myBehavior.setWanderVector(true);
+							bbc.clearRhythm(bbc.sfxrseq);
+							bbc.clearRhythm(bbc.instrumentseq);
+
+							if (myPlaySessionCount<2)
+							{
+								myPlaySessionCount=0;
+							}
+						}
+
+
+
+						break;
+
+						
+						 
+
+					case 150:  //shift received sequence  based on angle
 
 						//boolean[] t = bbc.receivedSequence.clone();
 						int numdiv=6;
@@ -1740,7 +1951,7 @@ public class BeatTimer extends Thread{
 
 						break;
 
-					case 151:  //shift ... based on neighbors
+					case 151:  //shift received sequence based on neighbors
 
 						int perN=6;
 						int shiftneighbor=perN*bbc.numNeighbors;
@@ -1753,7 +1964,7 @@ public class BeatTimer extends Thread{
 
 						break;
 
-					case 152:  //shift ... based on speed
+					case 152:  //shift received sequence based on speed
 						
 						
 						
@@ -1764,9 +1975,9 @@ public class BeatTimer extends Thread{
 						
 						
 						
-						int songShiftAngle = (int) bbc.map(angle1,0,360,-bbc.mySong.numMeasures()/2,bbc.mySong.numMeasures()/2);
+						int songShiftAngle = (int) bbc.map(angle1,0,360,0,bbc.mySong.numMeasures()/2);
 
-						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + songShiftAngle)%bbc.mySong.numMeasures());
+						this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure + songShiftAngle)%bbc.mySong.numMeasures()));
 						 
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
 						
@@ -1776,9 +1987,10 @@ public class BeatTimer extends Thread{
 					case 154: //shift song measure based on (extended) neigbhor
 						
 
-						int songShiftNeighbor = (int) bbc.map(bbc.myExtendedNeighbors.size(),0,360,0,bbc.mySong.numMeasures()-1);
+						//int songShiftNeighbor = (int) bbc.map(bbc.myExtendedNeighbors.size(),0,bbc.otherBots.size(),0,bbc.mySong.numMeasures()/2);
 
-						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + songShiftNeighbor)%bbc.mySong.numMeasures());
+						//this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure + songShiftNeighbor)%bbc.mySong.numMeasures()));
+						this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure + bbc.myExtendedNeighbors.size())%bbc.mySong.numMeasures()));
 						 
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
 						
@@ -1792,7 +2004,7 @@ public class BeatTimer extends Thread{
 						
 						//get circle target
 						PVector targ = new PVector();
-						if(bbc.myBehavior.formationType.equals("circle"))
+						if(bbc.myBehavior.formationType.equals("circle")||true)
 						{
 							PVector start = new PVector(640/2, 480/2);
 							float r=200;
@@ -1814,11 +2026,69 @@ public class BeatTimer extends Thread{
 						}
 						
 						PVector loc = new PVector(bbc.myposx,bbc.myposy);
-						int thin = (int) bbc.map(PVector.dist(loc, targ),0,640,0,bbc.mySong.numMeasures());
+						int thin = (int) bbc.map(PVector.dist(loc, targ),0,50,0,1);//every distance of 50 shift by 1
 						
 						this.currentMeasure=bbc.mySong.getMeasure((generalIndex + thin)%bbc.mySong.numMeasures());
 						
 						bbc.setRhythm(currentMeasure.toBellRhythm(bbc.myNote));
+						
+						break;
+						
+					case 161: //fill euclid based on distance to circle target...
+						
+						
+						PVector targ2 = new PVector();
+						if(bbc.myBehavior.formationType.equals("circle")||true)
+						{
+							PVector start = new PVector(640/2, 480/2);
+							float r=200;
+
+							float frac=0;
+							if(bbc.usingController)
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size());
+							}
+							else
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+							}
+
+
+							float x = (float) (r*Math.sin( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							float y= (float) (-r*Math.cos( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							targ2 = new PVector(start.x+x, start.y+y);
+						}
+						
+						bbc.fillEuclidDist(targ2);
+						
+						/*
+						PVector loc2 = new PVector(bbc.myposx,bbc.myposy);
+						int thin2 = (int) bbc.map(PVector.dist(loc2, targ2),0,50,0,1);//every distance of 50 shift by 1
+						bbc.setRhythm(bbc.receivedSequence);
+						for(int i=0;i<thin2*6;i++)
+						{
+							bbc.shiftRhythmLeft(bbc.instrumentseq);
+							bbc.shiftRhythmLeft(bbc.sfxrseq);
+						}
+						*/
+						
+						break;
+						
+					case 162: //shift based on distance to target...
+						
+						break;
+						
+					case 163: //filleuclid based on distance to targetx targety
+						
+						PVector ttt = new PVector(bbc.targetx,bbc.targety);
+						bbc.fillEuclidDist(ttt);
+						
+						break;
+						
+					
+						
+					case 171: //  play according to song measure but embellish
+						
 						
 						break;
 						

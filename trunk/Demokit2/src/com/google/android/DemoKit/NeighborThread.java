@@ -3,6 +3,8 @@ package com.google.android.DemoKit;
 public class NeighborThread extends Thread{
 
 	BoeBotController bbc;
+	
+	
 	NeighborThread(BoeBotController bbc)
 	{
 		this.bbc=bbc;

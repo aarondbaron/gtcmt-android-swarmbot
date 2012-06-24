@@ -475,6 +475,11 @@ public class ClientCode implements OnClickListener{
 						bbc.useSFXR=!bbc.useSFXR;
 
 					}
+					if(line.contains("setSoundChoice"))
+					{
+						String test [] = line.split(",");
+						bbc.mActivity.aTest.soundChoice=Integer.parseInt(test[1]);
+					}
 					if(line.contains("useInstrument"))
 					{
 						bbc.useInstrument=!bbc.useInstrument;
@@ -772,7 +777,11 @@ public class ClientCode implements OnClickListener{
 						Log.d("LINE","rightmotor");
 						bbc.danceSequencer=false;
 					}
-					
+
+					if(line.contains("smooth"))
+					{
+						bbc.myBehavior.setSmooth(!bbc.myBehavior.smooth);
+					}
 					if(line.contains("rotateTo"))
 					{
 						String test [] = line.split(",");
@@ -786,7 +795,7 @@ public class ClientCode implements OnClickListener{
 							{
 								float i = Float.parseFloat(test[1]);
 								bbc.myBehavior.orientationTarget = i;
-								
+
 								bbc.myBehavior.setRotate(true);
 							}
 							else
@@ -799,21 +808,21 @@ public class ClientCode implements OnClickListener{
 									bbc.targety=y;
 									bbc.myBehavior.setRotate(true);
 									bbc.moveToLoc(true);
-									
+
 								}
-							
+
 							}
-							
+
 						}
-						
-						
+
+
 					}
-					
+
 					if(line.contains("doRhythmMove"))
 					{
 						bbc.doRhythmMove=!bbc.doRhythmMove;
 					}
-					
+
 					if(line.contains("divUp"))
 					{
 						bbc.divUpFloat();
@@ -962,14 +971,14 @@ public class ClientCode implements OnClickListener{
 						int song = (int) Float.parseFloat(test[1]);
 						bbc.chooseSong(song);
 					}
-					
+
 					if(line.contains("timesloop"))
 					{
 						String test [] = line.split(",");
 						int s = (int) Float.parseFloat(test[1]);
 						bbc.mActivity.beatTimer.timesLoop=s;
 					}
-					
+
 					if(line.contains("mapping"))
 					{
 						String test [] = line.split(",");
@@ -1297,6 +1306,27 @@ public class ClientCode implements OnClickListener{
 								//should we just make a move relative behavior?
 
 							}
+							if(code==9985)
+							{
+
+								if(test.length==3)
+								{
+									float ang = Float.parseFloat(test[2]);
+
+									bbc.targetx= (int) (bbc.myposx+ 100.0*Math.cos(ang));
+									bbc.targety= (int) (bbc.myposy+ 100.0*Math.sin(ang));
+
+									bbc.myBehavior.setRotate(true);
+									bbc.moveToLoc(true);
+								}
+								if(test.length==2)
+								{
+									bbc.moveToLoc(false);
+									bbc.myBehavior.setRotate(false);
+								}
+
+
+							}
 
 							if(code==995) //wander
 							{
@@ -1379,9 +1409,55 @@ public class ClientCode implements OnClickListener{
 										}
 									});
 								}
-								
-								
+
+
 							}//end code==801
+							if(code==755)
+							{
+								if(test.length==3)
+								{
+									int t = Integer.parseInt(test[2]);
+									if(t==1)
+									{
+										bbc.useSFXR=true;
+									}
+									else
+									{
+										bbc.useSFXR=false;
+									}
+								}
+							}
+							if(code==756)
+							{
+								if(test.length==3)
+								{
+									int t = Integer.parseInt(test[2]);
+									if(t==1)
+									{
+										bbc.useSong=true;
+									}
+									else
+									{
+										bbc.useSong=false;
+									}
+								}
+							}
+							if(code==7555)
+							{
+								Log.d("code received","7555");
+
+								int c = Integer.parseInt(test[2]);
+								bbc.mActivity.aTest.setSoundChoice(c);
+
+								handler.post(new Runnable() {
+									@Override
+									public void run() {
+										Toast.makeText(mActivity.getApplicationContext(), "soundchoice" + bbc.mActivity.aTest.soundChoice  , Toast.LENGTH_LONG).show();
+									}
+								});
+
+							}
+
 						}
 
 					}//end controller
@@ -1835,7 +1911,7 @@ public class ClientCode implements OnClickListener{
 				Thread cThread = new Thread(new ClientThread());
 				cThread.start();
 			}
-			
+
 			if(bbc!=null)
 			{
 				bbc.stop();
@@ -1874,7 +1950,7 @@ public class ClientCode implements OnClickListener{
 
 
 		bbc.directControl=false;
-		
+
 		bbc.myBehavior.setRotate(false);
 
 

@@ -74,6 +74,7 @@ public class Behavior extends Thread
 	public boolean wanderVector;
 	public boolean moveVector;
 	public boolean move2Loc;
+	public float move2LocWeight=1;
 	public boolean separation;
 	public boolean alignment;
 	public boolean cohesion;
@@ -124,6 +125,12 @@ public class Behavior extends Thread
 	private boolean evadeAvatar;
 	//private boolean followBot;
 
+	
+	public boolean smooth; 
+	public int smoothL,smoothR;
+	public int diffL,diffR;
+	
+	
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
 		this.mActivity=mActivity;
@@ -303,9 +310,9 @@ public class Behavior extends Thread
 			}
 
 
-			if(this.rotateTo)
+			if(rotateTo)
 			{
-				rotateTo();
+				//rotateTo();
 			}
 			if(move2Loc)
 			{
@@ -1841,6 +1848,7 @@ public class Behavior extends Thread
 	{
 		PVector d = new PVector(p.x-bbc.myposx,p.y-bbc.myposy);
 		d.limit(1.0f);
+		d.mult(this.move2LocWeight);
 		this.desiredVel.add(d);
 	}
 
@@ -2014,6 +2022,7 @@ public class Behavior extends Thread
 
 
 	//this did not work exaclty right...
+	/*
 	public void doSteer()
 	{
 		//look at current position, bearing, velocity
@@ -2044,14 +2053,7 @@ public class Behavior extends Thread
 		// now start to change motor speed to adjust to new 
 		// -1 means need to turn right
 		// 1 means need to turn left
-		/*
-		 * ///////////////
-		rbyte= 128-20;
-		writeR(rbyte);
-		lbyte= 128+20;
-		writeL(lbyte);
-		/////////////
-		 */
+		 
 		if(System.currentTimeMillis()-vmtimer>vmInterval)
 		{
 			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
@@ -2076,7 +2078,7 @@ public class Behavior extends Thread
 		}
 
 	}
-
+	 */
 
 	//currently working do steer.  it's hacky..but its alright. 
 	public void doSteer2()
@@ -2117,21 +2119,36 @@ public class Behavior extends Thread
 
 
 
-		if( this.rotateTo)
+		if(rotateTo)
 		{
-			if(bbc.modDistance>10)
+			if(bbc.modDistance>8)
 			{
 
 
 				if(result==-1)
 				{
-					bbc.writeL((int) (128+20));
-					bbc.writeR((int) (128-20));
+					//bbc.writeL((int) (128+20));
+					//bbc.writeR((int) (128-20));
+					
+					//bbc.rotRight();
+					
+					int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 148);
+					bbc.writeL(vv);
+					bbc.writeR(vv);
+					
 				}
 				else
 				{
-					bbc.writeL((int) (128+20));
-					bbc.writeR((int) (128-20));
+					//bbc.writeL((int) (128+20));
+					//bbc.writeR((int) (128-20));
+					
+					//bbc.rotLeft();
+					
+					
+					int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 108);
+					bbc.writeL(vv);
+					bbc.writeR(vv);
+					
 				}
 
 				
@@ -2148,23 +2165,68 @@ public class Behavior extends Thread
 			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
 			vmtimer=System.currentTimeMillis();
 		}
+		
+		if(smooth)
+		{
+			
+			if(desiredVel.x==0 && desiredVel.y==0)
+			{
+				bbc.stop();
+				return;
+			}
+			
+			if(result==-1)
+			{
+				int v2 = (int) bbc.map(bbc.modDistance,0,180,108,128+20);
+				
+				int dif=v2-smoothR;//just doing diff isn't enough..but what i it was accumulated
+				diffR+=dif;//might want to do percentage o it
+				//diffR+=Math.signum(dif);//this didn't work as well
+				//smoothR=v2;
+				smoothR+=diffR;
+				
+				smoothL=148;
+				
+				bbc.writeL(smoothL);
+				bbc.writeR(smoothR);
+				
+			}
+			else
+			{
+				int v1 = (int) bbc.map(bbc.modDistance,0,180,148,128-20);
+				//int v2 = (int) bbc.map(bbc.modDistance,0,180,128,108);
+				
+				int dif=v1-smoothL;
+				diffL+=dif; //might want to do percentage o it
+				//diffL+=Math.signum(dif);//this didn't work as well
+				//smoothL=v1;
+				smoothL+=diffL;
+				
+				smoothR=108;
+				
+				bbc.writeL(smoothL);
+				bbc.writeR(smoothR);
+			}
+			
+			return;
+		}
 
 		if(bbc.modDistance>10)
 		{
 
-
-
-
-
 			if(result==-1)
-			{
-				bbc.writeL((int) (128+20*v.mag()));
-				bbc.writeR((int) (128-20*v.mag()*.1f));
+			{		
+				
+					bbc.writeL((int) (128+20*v.mag()));
+					bbc.writeR((int) (128-20*v.mag()*.1f));			
+				
 			}
 			else
 			{
+				
 				bbc.writeL((int) (128+20*v.mag()*.1f));
 				bbc.writeR((int) (128-20*v.mag()));
+				
 			}
 		}
 		else
@@ -2220,6 +2282,45 @@ public class Behavior extends Thread
 
 		if(bbc.movementseq[bbc.currentIndex])
 		{
+			
+			if(rotateTo)
+			{
+				if(bbc.modDistance>8)
+				{
+
+
+					if(result==-1)
+					{
+						//bbc.writeL((int) (128+20));
+						//bbc.writeR((int) (128-20));
+						
+						//bbc.rotRight(); //255255
+						
+						int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 148);
+						bbc.writeL(vv);
+						bbc.writeR(vv);
+					}
+					else
+					{
+						//bbc.writeL((int) (128+20));
+						//bbc.writeR((int) (128-20));
+						
+						//bbc.rotLeft();//00
+						int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 108);
+						bbc.writeL(vv);//using 0 creates oscillations. 
+						bbc.writeR(vv);
+					}
+
+					
+				}
+				else
+				{
+					bbc.stop();
+				}
+				return;
+			}
+			
+			
 			if(bbc.modDistance>10)
 			{
 				if(result==-1)
@@ -2756,12 +2857,30 @@ public class Behavior extends Thread
 
 		setRotate(false);
 		
+		
+		this.move2LocWeight=1;
+		this.sacWeights[0]=1;
+		this.sacWeights[1]=1;
+		this.sacWeights[2]=1;
+		
 	}
 
 	public void setRotate(boolean b) {
 		// TODO Auto-generated method stub
 		this.rotateTo=b;
 
+	}
+
+	public void setSmooth(boolean b) {
+		// TODO Auto-generated method stub
+		
+		this.smooth=b;
+		
+	}
+	
+	public void setMove2Loc(boolean b)
+	{
+		this.move2Loc=b;
 	}
 
 }
