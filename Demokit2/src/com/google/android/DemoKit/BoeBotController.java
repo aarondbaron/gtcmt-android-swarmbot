@@ -178,6 +178,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public Vector<Bot> myNeighbors;
 	public Vector<Bot> myExtendedNeighbors;
 	public long extendedNeighborsTimer;
+	PVector neighborCentroid;
+	PVector extendedNeighborCentroid;
 	
 	
 	NeighborThread neighborThread;
@@ -322,6 +324,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		myNeighbors = new Vector<Bot>();
 		myExtendedNeighbors = new Vector<Bot>();
 		extendedNeighborsTimer = System.currentTimeMillis();
+		
+		neighborCentroid = new PVector();
+		extendedNeighborCentroid = new PVector();
 		
 		neighborThread = new NeighborThread(this);
 		neighborThread.start();
@@ -817,7 +822,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public void moveToLoc(boolean b)
 	{
 
-		mActivity.beatTimer.move2Loc=b;
+		mActivity.beatTimer.move2Loc=b;//might not need this anmore
 		myBehavior.move2Loc=b;
 	}
 
@@ -2018,7 +2023,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		 */
 
 		//distances
-
+		this.neighborCentroid.mult(0);
+		this.neighborCentroid.x=this.myposx;
+		this.neighborCentroid.y=this.myposy;
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 
@@ -2029,9 +2036,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 			b.distToMe=(float) dist;
 			//if( dist < neighborBound )	
+			
 			if(b.distToMe-20<neighborBound)
 			{
 				numNeighbors++;
+				
+				this.neighborCentroid.x+=b.x;
+				this.neighborCentroid.y+=b.y;
 
 				if (!myNeighbors.contains(b))
 				{
@@ -2071,6 +2082,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			
 			//b.getNeighbors();
 		}
+		
+		this.neighborCentroid.div(this.numNeighbors+1);
 		
 		
 		/*
@@ -2733,6 +2746,23 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 		return result;
+	}
+	
+	void fillEuclidDist(PVector p1)
+	{
+		//PVector p1 = new PVector(b.x,b.y);
+		PVector p2= new PVector(this.myposx,this.myposy);
+
+		float d = map(PVector.dist(p1, p2), 0, 50, 0,1);//every 50 pixels..add by 1
+		if (d<0)
+		{
+			d=0;
+		}
+		
+		this.fillEuclid((int) d+1, instrumentseq);
+		this.fillEuclid((int) d+1, sfxrseq);
+
+		 
 	}
 
 	void fillRhythmDist(Bot b)

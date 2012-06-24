@@ -28,6 +28,8 @@ public class AudioTest
 
 	BoeBotController bbc;
 
+	int soundChoice=1;
+
 	public AudioTest()
 	{
 
@@ -73,12 +75,12 @@ public class AudioTest
 
 
 
-							int ch=1;
-							switch(ch)
+							//int ch=1;
+							switch(soundChoice)
 							{
 							case 0: //sine
-							samples[i] = (float)Math.sin( angle );
-							break;
+								samples[i] = (float)Math.sin( angle );
+								break;
 							case 1: //square
 								samples[i] = (float) Math.signum(Math.sin( angle ));
 								break;
@@ -133,7 +135,7 @@ public class AudioTest
 								samples[i] = (float) (Math.sin(angle+thing2*Math.sin(angle)));
 								break;
 
-							default: ;
+							default: samples[i] = (float) Math.signum(Math.sin( angle ));
 							}
 
 							angle += increment;
@@ -223,7 +225,7 @@ public class AudioTest
 	{
 		this.frequency=frequency;
 	}
-	
+
 	public void setNote(int n)
 	{
 		this.angle=0;
@@ -524,10 +526,16 @@ public class AudioTest
 
 		return fp3;
 	}
+
+	public void setSoundChoice(int a)
+	{
+		soundChoice =a;
+	}
 	////////////////////////////////////////////////////////
 	public float map(float value, float istart, float istop, float ostart, float ostop) {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
+
 
 
 }
