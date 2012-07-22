@@ -298,6 +298,9 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						myID= Integer.parseInt(test[1]);
 						bbc.ID=myID;
+						
+						bbc.CN();
+						
 
 						////check other bots
 						for(int i=0;i<bbc.otherBots.size();i++)
@@ -313,6 +316,8 @@ public class ClientCode implements OnClickListener{
 
 						//bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
 						bbc.setMyNote(bbc.getFightSongNote(bbc.ID));
+						
+						bbc.neighborThread.sortBy("ID");
 
 						///
 						handler.post(new Runnable() {
@@ -323,6 +328,11 @@ public class ClientCode implements OnClickListener{
 						});
 
 
+					}
+					
+					if(line.contains("debugView"))
+					{
+						bbc.rfv.drawFace=!bbc.rfv.drawFace;
 					}
 
 					if(line.contains("setNComEnable"))
