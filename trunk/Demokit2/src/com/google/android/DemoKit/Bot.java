@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Vector;
 
 // a class for keeping track of other bots
-public class Bot
+public class Bot    
 {
 	int x, y;
 	int vx, vy;
@@ -103,7 +103,7 @@ public class Bot
 	    {
 	      Bot b = (Bot) bots.get(i);
 	      PVector bloc = new PVector(b.x,b.y);
-	      if (loc.dist(bloc)<bbc.neighborBound && !this.equals(b))
+	      if (loc.dist(bloc)<bbc.neighborBound && !(this.ID==b.ID))
 	      {
 
 	        numNeighbors++;
@@ -152,9 +152,21 @@ public class Bot
 				//return ext;
 			}
 		}
+		
+		//attempt
+		//ext.remove(this);
 
 		return new Vector(new LinkedHashSet(ext));
 	}
+
+	
+	/*
+	@Override
+	public int compareTo(Bot arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	*/
 	
 }
 

@@ -54,6 +54,22 @@ public class Measure
 		}
 		return b;
 	}
+	
+	Vector whichBotsShouldPlay()
+	{
+		this.uniqueNotes();
+		
+		return new Vector();
+	}
+	
+	Vector<Bot> offendingBots(Vector<Bot> bots)
+	{
+		Vector<Bot> res = new Vector();
+		//Bot res;
+		
+		return res;
+		
+	}
 
 	boolean contains(int note)
 	{
@@ -157,6 +173,31 @@ public class Measure
 
 		notes[notes.length - 1] = temp;
 	}
+	
+	void reverseMeasure()
+	{
+		int left  = 0;          // index of leftmost element
+	    int right = notes.length-1; // index of rightmost element
+
+	    while (left < right) {
+	      // exchange the left and right elements
+	      int temp = notes[left]; 
+	      notes[left]  = notes[right]; 
+	      notes[right] = temp;
+
+	      // move the bounds toward the center
+	      left++;
+	      right--;
+	    }
+		
+	}
+	
+	 Measure getReversedMeasure()
+	  {
+	    Measure m = new Measure(this);
+	    m.reverseMeasure();
+	   return m; 
+	  }
 	
 	
 	//Object clone()

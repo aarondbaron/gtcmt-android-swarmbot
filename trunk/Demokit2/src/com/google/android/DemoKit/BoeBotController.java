@@ -1,6 +1,6 @@
 package com.google.android.DemoKit;
 
- 
+
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -180,11 +180,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public long extendedNeighborsTimer;
 	PVector neighborCentroid;
 	PVector extendedNeighborCentroid;
-	
-	
+
+
 	NeighborThread neighborThread;
 	boolean allowedToCheck;
 
+	boolean p;
+	boolean cn=false;
 
 	public boolean isnComEnable() {
 		return nComEnable;
@@ -324,16 +326,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		myNeighbors = new Vector<Bot>();
 		myExtendedNeighbors = new Vector<Bot>();
 		extendedNeighborsTimer = System.currentTimeMillis();
-		
+
 		neighborCentroid = new PVector();
 		extendedNeighborCentroid = new PVector();
-		
+
 		neighborThread = new NeighborThread(this);
 		neighborThread.start();
-		
+
 		myposx=640/2;
 		myposy=480/2;
-		
+
 
 	}
 
@@ -2026,6 +2028,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.neighborCentroid.mult(0);
 		this.neighborCentroid.x=this.myposx;
 		this.neighborCentroid.y=this.myposy;
+		
+		//p=false;
 		for(int i =0 ; i < otherBots.size();i++)
 		{
 
@@ -2036,11 +2040,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 			b.distToMe=(float) dist;
 			//if( dist < neighborBound )	
-			
+
 			if(b.distToMe-20<neighborBound)
 			{
 				numNeighbors++;
-				
+
 				this.neighborCentroid.x+=b.x;
 				this.neighborCentroid.y+=b.y;
 
@@ -2077,36 +2081,47 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				b.isNeighbor=false;
 				myNeighbors.remove(b);
 			}
+
 			
-			
-			
+			///had to add this
+			if(b.ID==this.ID)
+			{
+				myNeighbors.remove(b);
+				//p=true;
+			}
+			if(this.numNeighbors!=myNeighbors.size())
+			{
+				p=true;
+			}
+
+
 			//b.getNeighbors();
 		}
-		
+
 		this.neighborCentroid.div(this.numNeighbors+1);
-		
-		
+
+
 		/*
 		if(System.currentTimeMillis()-this.extendedNeighborsTimer>250)
 		{
 			Bot b = new Bot(this.myposx,this.myposy,this);
 			this.myExtendedNeighbors=b.getExtendedNeighbors();
-			
+
 			//this.myExtendedNeighbors=getExtendedNeighbors();
 			this.resetQuery();
 			Log.d("bbc","extended neighbors");
 			this.extendedNeighborsTimer+=250;
 		}
-		*/
-		
+		 */
+
 
 
 	}
-	
+
 	public Vector<Bot> getExtendedNeighbors()
 	{
 
-		
+
 		Vector<Bot> ext = new Vector<Bot>();	
 		//ext.add(new Bot(bbc.myposx,bbc.myposy,bbc)); //do you need this?
 		for (int i=0;i<myNeighbors.size();i++)
@@ -2747,7 +2762,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		return result;
 	}
-	
+
 	void fillEuclidDist(PVector p1)
 	{
 		//PVector p1 = new PVector(b.x,b.y);
@@ -2758,11 +2773,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		{
 			d=0;
 		}
-		
+
 		this.fillEuclid((int) d+1, instrumentseq);
 		this.fillEuclid((int) d+1, sfxrseq);
 
-		 
+
 	}
 
 	void fillRhythmDist(Bot b)
@@ -3167,9 +3182,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.beatTimer.myPlaySessionCount=0;
 
 	}
-	
-	
-	
+
+
+
 	public void resetQuery()
 	{
 		for(int i=0;i<otherBots.size();i++)
@@ -3177,6 +3192,64 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			Bot b = otherBots.get(i);
 			b.queried=false;			
 		}		
+	}
+
+	public void fillDistributedEuclid() {
+		// TODO Auto-generated method stub
+
+		this.clearRhythm(this.instrumentseq);
+		this.clearRhythm(this.sfxrseq);
+		
+		//do this using extended neigbhors.
+
+		//using default ordering
+		if(this.myExtendedNeighbors.size()!=0)
+		{
+			boolean[] eu = this.euclidArray(this.myExtendedNeighbors.size()+1, this.SEQUENCERLENGTH);
+
+			/*
+			for(int i=0;i<myExtendedNeighbors.size();i++)
+			{
+
+			}
+			 */
+
+			int cnt=0;
+			for(int i=0;i<eu.length;i++)
+			{
+				if(eu[i])
+				{
+
+					if(cnt==this.ID)
+					{
+						this.fillPosition(i, this.instrumentseq);
+						this.fillPosition(i, this.sfxrseq);
+					}
+					cnt++;
+					if(cnt>myExtendedNeighbors.size()+1)
+					{
+						cnt=0;
+					}
+
+				}
+
+			}
+
+
+		}
+		else
+		{
+			this.fillPosition(0, this.instrumentseq);
+			this.fillPosition(0, this.sfxrseq);
+		}
+
+
+	}
+
+	public void CN() {
+		// TODO Auto-generated method stub
+		this.myNeighbors.clear();
+		this.myExtendedNeighbors.clear();
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.google.android.DemoKit;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Vector;
@@ -96,6 +97,10 @@ public class BeatTimer extends Thread{
 	public int completedGilsCount;
 	
 	public long gilTime;
+	
+	public Vector<Bot> tExtendedNeighbors;
+	
+	public long deTimer;
 
 
 	BeatTimer()
@@ -112,6 +117,7 @@ public class BeatTimer extends Thread{
 		currentMeasure = new Measure();
 		possibleMeasures = new Vector();
 		possibleNotes = new Vector();
+		tExtendedNeighbors = new Vector();
 		
 		gilTime=120*1000;
 	}
@@ -1928,6 +1934,73 @@ public class BeatTimer extends Thread{
 						break;
 
 						
+					case 133:
+						
+						
+						if(bbc.myExtendedNeighbors.size()==0)
+						{
+							bbc.myBehavior.setWanderVector(true);
+						}
+						else
+						{
+							
+						}
+						
+						break;
+						
+					case 134: //use extended neigbhors along with distributed euclid
+						
+						bbc.fillDistributedEuclid();
+						
+						boolean sameExtended =false;
+						if(tExtendedNeighbors.size()==bbc.myExtendedNeighbors.size())
+						{
+							sameExtended=true;
+						}
+						this.tExtendedNeighbors.clear();
+						this.tExtendedNeighbors.addAll(bbc.myExtendedNeighbors);
+						BotComparator bc = new BotComparator();
+						bc.compareBy("ID");
+						Collections.sort(tExtendedNeighbors,bc);
+						
+						if(tExtendedNeighbors.size()==0)
+						{
+							bbc.myBehavior.setWanderVector(true);
+						}
+						else
+						{
+							bbc.myBehavior.setWanderVector(false);
+						}
+						
+						if(sameExtended)
+						{
+							
+						}
+						else
+						{
+							deTimer = System.currentTimeMillis();
+						}
+						
+						if(deTimer-System.currentTimeMillis()>1000*5)
+						{
+							//bbc.myBehavior.setWanderVector(true);
+							deTimer=System.currentTimeMillis();
+						}
+						
+						
+						
+						
+						
+						
+						break;
+						
+						
+					case 135 :  // wander then follow in line according to 
+						
+						
+						
+						
+						break;
 						 
 
 					case 150:  //shift received sequence  based on angle
@@ -2085,6 +2158,92 @@ public class BeatTimer extends Thread{
 						
 						break;
 						
+					case 164://same rhythm, but only the correct notes when it reaches the targets of the circle or whatever target.
+						
+						//get circle target
+						PVector targ22 = new PVector();
+						if( true)//
+						{
+							PVector start = new PVector(640/2, 480/2);
+							float r=200;
+
+							float frac=0;
+							if(bbc.usingController)
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size());
+							}
+							else
+							{
+								frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+							}
+
+
+							float x = (float) (r*Math.sin( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							float y= (float) (-r*Math.cos( (float)(bbc.ID+bbc.myBehavior.formationOffset)*frac  ));
+							targ22 = new PVector(start.x+x, start.y+y);
+						}
+						
+						PVector loc22 = new PVector(bbc.myposx,bbc.myposy);
+						int thin22 = (int) bbc.map(PVector.dist(loc22, targ22),0,50,0,1);//every distance of 50 shift by 1
+						
+						this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure)%bbc.mySong.numMeasures()));
+						
+						bbc.setRhythm(currentMeasure.toBellRhythm( bbc.getFightSongNote( bbc.ID+ thin22%(bbc.otherBots.size()+1)  ))) ;
+						
+						break;
+					 
+					case 165:
+						
+						 //get circle target
+					    PVector target = new PVector();
+					    if ( true)//
+					    {
+					      PVector start = new PVector(640/2, 480/2);
+					      float r=150;
+
+
+
+					      float frac = (float)(2*Math.PI) / (bbc.otherBots.size()+1);
+					      float x = (float) (r*Math.sin( (float)(bbc.ID)*frac  ));
+					      float y= (float) (-r*Math.cos( (float)(bbc.ID)*frac  ));
+					      target = new PVector(start.x+x, start.y+y);
+					    }
+
+					    bbc.myBehavior.moveTo(target);
+					    ////////////
+					    PVector llc = new PVector(bbc.myposx,bbc.myposy);
+					    int th = (int) bbc.map(PVector.dist(llc, target), 0, 50, 0, 1);//every distance of 50 is 1
+					     
+					    if (th==0)
+					    {
+					      this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure)%bbc.mySong.numMeasures()));
+					      bbc.setRhythm(currentMeasure.toBellRhythm(bbc.getFightSongNote( bbc.ID  )));
+					    }
+					    else
+					    {
+					      this.currentMeasure=bbc.mySong.getMeasure((int) ((generalMeasure)%bbc.mySong.numMeasures()));
+
+					      LinkedHashSet un=currentMeasure.uniqueNotes();
+					      Vector vv = new Vector(un);
+					      
+					      boolean[] base = currentMeasure.toBellRhythm(bbc.getFightSongNote( bbc.ID  ));
+
+					      for (int i = 0;i < th;i++)
+					      {
+					        Integer ii = (Integer) vv.get(i%vv.size());
+
+					         boolean[] t = currentMeasure.toBellRhythm(ii.intValue());
+
+					        for (int m = 0; m < t.length;m ++)
+					        {
+					          base[m]= base[m] || t[m];
+					        }
+					      }
+					      bbc.setRhythm(base);
+					    }
+					    //////////////////
+						
+						break;
 					
 						
 					case 171: //  play according to song measure but embellish
