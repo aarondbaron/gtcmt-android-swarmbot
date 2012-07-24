@@ -704,6 +704,14 @@ public class Client implements OnClickListener{
 						String test [] = line.split(",");
 						bbc.neighborBound= Integer.parseInt(test[1]);
 					}
+					
+					if(line.contains("setTempo"))
+					{
+
+						String test [] = line.split(",");
+						mActivity.beatTimer.globalTimeInterval=Integer.parseInt(test[1]);
+						Log.d("client","setTempo"+ bbc.getTempo());
+					}
 
 
 					/*
@@ -1144,7 +1152,7 @@ public class Client implements OnClickListener{
 								if(bbc.allBots.size()==0)
 								{
 									Log.d("clientcode", "adding new bot: " + ID);
-									Bot newBot = new Bot();
+									Bot newBot = new Bot(bbc);
 									newBot.setPos(newx, newy);
 									newBot.camang=newang;
 									newBot.ID=ID;
@@ -1198,7 +1206,7 @@ public class Client implements OnClickListener{
 								if(cnew)
 								{
 									Log.d("clientcode", "new bot -- b.id!=id  " + ID);
-									Bot newBot = new Bot();
+									Bot newBot = new Bot(bbc);
 									if(!posLost)
 									{
 										newBot.setPos(newx, newy);

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+
 import gtcmtswarmbot.mobilecontrol.enums.ControllerCode;
 import gtcmtswarmbot.mobilecontrol.enums.Mapping;
 import android.app.Activity;
@@ -24,6 +25,8 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.WindowManager;
 
+
+ 
 
 import com.android.future.usb.UsbAccessory;
 import com.android.future.usb.UsbManager;
@@ -49,6 +52,11 @@ public class DemokitMobileControlActivity extends Activity {
 	long startTime;
 
 	boolean doTrackMenu;
+	
+	boolean useSFXR;
+	int changeSound;
+	
+	boolean useSong;
 
 
 	/** Called when the activity is first created. */
@@ -209,6 +217,13 @@ public class DemokitMobileControlActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 			// do something on back.
+			
+			if(this.drawView.thread.numberPick.show)
+			{
+				this.drawView.thread.numberPick.show=false;
+			    this.drawView.mode = prevMode;
+				return true;
+			}
 
 			if(this.drawView.thread.showSequencer)
 			{
@@ -246,6 +261,33 @@ public class DemokitMobileControlActivity extends Activity {
 		} else if (item.getTitle() == "Quit") {
 			finish();
 			System.exit(0);
+		}else if (item.getTitle() == "HitMode") {
+			this.drawView.mode="hitMode";
+		}else if (item.getTitle() == "UseSFXR") {
+			useSFXR=!useSFXR;
+			int t=0;
+			if(useSFXR)
+			{
+				t=1;
+			}
+			this.client.sendMessage("controller,"+ 755 + "," + t );
+		}else if (item.getTitle() == "UseSong") {
+			useSong=!useSong;
+			int t=0;
+			if(useSong)
+			{
+				t=1;
+			}
+			this.client.sendMessage("controller,"+ 756 + "," + t );
+		}else if (item.getTitle() == "ChangeSound") {
+			changeSound++;
+			 
+			if(changeSound>10)
+			{
+				changeSound=0;
+			}
+			this.client.sendMessage("controller,"+ 7555 + "," + changeSound );
+			
 		}else if (item.getTitle() == "StopAll") {
 			//mActivity.client.sendMessage("controller,"+ 999 + "," + xx + "," + yy) ;
 			drawView.mode="StopAll";
@@ -305,6 +347,8 @@ public class DemokitMobileControlActivity extends Activity {
 			this.drawView.mode="TugMove";
 		}else if (item.getTitle() == "AvatarMove") {
 			this.drawView.mode="AvatarMove";
+		}else if (item.getTitle() == "RotateToAngle") {
+			this.drawView.mode="RotateToAngle";
 		}else if (item.getTitle() == "followAvatar") {
 			this.client.sendMessage("controller,"+ 99879 );
 			this.drawView.mode="AvatarMove";
@@ -349,12 +393,27 @@ public class DemokitMobileControlActivity extends Activity {
 			}
 		}else if (item.getTitle() == "noMapping") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
+		}else if (item.getTitle() == "chooseNumber") {
+			
+			this.drawView.thread.numberPick.show=true;
+			Log.d("bringing up the nuberpick" ,"" + this.drawView.thread.numberPick.show );
+			
+			prevMode=drawView.mode;
+			drawView.mode="chooseNumber";
+			
+			//this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
 		}else if (item.getTitle() == "angle") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE.getMap());
 		}else if (item.getTitle() == "neighbor") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NEIGHBOR.getMap());
+		}else if (item.getTitle() == "extendedneighbor") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.EXTENDED_NEIGHBOR.getMap());
 		}else if (item.getTitle() == "speed") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.SPEED.getMap());
+		}else if (item.getTitle() == "disttarget") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.DISTANCE_TARGET.getMap());
+		}else if (item.getTitle() == "distcircletarget") {
+			this.client.sendMessage("controller,"+ 800 + "," + Mapping.DISTANCE_CIRCLETARGET.getMap());
 		}else if (item.getTitle() == "angle_embellish") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE_EMBELLISH.getMap());
 		}else if (item.getTitle() == "neighbor_embellish") {
@@ -369,14 +428,20 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.FIGHTSONG_NEIGHBOR.getMap());
 		}else if (item.getTitle() == "FightSong_Speed") {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.FIGHTSONG_SPEED.getMap());
+		}else if (item.getTitle() == "FightSong_Distance") {
+			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.FIGHTSONG_DISTANCE.getMap());
 		}else if (item.getTitle() == "Gil_V1") {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.GIL_V1.getMap());
 		}else if (item.getTitle() == "Gil_V2") {
 			this.client.sendMessage("controller,"+ ControllerCode.MAPPING.getCode() + "," + Mapping.GIL_V2.getMap());
 		}else if(item.getTitle() == "ToSongMaker")		{
 			this.drawView.thread.arenaSongmaker=true;
+			//prevMode=this.drawView.mode;
+			this.drawView.mode="";
 		}else if(item.getTitle() == "ToArena")		{
 			this.drawView.thread.arenaSongmaker=false;
+			//this.drawView.mode=prevMode;
+			this.drawView.mode="";
 		}else if(item.getTitle() == "Clear")		{
 			if(this.drawView.thread.arenaSongmaker)
 			{
@@ -569,6 +634,10 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Connect");
 		menu.add("Sync");		
 		menu.add("Inspect");
+		menu.add("UseSFXR");
+		menu.add("ChangeSound");
+		menu.add("UseSong");
+		menu.add("HitMode");
 		menu.add("Problem?");		
 		menu.add("Quit");
 
@@ -593,6 +662,7 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.clear();
 		SubMenu sub = menu.addSubMenu(0,1,0, "Music Mappings");
 		sub.add("noMapping");
+		sub.add("chooseNumber");
 		sub.add("FightSong_Angle");
 		sub.add("FightSong_Neighbor");
 		sub.add("FightSong_Speed");
@@ -601,7 +671,10 @@ public class DemokitMobileControlActivity extends Activity {
 		sub.add("broadcastSequence");
 		sub.add("angle");
 		sub.add("neighbor");
+		sub.add("extendedneighbor");
 		sub.add("speed");
+		sub.add("disttarget");
+		sub.add("distcircletarget");
 		sub.add("angle_embellish");
 		sub.add("neighbor_embellish");
 		sub.add("speed_embellish");
@@ -613,6 +686,7 @@ public class DemokitMobileControlActivity extends Activity {
 		sub2.add("AvatarMove");
 		sub2.add("Orbit");
 		sub2.add("Wander");
+		sub2.add("RotateToAngle");
 
 		sub2.add("ViewCursor");
 		sub2.add("Move");
@@ -662,6 +736,9 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Alignment");
 		menu.add("Cohesion");
 		 */
+		menu.add("UseSFXR");
+		menu.add("ChangeSound");
+		menu.add("UseSong");
 		menu.add("Problem?");		
 		menu.add("Quit");
 

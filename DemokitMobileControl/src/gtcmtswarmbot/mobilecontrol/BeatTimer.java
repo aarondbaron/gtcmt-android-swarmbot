@@ -59,7 +59,7 @@ public class BeatTimer extends Thread{
 	BeatTimer(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
 		this.mActivity= demokitMobileControlActivity;
-		globalTimeInterval=50;
+		globalTimeInterval=75;
 
 		this.bbc=mActivity.sc;
 
