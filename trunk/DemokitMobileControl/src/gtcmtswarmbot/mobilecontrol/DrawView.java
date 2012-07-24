@@ -3,16 +3,21 @@ package gtcmtswarmbot.mobilecontrol;
 
 
 
+import  gtcmtswarmbot.mobilecontrol.groupings.*;
+
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Vector;
 
 import gtcmtswarmbot.mobilecontrol.DrawView.Cursor;
+import gtcmtswarmbot.mobilecontrol.DrawView.NumberPick;
 import gtcmtswarmbot.mobilecontrol.enums.Mapping;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -58,6 +63,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 	boolean surfCreated;
 	boolean simulateVel;
 
+	Vector simulatedVels;
+
 	int screenWidth;
 	int screenHeight;
 
@@ -70,6 +77,12 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 	int selectedI,selectedJ;
 	long longTouchTimer;
+
+	List<List<String>> groupings;
+
+	public boolean doTraverse;
+	public long traverseTimer;
+	public long traverseInterval=500;
 
 	public DrawView(Context context, SomeController bbc) {
 		//super(context);
@@ -131,18 +144,29 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 		//thread.arena = new Arena(getWidth()/2, getHeight()/2,getWidth()/2-woff,getHeight()/2-hoff);		
 		thread.arena = new Arena(getWidth()/2, getHeight()/2, (int) ((getWidth()/2)/factor) ,(int)( getHeight()/2) );		
 		thread.sequencer = new Sequencer(this);
+		
+		
 
 		surfCreated=true;
 
 		thread.songMaker = new SongMaker(this);
+		
+		thread.numberPick = new NumberPick();
+
+
 
 		//doTest();
+		this.traverseTimer=System.currentTimeMillis();
+		this.doTraverse=false;
+
+
 
 
 	}
 
 	void doTest()
 	{
+		this.simulateVel=true;
 		/*
 		Bot testBot = new Bot();
 		testBot.x=640/4;
@@ -161,7 +185,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 		for(int i=0;i<8;i++)
 		{
-			Bot testBot = new Bot();
+			Bot testBot = new Bot(bbc);
 			testBot.x=(int) (Math.random()*640);
 			testBot.y=(int) (Math.random()*480);
 			testBot.ID=i;
@@ -169,8 +193,31 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			bbc.allBots.add(testBot);
 		}
 
-		simulateVel=true;
+		bbc.registry = new Vector<List<String>>();
+		for(int i=0;i<bbc.allBots.size();i++)
+		{
+			bbc.registry.add(new Vector<String>());
+		}
+
+
+		if(simulateVel)
+		{
+			simulatedVels = new Vector();
+			for(int i=0;i<bbc.allBots.size();i++)
+			{
+				PVector v = new PVector((float)Math.random(),(float)Math.random());
+				v.normalize();
+				v.mult(2);
+				simulatedVels.add(v);
+			}
+		}
+
+
 	}
+
+
+
+
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -205,7 +252,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 				initialTouchX=touchX;
 				initialTouchY=touchY;
 			}
-			
+
 			//Log.d("xy","touch:"+ touchX + "," + touchY+ " prevTouch:"+ prevTouchX + "," + prevTouchY+ " delta:"+ deltaTouchX + "," + deltaTouchY);
 
 			if(this.thread.arenaSongmaker)
@@ -213,45 +260,78 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 				float[] fff= thread.songMaker.g.pointInside(touchX,touchY);
 				int i =Math.round( fff[0]);
 				int j = Math.round( fff[1]);
-				if (i<0)
+				
+				if(i>thread.songMaker.g.gridVals.length)
 				{
-					i=0;
+					
 				}
-				if (i>thread.songMaker.g.ny-1)
+				else
 				{
-					i=thread.songMaker.g.ny-1;
-				}
-				if (j<0)
-				{
-					j=0;
-				}
-				if (j>thread.songMaker.g.nx-1)
-				{
-					j=thread.songMaker.g.nx-1;
-				}
-
-				selectedI=i;
-				selectedJ=j;
-
-
-				////
-				if (!this.thread.songMaker.trigValLock)
-				{
-					if (this.thread.songMaker.g.gridVals[i][j])
+					Log.d("coords","" + i + "," + j);
+					if (i<0)
 					{
-						this.thread.songMaker.trigVal=false;
-						this.thread.songMaker.trigValLock=true;
+						i=0;
 					}
-					else
+					if (i>thread.songMaker.g.ny-1)
 					{
-						this.thread.songMaker.trigVal=true;
-						this.thread.songMaker.trigValLock=true;
+						i=thread.songMaker.g.ny-1;
 					}
+					if (j<0)
+					{
+						j=0;
+					}
+					if (j>thread.songMaker.g.nx-1)
+					{
+						j=thread.songMaker.g.nx-1;
+					}
+					
+				
+
+					selectedI=i;
+					selectedJ=j;
+
+
+					////
+					if (!this.thread.songMaker.trigValLock)
+					{
+						if (this.thread.songMaker.g.gridVals[i][j])
+						{
+							this.thread.songMaker.trigVal=false;
+							this.thread.songMaker.trigValLock=true;
+						}
+						else
+						{
+							this.thread.songMaker.trigVal=true;
+							this.thread.songMaker.trigValLock=true;
+						}
+					}
+					this.thread.songMaker.g.setGridCell(i, j, this.thread.songMaker.trigVal);
 				}
-				this.thread.songMaker.g.setGridCell(i, j, this.thread.songMaker.trigVal);
+				
+				/*
+				float ff= thread.songMaker.cp.pointInside(touchX);
+				if(this.touchY>this.screenHeight/2 && this.touchY<screenHeight)
+				{
+					int c= (int) Math.round( ff );
+					if(c<thread.songMaker.cp.keyVals.size()&&c>0)
+					{
+						//Boolean b = (Boolean) thread.songMaker.cp.keyVals.get(c);
+						//b = new Boolean(true);
+					}
+					 
+					
+				}
+				*/
 
 
-
+			}
+			
+			if(this.mode.equals("hitMode"))
+			{
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					mActivity.client.sendMessage("controller,"+ 803 ) ;
+				}
 			}
 
 			if(mode.equals("drawn")||mode.equals("Path"))
@@ -297,6 +377,29 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 					tugMoveTimer = System.currentTimeMillis();
 				}
 			}
+			if(mode.equals("RotateToAngle"))
+			{
+				if(System.currentTimeMillis()-tugMoveTimer>125)
+				{
+					int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
+					int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
+					
+					float rx = thread.arena.cursor.x-getWidth()/2;
+					float ry = thread.arena.cursor.y-getHeight()/2;
+					
+					if(rx==0)
+					{
+						rx=.0000001f;
+					}
+					
+					float ang = (float) Math.atan2(ry, rx);
+					//ang = (float) Math.toDegrees(ang);
+					
+					mActivity.client.sendMessage("controller,"+ 9985 + "," + ang) ;
+					
+					tugMoveTimer = System.currentTimeMillis();
+				}
+			}
 
 			if(this.mode.equals("editSequencer"))
 			{
@@ -317,6 +420,8 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 			if(this.mode.equals("Inspect"))
 			{
+				
+				
 				for(int i=0;i<bbc.allBots.size();i++)
 				{
 					Bot b = (Bot) bbc.allBots.get(i);
@@ -389,6 +494,18 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			{
 				this.thread.songMaker.trigValLock=false;
 			}
+			
+			if(thread.numberPick.show)
+			{
+			thread.numberPick.bTimeInterval=thread.numberPick.startTime;
+			thread.numberPick.bTimer=System.currentTimeMillis();
+			
+				if(thread.numberPick.pick.isPressed)
+				{
+					thread.numberPick.pickit();
+				}
+			}
+			
 
 			thread.arena.fixCursor();
 
@@ -412,22 +529,21 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 					b.vibrateOnce=false;
 				}
 			}
+			
+			
 
 			if(this.mode.equals("TugMove"))
 			{
-				int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
-
-				int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
-
 				mActivity.client.sendMessage("controller,"+ 9988) ;
 			}
 			if(this.mode.equals("AvatarMove"))
 			{
-				int xx = (int) map(thread.arena.cursor.x,thread.arena.leftx,thread.arena.rightx,0,640);
-
-				int yy = (int) map(thread.arena.cursor.y,thread.arena.topy,thread.arena.bottomy,0,480);
-
 				mActivity.client.sendMessage("controller,"+ 9987) ;
+			}
+			
+			if(mode.equals("RotateToAngle"))
+			{
+				mActivity.client.sendMessage("controller,"+ 9985 ) ;	 
 			}
 
 			if(this.mode.equals("drawn"))
@@ -519,6 +635,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 	class DrawViewThread extends Thread {
 
+		public NumberPick numberPick;
 		public Sequencer sequencer;
 		private SurfaceHolder mSurfaceHolder;
 		private Handler mHandler;
@@ -575,7 +692,11 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 							songMaker.run(c);
 							//Log.d("drawview","songmker running");
 						}
-
+						
+						if(numberPick.show)
+						{
+							numberPick.run(c);
+						}
 
 						if(showSequencer)
 						{
@@ -689,6 +810,48 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 		void update()
 		{
 
+			if(doTraverse)
+			{
+				if(System.currentTimeMillis()-traverseTimer>traverseInterval)
+				{
+					traverseTimer+=traverseInterval;
+
+					for(int i=0;i<bbc.allBots.size();i++)
+					{
+						Bot b = (Bot) bbc.allBots.get(i);
+
+						bbc.registry.get(i).clear();
+						for(int j=0;j<bbc.allBots.size();j++)
+						{
+							Bot b2= (Bot) bbc.allBots.get(j);
+							PVector p1 = new PVector(b.x,b.y);
+							PVector p2 = new PVector( b2.x,b2.y);
+							if(p1.dist(p2) -20<bbc.neighborBound)
+							{
+								bbc.registry.get(i).add("" + b2.ID);					
+							}
+						}
+
+						groupings = Traverse.getGroupings(bbc.registry);
+
+					}
+				}
+			}
+			/*
+			List<List<String>> registry = new Vector<List<String>>();
+			for(int i=0;i<bbc.allBots.size();i++)
+			{
+				registry.add(new Vector<String>());
+			}
+			 */
+			/*
+			registry.add(new Vector<String>());
+			registry.add(new Vector<String>());
+			registry.add(new Vector<String>());
+			registry.add(new Vector<String>());
+			registry.add(new Vector<String>());
+			 */
+
 		}
 
 		void render(Canvas c)
@@ -725,17 +888,71 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 					}
 					c.drawCircle(cursor.x, cursor.y, cursor.sz, redPaintHighlight);
 				}
+				
+				if(mode.equals("RotateToAngle")&& touching)
+				{
+					c.drawLine(getWidth()/2, getHeight()/2, cursor.x, cursor.y, redPaintHighlight);
+				}
 			}
 
 			//bbc.numberOfNeigbhors();
 
+			///////////////////////
+			if(groupings!=null)
+			{
+				if(doTraverse)
+				{
+					for(int i = 0; i < groupings.size(); i++){
+						System.out.print(i + ": ");
+						for(int j = 0; j < groupings.get(i).size(); j++){
+							//System.out.print(groupings.get(i).get(j) + " ");
+							String s = groupings.get(i).get(j);
+
+							Bot t= (Bot) bbc.allBots.get(Integer.parseInt(s));
+							int tx=(int) map(t.x,0,640,this.leftx,this.rightx);
+							int ty=(int) map(t.y,0,480,this.topy,this.bottomy);
+
+							Paint p = new Paint();
+							p.setColor(Color.rgb(i*25+30, i*25+25, 200));
+							c.drawCircle(tx, ty, 20, p);
+						}
+						//System.out.println();
+					}
+				}
+			}
+
+			/////////////////////
 			for(int i=0; i<bbc.allBots.size(); i ++)
 			{
 				Bot b= (Bot) bbc.allBots.get(i);
 
-				if(simulateVel)
-				{
+				int bx=(int) map(b.x,0,640,leftx,rightx);
+				int by=(int) map(b.y,0,480,topy,bottomy);
 
+
+				if(simulateVel && simulatedVels!=null)
+				{
+					//Log.d("","did it get");
+
+
+
+					PVector simV = (PVector) simulatedVels.get(i);
+					b.x+=simV.x;
+					b.y+=simV.y;
+
+
+					if(touching)
+					{
+						PVector l = new PVector(bx,by);
+						PVector t = new PVector(touchX,touchY);
+						PVector d= PVector.sub(t,l);
+						d.normalize();
+						d.mult(1);
+
+						simV.add(d);	
+						simV.limit(2);
+					}
+					/*
 					if(Math.random()<.5)
 					{
 						b.x+=1;
@@ -752,28 +969,39 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 					{
 						b.y-=1;
 					}
+
+					 */
 
 					if(b.x<0)
 					{
-						b.x+=1;
+						b.x=0;
+						simV.x*=-1;
 					}
 					if(b.y<0)
 					{
-						b.y+=1;
+						//b.y+=1;
+						b.y=0;
+						simV.y*=-1;
 					}
 					if(b.x>640)
 					{
-						b.x-=1;
+						//b.x-=1;
+						b.x=640;
+						simV.x*=-1;
 					}
 					if(b.y>480)
 					{
-						b.y-=1;
+						//b.y-=1;
+						b.y=480;
+						simV.y*=-1;
 					}
+
 
 				}
 
-				int bx=(int) map(b.x,0,640,leftx,rightx);
-				int by=(int) map(b.y,0,480,topy,bottomy);
+
+
+
 				if(bx<leftx)
 				{
 					bx=leftx;
@@ -819,9 +1047,55 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 
 
+				/////////////
+				b.getNeighbors();
+				b.extendedNeighbors=b.getExtendedNeighbors();
+				bbc.resetQuery();
+
 				//////////////////////////////////
 
 				PVector p1 = new PVector(b.x,b.y);
+
+				for(int m=0;m<b.neighbors.size();m++)
+				{
+					Bot b2 = (Bot) b.neighbors.get(m);
+					PVector p2 = new PVector(b2.x,b2.y);
+					float d = PVector.dist(p1, p2);	
+					int b2x=(int) map(b2.x,0,640,leftx,rightx);
+					int b2y=(int) map(b2.y,0,480,topy,bottomy);
+					if(d< (bbc.neighborBound +20) && d>bbc.neighborBound)
+					{
+						c.drawLine(bx, by, b2x, b2y, yellowPaint);
+					}
+					else
+					{
+						c.drawLine(bx, by, b2x, b2y, redPaintHighlight);
+					}
+
+
+
+
+				}
+
+
+				if(b.ID==0)
+				{
+					int b1x=(int) map(b.x,0,640,leftx,rightx);
+					int b1y=(int) map(b.y,0,480,topy,bottomy);
+					c.drawCircle(b1x, b1y, 10, blackPaint); 
+					for(int m=0;m<b.extendedNeighbors.size();m++)
+					{
+						Bot b2 = (Bot) b.extendedNeighbors.get(m);
+						PVector p2 = new PVector(b2.x,b2.y);
+
+						int b2x=(int) map(b2.x,0,640,leftx,rightx);
+						int b2y=(int) map(b2.y,0,480,topy,bottomy);
+						c.drawCircle(b2x, b2y, 10, blackPaint); 
+
+					}
+				}
+
+				/*
 				b.numN=0;
 				for(int j=0;j<bbc.allBots.size();j++)
 				{
@@ -846,13 +1120,14 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 
 					}
 				}
+				 */
 
 				/////////////////////////////////
 
 
 				c.drawText("" + b.ID, bx, by+10, whitePaintText);
-				c.drawText("" + b.numN, bx, by+35, blackPaintText);
-
+				c.drawText("" + b.numNeighbors, bx, by+35, blackPaintText);
+				c.drawText("ex:" + b.extendedNeighbors.size(), bx, by+70, blackPaintText);
 
 			}
 
@@ -933,7 +1208,7 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 			{
 				Log.d("onlongclick","it worked: " + dist);
 				//this.mActivity.makeTrackMenu();
-				
+
 				//this.mActivity.openContextMenu(this);
 				this.mActivity.doTrackMenu=true;				
 				this.mActivity.openOptionsMenu();
@@ -952,6 +1227,203 @@ public class DrawView extends SurfaceView implements OnTouchListener , SurfaceHo
 	}
 	 */
 
+
+
+	class NumberPick
+	{
+		public boolean show;
+		public long startTime=250;
+		public long minTime=25;
+		int number;
+		Button bup,bdown, pick;
+
+		long bTimer;
+		//long startTime=250;
+		long bTimeInterval=startTime;
+		
+		
+		PVector l;
+
+		NumberPick()
+		{
+			bup = new Button();
+			bup.msg="+";
+			bdown = new Button();
+			bdown.msg="-";
+			
+			
+//			bup.loc.x=getWidth()/2-bup.sz;
+//			bup.loc.y=getHeight()-bup.sz;
+//			
+//			bdown.loc.x=getWidth()/2+bdown.sz;
+//			bdown.loc.y=getHeight()-bdown.sz;
+			l = new PVector();
+			l.x = getWidth()/2;
+			l.y=getHeight()/2;
+			bup.loc.x=l.x+bup.sz;
+			bup.loc.y=l.y-bup.sz;
+			
+			bdown.loc.x=l.x-bdown.sz;
+			bdown.loc.y=l.y-bdown.sz;
+			
+			bTimer=System.currentTimeMillis();
+			
+			pick = new Button();
+			pick.loc.x=l.x;
+			pick.loc.y=l.y+ pick.sz;
+			pick.msg="pick";
+			
+
+		}
+
+		public void pickit() {
+			// TODO Auto-generated method stub
+			show=false;
+			mActivity.client.sendMessage("controller,"+ 800 + "," + this.number);
+			Log.d("sending map","" + this.number);
+			mode= mActivity.prevMode;
+			Log.d("returning to mode","" + mode);
+			
+		}
+
+		void run(Canvas c)
+		{
+			
+			
+			update();
+			render(c);
+			
+			bup.run(c);
+			bdown.run(c);
+			pick.run(c);
+
+		}
+		void update()
+		{
+			if(bup.isPressed)
+			{
+				if(System.currentTimeMillis()-bTimer>bTimeInterval)
+				{
+					number++;
+					if(bTimeInterval>minTime)
+					{
+						bTimeInterval-=10;
+					}
+					bTimer=System.currentTimeMillis();
+				}
+			}
+			if(bdown.isPressed)
+			{
+				if(System.currentTimeMillis()-bTimer>bTimeInterval)
+				{
+
+
+					if(number>0)
+					{
+						number--;
+					}
+					if(number<0)
+					{
+						number=0;
+					}
+					
+					if(bTimeInterval>minTime)
+					{
+						bTimeInterval-=10;
+					}
+					//bTimer+=bTimeInterval;
+					bTimer=System.currentTimeMillis();
+				}
+			}
+			
+			if(pick.isPressed)
+			{
+				
+			}
+			
+			/*
+			if(!bup.isPressed && !bdown.isPressed)
+			{
+				bTimeInterval=starTime;
+				System.currentTimeMillis();
+			}
+			*/
+		}
+		void render(Canvas c)
+		{
+			c.drawText("" + number, l.x, l.y, whitePaintText);
+		}
+
+		class Button
+		{
+
+			Paint pressedColor,notPressedColor;
+			String msg;
+			PVector loc;
+			boolean isPressed;
+
+			int sz=100;
+
+			//long pressedTimer;
+			
+			Rect r;
+
+			Button()
+			{
+				pressedColor = new Paint();
+				pressedColor.setColor(Color.RED);
+				notPressedColor = new Paint();
+				notPressedColor.setColor(Color.WHITE);
+				msg="";
+
+				loc = new PVector();
+				
+				r = new Rect();
+			}
+
+			void run(Canvas c)
+			{
+				update();
+				render(c);
+
+			}
+
+
+			void update()
+			{
+				boolean c1=(touchX<loc.x+sz/2 && touchX >loc.x-sz/2);
+				boolean c2 = (touchY<loc.y+sz/2 && touchY >loc.y-sz/2);
+				if(c1&&c2&&touching)
+				{
+					isPressed=true;
+					//pressedTimer =System.currentTimeMillis();
+
+				}
+				else
+				{
+					isPressed=false;
+				}
+				
+				r.set((int) (loc.x-sz/2) , (int) (loc.y-sz/2), (int) (loc.x+sz/2), (int)  (loc.y+sz/2));
+			}
+
+			void render(Canvas c)
+			{
+				if(isPressed)
+				{
+					c.drawRect(r, pressedColor);
+				}
+				else
+				{
+					c.drawRect(r, notPressedColor);
+				}
+				
+				c.drawText(msg, loc.x, loc.y, blackPaintText);
+					
+			}
+		}
+
+	}
 
 
 }

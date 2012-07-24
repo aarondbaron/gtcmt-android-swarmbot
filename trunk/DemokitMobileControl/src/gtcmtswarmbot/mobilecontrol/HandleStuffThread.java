@@ -34,6 +34,18 @@ public class HandleStuffThread extends Thread{
 				
 				boolean[] b = vals[count];
 				
+				if(b.length== this.mActivity.drawView.thread.songMaker.TRUELENGTH/2)
+				{
+					boolean[] b2 = new boolean[b.length*2];
+					
+					for(int i=0;i<b.length;i++)
+					{
+						b2[i*2]=b[i];
+					}
+					
+					b=b2;
+				}
+				
 				String s = this.mActivity.drawView.bbc.patternToString(b);
 				Log.d("","count: " + count + ", " + s);
 				//

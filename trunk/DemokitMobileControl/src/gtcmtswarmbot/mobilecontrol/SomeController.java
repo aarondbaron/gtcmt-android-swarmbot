@@ -1,5 +1,6 @@
 package gtcmtswarmbot.mobilecontrol;
 
+import java.util.List;
 import java.util.Vector;
 
 import android.util.Log;
@@ -36,6 +37,9 @@ public class SomeController {
 	long logTimer;
 	public int[] MSDeg;
 	
+	
+	List<List<String>> registry;
+	
 	SomeController(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
 		
@@ -64,6 +68,9 @@ public class SomeController {
 		MSDeg[6]=11;
 		MSDeg[7]=12;
 		
+		
+		
+		registry = new Vector<List<String>>();
 	}
 
 	public void resetIndex() {
@@ -484,6 +491,12 @@ public class SomeController {
 		//Log.d("dfdf","");
 		
 	}
+	
+	
+	public void doNeighborhood()
+	{
+		
+	}
 
 	 
 	public int getMSDegree(int n)
@@ -533,6 +546,22 @@ public class SomeController {
 		}
 		
 	   return res;
+	}
+	
+	
+	public void resetQuery()
+	{
+		for(int i=0;i<allBots.size();i++)
+		{
+			Bot b = (Bot)allBots.get(i);
+			b.queried=false;			
+		}		
+	}
+	
+	
+	public long getTempo()
+	{
+		return mActivity.beatTimer.globalTimeInterval;
 	}
 	
 	

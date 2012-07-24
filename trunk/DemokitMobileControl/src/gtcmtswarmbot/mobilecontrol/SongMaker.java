@@ -18,6 +18,8 @@ public class SongMaker {
 	Scroll scroll;
 	
 	int TRUELENGTH=48;
+	
+	CarillonPlayer cp;
 
 	SongMaker(DrawView myDrawView)
 	{
@@ -48,6 +50,8 @@ public class SongMaker {
 		g = new Grid();
 		
 		scroll= new Scroll();
+		
+		cp = new CarillonPlayer(v);
 	}
 
 	void run(Canvas c)
@@ -55,6 +59,8 @@ public class SongMaker {
 		g.run(c);
 		update();
 		render(c);
+		
+		cp.run(c);
 	}
 
 	void update()
@@ -71,7 +77,7 @@ public class SongMaker {
 
 	class Grid
 	{
-		int nx=48;
+		int nx=TRUELENGTH/2;
 		int ny=8;
 		int width,height;
 		float sz=width/ (float) nx ;
