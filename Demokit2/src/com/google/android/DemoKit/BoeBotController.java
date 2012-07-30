@@ -171,6 +171,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	int servo3;
 
 	Song mySong;
+	Song createdSong;
+	Measure receivedMeasure;
 
 	public boolean doRhythmMove;
 
@@ -482,6 +484,8 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean usingController;
 	public boolean headMove;
 	public boolean useInstrument=true;
+	public boolean userPlayed;
+	public boolean recordSequence;
 
 
 	/////??
@@ -923,6 +927,64 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
 				mCommandTarget4, 0 );
 		 */
+
+	}
+
+	public void userPlay()
+	{
+		this.userPlayed=true;
+		new Thread(
+				new Runnable() {
+					public void run() {
+						try {
+							//Thread.sleep(10 * 1000);
+							
+							
+							
+							////////////////////
+							rfv.doJiggle();
+							rfv.doJiggleBigger();
+							////////////////////
+							mActivity.aTest.soundType(7);
+							mActivity.aTest.replay();
+
+							if(!useSong)
+							{
+								mActivity.aTest.setNote(myNote);
+							}
+							else
+							{
+								mActivity.aTest.setNote(mActivity.beatTimer.currentMeasure.notes[currentIndex]);
+								//mActivity.aTest.properIncrement();
+							}
+							mActivity.aTest.properIncrement();
+							///////////////////
+
+							byte instr1=0;
+							mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
+									instr1, (byte) 255);
+							long tmer=System.currentTimeMillis();
+
+							boolean hit=true;
+
+							while(hit)
+							{
+								if(System.currentTimeMillis()-tmer>mActivity.beatTimer.globalTimeInterval/2 )
+								{
+									mActivity.sendCommand(DemoKitActivity.RELAY_COMMAND,
+											instr1, (byte) 0);
+									hit=false;
+								}
+							}
+
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+					}
+				}).start();
+
 
 	}
 
@@ -2028,7 +2090,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.neighborCentroid.mult(0);
 		this.neighborCentroid.x=this.myposx;
 		this.neighborCentroid.y=this.myposy;
-		
+
 		//p=false;
 		for(int i =0 ; i < otherBots.size();i++)
 		{
@@ -2082,7 +2144,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 				myNeighbors.remove(b);
 			}
 
-			
+
 			///had to add this
 			if(b.ID==this.ID)
 			{
@@ -3199,7 +3261,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 		this.clearRhythm(this.instrumentseq);
 		this.clearRhythm(this.sfxrseq);
-		
+
 		//do this using extended neigbhors.
 
 		//using default ordering
@@ -3251,5 +3313,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		this.myNeighbors.clear();
 		this.myExtendedNeighbors.clear();
 	}
+	
+	
+	public void createSong()
+	{
+		createdSong = new Song();
+	}
+	
+	public void shareMeasure(Measure m, Bot b)
+	{
+		 mActivity.client.sendMessage2(this.notesToString(m.notes));		
+	}
+	
+	
 
 }

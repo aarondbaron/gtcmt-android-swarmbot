@@ -2251,6 +2251,20 @@ public class BeatTimer extends Thread{
 						
 						break;
 						
+					case 180: //christopher michaud's idea
+						/*
+						 * -Users Store patterns (could also do this with carillon)
+						 * -Robots play individual patterns at different times based on location
+						 * -As robots collide or move together, patterns begin to join and movements become united
+						 * -----expansion--- if two robots get near each other...lets say that they have only one partner and look at each other
+						 * -----expansion--- this means that any other robot that comes near, will have to ask the state of the one its near..and avoid if they are in the processs of sharing.
+						 * -Robots introduce some stochastic variations on the patterns or work through a fugue like setting.
+						 * -Program combines patterns into one long passage
+						 * -Robots play passage in unison to end the composition and performance.						 * 
+						 */
+						
+						break;
+						
 					case 199: 
 
 
@@ -2435,7 +2449,10 @@ public class BeatTimer extends Thread{
 						test=false;
 						if(bbc.useInstrument)
 						{
-							bbc.playInstrument();
+							if(!bbc.userPlayed)
+							{
+								bbc.playInstrument();
+							}
 						}
 						bbc.rfv.doJiggle();
 						bbc.rfv.doJiggleBigger();
@@ -2491,7 +2508,10 @@ public class BeatTimer extends Thread{
 				{
 					if(bbc.sequencerMode)
 					{
-						bbc.stopInstrument();
+						if(!bbc.userPlayed)
+						{
+							bbc.stopInstrument();
+						}
 					}
 					else
 					{
@@ -2543,6 +2563,8 @@ public class BeatTimer extends Thread{
 
 				bbc.findOnce=false;
 				this.myPlayFlag=false;
+				
+				bbc.userPlayed=false;
 
 				if(hasCompletedGils())
 				{
