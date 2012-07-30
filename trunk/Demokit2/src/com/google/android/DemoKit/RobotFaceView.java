@@ -1759,6 +1759,7 @@ SurfaceHolder.Callback, Runnable {
 					+ Math.pow(y - thread.robotNose.y, 2));
 			if (f < thread.robotNose.sz) {
 				bbc.setMapping(0);
+				bbc.userPlay();
 				bbc.instrumentseq[bbc.currentIndex] = !bbc.instrumentseq[bbc.currentIndex];
 				bbc.sfxrseq[bbc.currentIndex] = !bbc.sfxrseq[bbc.currentIndex];
 				Log.d("robotfaceView", "f: " + f);

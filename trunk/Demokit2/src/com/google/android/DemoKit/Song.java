@@ -915,3 +915,62 @@ class HalfFightSong extends FightSong
 }
 
 
+class Kuku extends Song
+{
+	int[][] kuku;
+	
+	Kuku()
+	{
+		initializeKuku();
+		dchoice();
+	}
+	
+	void initializeKuku()
+	{
+		int[] d0= new int[] {      
+				0, 2, 3, 5, 7, 8, 10, 11, 12
+		};
+		int[] d1= new int[] {
+				0, 4, 8, 10, 12, 13
+		};
+		int[] d2= new int[] {
+				0, 2, 3, 6, 8, 10, 11, 14
+		};
+		int[] d3= new int[] {
+				0, 1, 3, 4, 5, 6, 8, 9, 11, 12, 13, 14
+		};
+
+		kuku = new int[4][];
+		kuku[0]=d0;
+		kuku[1]=d1;
+		kuku[2]=d2;
+		kuku[3]=d3;
+
+		dchoice();
+	}
+	void dchoice()
+	{
+		int d=this.SEQUENCERLENGTH/16;
+
+		for (int k=0;k<kuku.length;k++)
+		{
+			for (int i=0;i<kuku[k].length;i++)
+			{
+				kuku[k][i]=kuku[k][i]*d;
+			}
+		}
+	}
+}
+
+class Orff
+{
+	
+	Orff()
+	{
+		
+	}
+	
+	
+}
+
+

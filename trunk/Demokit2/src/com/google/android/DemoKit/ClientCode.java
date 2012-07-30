@@ -1110,6 +1110,11 @@ public class ClientCode implements OnClickListener{
 						bbc.myBehavior.setWanderVector(true);
 						bbc.myBehavior.setSeparation(true);
 					}
+					if(line.contains("hitNow"))
+					{
+						//bbc.mActivity.beatTimer;
+						bbc.userPlay();
+					}
 					if(line.contains("controller,"))
 					{
 						Log.d("client","controller move");
@@ -1365,6 +1370,35 @@ public class ClientCode implements OnClickListener{
 										Toast.makeText(mActivity.getApplicationContext(), "mapping set -- " +  bbc.mActivity.beatTimer.mapping + " -- by server--" + bbc.otherBots.size() + "-nn-" + bbc.numNeighbors, Toast.LENGTH_LONG).show();
 									}
 								});
+							}
+							if(code==803)
+							{
+								if(test.length==2)
+								{
+									bbc.userPlay();
+									if(bbc.recordSequence)
+									{
+										bbc.fillNow(bbc.instrumentseq);
+										bbc.fillNow(bbc.sfxrseq);
+									}
+								}
+								else
+								{
+									if(test.length==3)
+									{
+										int d = Integer.parseInt(test[2]);
+										if(d==bbc.ID)
+										{
+											bbc.userPlay();
+											
+											if(bbc.recordSequence)
+											{
+												bbc.fillNow(bbc.instrumentseq);
+												bbc.fillNow(bbc.sfxrseq);
+											}
+										}
+									}
+								}
 							}
 							if(code==802)
 							{
