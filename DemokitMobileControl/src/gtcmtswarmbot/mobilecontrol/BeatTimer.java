@@ -179,6 +179,22 @@ public class BeatTimer extends Thread{
 									mActivity.drawView.vib.vibrate(globalTimeInterval/2);
 								}
 							}
+							
+							
+							
+							//////////////////vibrate every 4 for metronome effect
+							if(bbc.currentIndex % (bbc.SEQUENCERLENGTH/4) == 0)
+							{
+								if(bbc.loopMeasure)
+								{
+									mActivity.drawView.vib.vibrate(globalTimeInterval/2);
+								}
+							}
+							
+							
+							///////////////vibrate if touching and finger on grid val? next time.
+							
+							
 						}
 					}
 

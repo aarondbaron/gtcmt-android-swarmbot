@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.util.Vector;
+
+
 
 
 
@@ -172,24 +175,24 @@ public class Client implements OnClickListener{
 
 					if(line.contains("com,"))
 					{
-						
+
 						//substring 0 is com
 						//substring 1 is from who
 						//substring 2, to whom
 						//substring 3 what 
 						//substring 4 ..the data????
-						
+
 						String test [] = line.split(",");
 						int from= Integer.parseInt(test[1]);
 						int tome=Integer.parseInt(test[2]);
-						
+
 						Log.d("client controller com" , "from: " + from );
-						
+
 						if(tome==bbc.ID)
 						{
 							String whatToDo = test[3];
 							String data = test[4];
-							
+
 
 							if(whatToDo=="query")
 							{
@@ -197,7 +200,7 @@ public class Client implements OnClickListener{
 								sendMessage("com," + tome+ "," + from + "," + "response," + mActivity.drawView.thread.sequencer.getMySequence());
 
 								char[] a= data.toCharArray();
- 
+
 
 
 							}
@@ -206,7 +209,7 @@ public class Client implements OnClickListener{
 								Log.d("response , " , " from: " + from );
 								char[] a= data.toCharArray();
 								boolean[] b  = new boolean[bbc.instrumentseq.length];
-								mActivity.drawView.thread.showSequencer=true;
+								mActivity.drawView.thread.showSequencer=true;//temporarilystop
 								for(int i=0;i<bbc.instrumentseq.length;i++)
 								{
 									if(i<a.length)
@@ -216,7 +219,7 @@ public class Client implements OnClickListener{
 											b[i] = false;
 											bbc.receivedSequence[i]=false;
 											mActivity.drawView.thread.sequencer.seq[i]=false;
-											
+
 											//bbc.instrumentseq[i]=false;
 											//bbc.sfxrseq[i]=false;
 
@@ -228,18 +231,116 @@ public class Client implements OnClickListener{
 											b[i]=true;
 											bbc.receivedSequence[i]=true;
 											mActivity.drawView.thread.sequencer.seq[i]=true;
-										 
+
 										}
 									}
 
-								}
+								}							
+
+
 
 
 								Log.d("response , " , bbc.patternToString(bbc.receivedSequence));
 
 							}
-							
-							
+							if(whatToDo.equals("response2"))
+							{
+								//for right now...only do this if its the appropriate(robots') measure
+								if(mActivity.measureCounter%2==1)
+								{
+
+									Log.d("response2 , " , " from: " + from );
+									char[] a= data.toCharArray();
+									boolean[] b  = new boolean[bbc.instrumentseq.length];
+
+									for(int i=0;i<bbc.instrumentseq.length;i++)
+									{
+										if(i<a.length)
+										{
+											if(a[i]=='0')
+											{
+												b[i] = false;
+												bbc.receivedSequence[i]=false;
+												mActivity.drawView.thread.sequencer.seq[i]=false;
+
+												//bbc.instrumentseq[i]=false;
+												//bbc.sfxrseq[i]=false;
+
+												//temporary only
+												//bbc.avatarseq[i]=false;
+											}
+											else
+											{
+												b[i]=true;
+												bbc.receivedSequence[i]=true;
+												mActivity.drawView.thread.sequencer.seq[i]=true;
+
+											}
+										}
+
+									}
+									///////put this into composition
+									//write this into the composition
+									//Vector<Integer> nn = new Vector<Integer>();
+									Integer t = new Integer(from);
+
+									for(int i=0;i<bbc.receivedSequence.length;i++)
+									{
+
+										/*
+									if(bbc.receivedSequence[i])
+									{
+										nn.add(new Integer(i));
+									}
+										 */
+										//clear the sequence so you're not constantly adding into it
+										//bbc.myComposition.currentMeasure.notes[i].clear();									
+										if(bbc.receivedSequence[i])
+										{
+											if(!bbc.myComposition.currentMeasure.notes[i].contains(t))
+											{
+												bbc.myComposition.currentMeasure.notes[i].add(t);
+											}
+										}
+										else
+										{
+											if(bbc.myComposition.currentMeasure.notes[i].contains(t))
+											{
+												bbc.myComposition.currentMeasure.notes[i].remove(t);
+											}
+										}
+
+										/*
+									if(!bbc.myComposition.currentMeasure.notes[i].contains(t))
+									{
+										bbc.myComposition.currentMeasure.notes[i].add(t);
+									}
+										 */
+
+									}							
+									//bbc.myComposition.currentMeasure=bbc.myComposition.getMeasure(mActivity.measureCounter);
+									//bbc.myComposition.currentMeasure.notes[from].clear();
+									//bbc.myComposition.currentMeasure.notes[from].addAll(nn);							
+									mActivity.drawView.thread.songMaker.displayMeasure(bbc.myComposition.currentMeasure);
+
+
+									Log.d("r , " , bbc.patternToString(bbc.receivedSequence));
+									/*
+									handler.post(new Runnable() {
+										@Override
+										public void run() {
+											Toast.makeText(mActivity.getApplicationContext(), "r2,--currMeaID:" + bbc.myComposition.currentMeasure.ID   , Toast.LENGTH_SHORT).show();
+										}
+									});
+									*/
+
+								}
+								
+								
+								
+							}
+
+
 
 						}
 					}
@@ -310,6 +411,20 @@ public class Client implements OnClickListener{
 					{
 						String s= "pattern," + myID + "," + bbc.patternToString(bbc.instrumentseq);
 						out.println(s);
+					}
+					
+					if(line.contains("resetComposition"))
+					{
+						mActivity.measureCounter=0;						
+						//bbc.compositionIndex=0;
+						//bbc.compositionMarker=0;						
+						for(int i=0;i<bbc.myComposition.measures.size();i++)
+						{
+							CMeasure m = bbc.myComposition.getMeasure(i);
+							m.clearMeasure();
+						}
+						mActivity.drawView.thread.songMaker.displayMeasure(mActivity.measureCounter);		
+						
 					}
 
 					/*
@@ -704,7 +819,7 @@ public class Client implements OnClickListener{
 						String test [] = line.split(",");
 						bbc.neighborBound= Integer.parseInt(test[1]);
 					}
-					
+
 					if(line.contains("setTempo"))
 					{
 
