@@ -96,7 +96,7 @@ public class Behavior extends Thread
 	public String formationType;
 	public boolean formation;
 	public int formationOffset;
-	public int distFormation=80;
+	public int distFormation=160;
 	private boolean wto1;
 	private boolean wtf1;
 	public boolean wanderThenFollow;
@@ -125,12 +125,29 @@ public class Behavior extends Thread
 	private boolean evadeAvatar;
 	//private boolean followBot;
 
-	
+
 	public boolean smooth; 
 	public int smoothL,smoothR;
 	public int diffL,diffR;
-	
-	
+
+	boolean shakeEmotion;
+	boolean agitation;
+
+
+	long robotTurnTimer;
+	long robotTurnInitTimer1;
+	//long robotTurnInitTimer2;
+	public boolean avoidBoundaryFlag;
+
+	//public long emoteTimer;
+
+	public boolean useHappiness=true;
+
+	public long newShakeTimer;
+	public boolean newShakeTimerFlag;
+	private boolean sadShake;
+
+
 	public Behavior(DemoKitActivity mActivity /*BoeBotController bbc*/)
 	{
 		this.mActivity=mActivity;
@@ -162,7 +179,9 @@ public class Behavior extends Thread
 
 		sacWeights = new float[]{1,1,1};
 
-		distFormation = 80;
+		distFormation = 160;
+
+		circleFormationTarg= new PVector();
 
 	}
 
@@ -291,6 +310,13 @@ public class Behavior extends Thread
 			{
 				wanderVector();
 			}
+			
+			/*
+			if(performComposition)
+			{
+				performComposition();
+			}
+			*/
 
 			if(wanderThenFollow)
 			{
@@ -342,7 +368,7 @@ public class Behavior extends Thread
 
 			if(separation)
 			{
-				Log.d("behavior","separation " + desiredVel);
+				//Log.d("behavior","separation " + desiredVel);
 				PVector v = bbc.myBehavior.separate();
 				v.mult(sacWeights[0]);
 				desiredVel.add(v);
@@ -435,6 +461,119 @@ public class Behavior extends Thread
 				this.turnRightVector();
 			}
 
+			if(shakeEmotion)
+			{
+				//doShake();
+
+				emoteJiggle();
+			}
+
+			/*
+			if(sadShake)
+			{
+				emoteJiggle();
+			}
+			 */
+
+			//if(agitation)
+			if(bbc.usingEmotion)
+			{
+				if(useHappiness)
+				{
+
+					//neutral
+					if(bbc.happiness==0)
+					{
+
+					}
+					//happy
+					if(bbc.happiness==1)
+					{
+
+					}
+					//agitated
+					if(bbc.happiness==-1)
+					{
+
+
+						//must make sure that this time 4000 is greater than the time it takes to complete the shake
+						if(System.currentTimeMillis()-shakeTimer > 4000)
+						{
+
+							shakeEmotion=true;						
+							bbc.stop();
+							bbc.directControl=true;						
+
+							//newShakeTimer=System.currentTimeMillis();	
+							shakeTimer=System.currentTimeMillis();
+							bbc.rfv.thread.message.displayMessage("shak emot true, tr set");
+						}
+						else
+						{
+							bbc.directControl=false;
+							//bbc.rfv.thread.message.displayMessage("shak emot true, tr set");
+						}
+
+					}
+
+				}
+			}
+
+			if(bbc.userPlayed)
+			{
+				if(System.currentTimeMillis()-bbc.timeFromUserPlayed>2000)
+				{
+					bbc.userPlayed=false;
+				}
+			}
+
+			//this is to be used pretty much only for the gotostart
+			if(targetCheck)
+			{
+				if(this.isTargetReached(this.circleFormationTarg))
+				{
+					targetCheck=false;
+					this.setFormation(false);
+					bbc.lookAtHuman();	//will now look at the human and keep looking
+					this.avoidBoundaryFlag=false;//dangerous but it's put here to avoid the formation problme
+					//bbc.fillEuclid(10, bbc.sfxrseq);
+					//bbc.fillEuclid(10,bbc.instrumentseq);
+
+				}
+				else
+				{
+					//bbc.clearAll();
+					this.avoidBoundaryFlag=true;
+				}
+			}
+
+			//this is for the robot's turn only
+			if(playAndReport)
+			{
+				if(System.currentTimeMillis()-robotTurnTimer<1000*120+extraHumanTime)
+				{
+					doPlayAndReport();
+				}
+				else
+				{
+					//end the robot's turn after 2 minutes///set the mapping to be benign
+					//then report, and------------ end my turn?
+
+					bbc.doRhythmMove=false;
+					this.setOrbitInLine(false);
+					this.setWanderVector(false);
+					this.setOrbitCenter(false);
+					bbc.goToStartPosition();
+					bbc.setMapping(299);				
+					mActivity.client.sendMessage3("com," + bbc.ID+ "," + (bbc.otherBots.size()) + "," + "response2," + bbc.patternToString(bbc.instrumentseq));
+					//mActivity.client.sendMessage3("com," + bbc.ID+ "," + (bbc.otherBots.size()) + "," + "endTurn," + bbc.patternToString(bbc.instrumentseq));
+					reportTimer=System.currentTimeMillis();
+
+					bbc.robotTurnInitFlag2=false;
+					playAndReport=false;
+				}
+			}
+
 
 			//Log.d("behavior","" + desiredVel);
 			//finally act on velocity
@@ -443,7 +582,10 @@ public class Behavior extends Thread
 			{
 				if(!bbc.directControl)
 				{
-					avoidBoundary3();
+					if(avoidBoundaryFlag)
+					{
+						avoidBoundary3();
+					}
 					if(bbc.doRhythmMove)
 					{
 						this.doSteerDance();
@@ -459,6 +601,216 @@ public class Behavior extends Thread
 	}
 
 
+
+	public void performComposition() {
+		// TODO Auto-generated method stub
+		//go to start position
+		
+		if(!targetCheck)
+		{
+			
+			this.setRotate(true);
+			
+			
+			//  get orientations for measures
+			PVector curLoc= new PVector(bbc.myposx,bbc.myposy);
+			
+			float r=100;
+			float ang=bbc.map(bbc.compositionIndex%8,0,8,(float)-Math.PI,(float)Math.PI);	
+			
+			PVector newLoc = new PVector(curLoc.x+r*(float)Math.cos(ang),curLoc.y+r*(float)Math.sin(ang));
+			
+			//this.move2Loc=true;
+			//this.moveTo(newLoc);
+			bbc.lookAtPosition(newLoc);
+			
+			
+		}
+		
+	}
+
+
+
+	long humanInterruptedMeTimer;	
+	long reportTimer;
+	long extraHumanTime;
+	private boolean emoteFlag;
+	public  boolean humanInterruptedMe;
+	private void doPlayAndReport() {
+		// TODO Auto-generated method stub
+
+
+
+		//as a check...just make sure that you don't do anything when it's not your turn to play
+		if(bbc.compositionMarker%2==0)
+		{
+			//or rather...later on ...you could interrupt the human with a shake... perhaps this could be if you're not moving right here
+
+			return;
+		}
+
+
+		//if the human interrupted me when it was my turn
+
+
+		//the human interrupted
+		if(bbc.myBehavior.humanInterruptedMe)
+		{
+			//look at the human for 2 seconds
+			if(System.currentTimeMillis()-humanInterruptedMeTimer <2000)
+			{
+				bbc.lookAtHuman();
+				this.setSeparation(false);
+				this.avoidBoundaryFlag=false;
+				return;
+			}
+			else
+			{
+				//do not put return here...because that would mean anything greater than or equal to 2s
+				
+				//look at the center for an additional 2 seconds
+				if(System.currentTimeMillis()-humanInterruptedMeTimer<4000)
+				{
+					bbc.lookAtPosition(new PVector(640/2,480/2));
+					return;
+				}
+				else
+				{
+					//after total of 4 seconds up, allow it to get out of the rotate fix and then reset flag
+					bbc.myBehavior.setRotate(false);
+					//do not put
+					bbc.myBehavior.humanInterruptedMe=false; //gets us out of the human interruption					
+					this.setSeparation(true); //make sure we can separate
+					this.avoidBoundaryFlag=true; //make sure we can avoid boundary///this is bad but have to do it for now
+				}
+
+
+			}
+		}
+
+
+
+
+
+		//now this is where the human has not interrupted at all ..so robot must play andreport here
+		//bbc.setMapping(301); //handle what to do
+
+
+
+		//first look at the center...then afterwards...do your thing...	
+		boolean allowedToMove=false;
+		
+		//first get previous measure...(should be one that human did)
+		int mID=this.mActivity.beatTimer.currentCMeasure.ID;
+		int pID=mID-1;
+		if(pID<0)
+		{
+			pID=bbc.theComposition.measures.size()-1;
+		}
+		boolean[] old = bbc.theComposition.getMeasure(pID).getLine(bbc.ID);
+		
+		boolean oldEmptyStart = bbc.isSilent(old);
+		boolean hiseqEmptyStart = bbc.isSilent(bbc.hiseq);
+		boolean hiseqnegEmptyStart = bbc.isSilent(bbc.hiseqneg);
+		
+		//if the prev measure had nothing and human did not play , and did not tell us NOT to play at some time
+		if(oldEmptyStart && (hiseqEmptyStart && hiseqnegEmptyStart) )
+		{
+			allowedToMove=false;
+		}
+		else
+		{
+			allowedToMove=true;
+		}
+		
+		
+		//this should have been enough....the instrumentseq
+		/*
+		if(bbc.isSilent(bbc.instrumentseq) && hiseqEmptyStart && hiseqnegEmptyStart ) 
+		{
+			allowedToMove=false;
+		}
+		else
+		{
+			allowedToMove=true;
+		}
+		*/
+
+		//this is for the non interruption case..if allowed to move, then after 1 second, look at the center
+		if(System.currentTimeMillis()-this.robotTurnInitTimer1<1000)
+		{
+			if(allowedToMove)
+			{
+				bbc.lookAtPosition(new PVector(640/2,480/2));
+			}
+		}		
+		else
+		{
+			bbc.moveToLoc(false);
+			this.setMove2Loc(false);
+
+			if(allowedToMove)
+			{
+				this.setRotate(false);	
+				
+				//this.setOrbitInLine(true);
+				//this.setOrbitCenter(true);
+				
+				this.setWanderVector(true);
+				this.setSeparation(true);
+				bbc.doRhythmMove=true;
+
+			}
+			else
+			{
+				//this.doStop();
+				this.setWanderVector(false);
+				this.setOrbitInLine(false);
+				this.setOrbitCenter(false);
+				
+				bbc.doRhythmMove=false;
+				this.setSeparation(true);
+				this.setRotate(true);	
+
+
+			}
+
+			///you only need to set this once..not constantly
+			/*
+			if(!bbc.robotTurnInitFlag2)
+			{
+
+
+					this.setRotate(false);					
+					this.setOrbitInLine(true);
+
+					bbc.doRhythmMove=true;
+					bbc.robotTurnInitFlag2=true;				
+			}
+			 */
+
+
+
+		}
+
+		//bbc.reportCMeasure();
+		//report back
+
+
+		if(System.currentTimeMillis()-reportTimer>1000)
+		{
+			mActivity.client.sendMessage3("com," + bbc.ID+ "," + (bbc.otherBots.size()) + "," + "response2," + bbc.patternToString(bbc.instrumentseq));
+			reportTimer=System.currentTimeMillis();
+		}
+
+
+
+
+		this.setSeparation(true);
+
+	}
+
+	/*
 	public void rotateTo()
 	{
 		float currentangle = bbc.camang;
@@ -496,8 +848,19 @@ public class Behavior extends Thread
 			bbc.stop();			 
 		}
 	}
+	 */
 
 
+	long shakeTimer;
+	/*
+	void doShake()
+	{
+		if(System.currentTimeMillis()-shakeTimer<2000)
+		{
+
+		}
+	}
+	*/
 	public PVector forwardVector() {
 		// TODO Auto-generated method stub
 
@@ -884,7 +1247,7 @@ public class Behavior extends Thread
 	}
 
 
-
+	PVector circleFormationTarg;
 	public void doFormation() {
 		// TODO Auto-generated method stub
 
@@ -897,7 +1260,9 @@ public class Behavior extends Thread
 
 			//parameters for circle equispaced
 			PVector start = new PVector(w, h);
-			float r=200;
+			//float r=190;
+			float r =distFormation;
+			//float r=160;
 
 			float frac=0;
 			if(bbc.usingController)
@@ -913,6 +1278,9 @@ public class Behavior extends Thread
 			float x = (float) (r*Math.sin( (float)(bbc.ID+formationOffset)*frac  ));
 			float y= (float) (-r*Math.cos( (float)(bbc.ID+formationOffset)*frac  ));
 			PVector targ = new PVector(start.x+x, start.y+y);
+
+			circleFormationTarg.x=targ.x;
+			circleFormationTarg.y=targ.y;
 
 			this.moveTo(targ);
 			//Log.d("behavior","formation move to targ: " + targ);
@@ -1852,6 +2220,22 @@ public class Behavior extends Thread
 		this.desiredVel.add(d);
 	}
 
+	public void moveToAndStop(PVector p)
+	{
+
+		PVector d = new PVector(p.x-bbc.myposx,p.y-bbc.myposy);
+		if(d.mag()<5)
+		{
+			d.mult(0);
+		}
+		else
+		{
+			d.limit(1.0f);
+			d.mult(this.move2LocWeight);
+		}
+		this.desiredVel.add(d);
+	}
+
 	public void orbit(PVector p)
 	{
 
@@ -2053,7 +2437,7 @@ public class Behavior extends Thread
 		// now start to change motor speed to adjust to new 
 		// -1 means need to turn right
 		// 1 means need to turn left
-		 
+
 		if(System.currentTimeMillis()-vmtimer>vmInterval)
 		{
 			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
@@ -2129,29 +2513,29 @@ public class Behavior extends Thread
 				{
 					//bbc.writeL((int) (128+20));
 					//bbc.writeR((int) (128-20));
-					
+
 					//bbc.rotRight();
-					
+
 					int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 148);
 					bbc.writeL(vv);
 					bbc.writeR(vv);
-					
+
 				}
 				else
 				{
 					//bbc.writeL((int) (128+20));
 					//bbc.writeR((int) (128-20));
-					
+
 					//bbc.rotLeft();
-					
-					
+
+
 					int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 108);
 					bbc.writeL(vv);
 					bbc.writeR(vv);
-					
+
 				}
 
-				
+
 			}
 			else
 			{
@@ -2165,49 +2549,49 @@ public class Behavior extends Thread
 			bbc.mActivity.client.sendMessage("vel,"+ bbc.mActivity.client.myID + "," + new DecimalFormat("#.##").format(v.x) + "," + new DecimalFormat("#.##").format(v.y)) ;
 			vmtimer=System.currentTimeMillis();
 		}
-		
+
 		if(smooth)
 		{
-			
+
 			if(desiredVel.x==0 && desiredVel.y==0)
 			{
 				bbc.stop();
 				return;
 			}
-			
+
 			if(result==-1)
 			{
 				int v2 = (int) bbc.map(bbc.modDistance,0,180,108,128+20);
-				
+
 				int dif=v2-smoothR;//just doing diff isn't enough..but what i it was accumulated
 				diffR+=dif;//might want to do percentage o it
 				//diffR+=Math.signum(dif);//this didn't work as well
 				//smoothR=v2;
 				smoothR+=diffR;
-				
+
 				smoothL=148;
-				
+
 				bbc.writeL(smoothL);
 				bbc.writeR(smoothR);
-				
+
 			}
 			else
 			{
 				int v1 = (int) bbc.map(bbc.modDistance,0,180,148,128-20);
 				//int v2 = (int) bbc.map(bbc.modDistance,0,180,128,108);
-				
+
 				int dif=v1-smoothL;
 				diffL+=dif; //might want to do percentage o it
 				//diffL+=Math.signum(dif);//this didn't work as well
 				//smoothL=v1;
 				smoothL+=diffL;
-				
+
 				smoothR=108;
-				
+
 				bbc.writeL(smoothL);
 				bbc.writeR(smoothR);
 			}
-			
+
 			return;
 		}
 
@@ -2216,17 +2600,17 @@ public class Behavior extends Thread
 
 			if(result==-1)
 			{		
-				
-					bbc.writeL((int) (128+20*v.mag()));
-					bbc.writeR((int) (128-20*v.mag()*.1f));			
-				
+
+				bbc.writeL((int) (128+20*v.mag()));
+				bbc.writeR((int) (128-20*v.mag()*.1f));			
+
 			}
 			else
 			{
-				
+
 				bbc.writeL((int) (128+20*v.mag()*.1f));
 				bbc.writeR((int) (128-20*v.mag()));
-				
+
 			}
 		}
 		else
@@ -2282,7 +2666,7 @@ public class Behavior extends Thread
 
 		if(bbc.movementseq[bbc.currentIndex])
 		{
-			
+
 			if(rotateTo)
 			{
 				if(bbc.modDistance>8)
@@ -2293,9 +2677,9 @@ public class Behavior extends Thread
 					{
 						//bbc.writeL((int) (128+20));
 						//bbc.writeR((int) (128-20));
-						
+
 						//bbc.rotRight(); //255255
-						
+
 						int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 148);
 						bbc.writeL(vv);
 						bbc.writeR(vv);
@@ -2304,14 +2688,14 @@ public class Behavior extends Thread
 					{
 						//bbc.writeL((int) (128+20));
 						//bbc.writeR((int) (128-20));
-						
+
 						//bbc.rotLeft();//00
 						int vv =  (int) bbc.map(bbc.modDistance, 0, 180, 128, 108);
 						bbc.writeL(vv);//using 0 creates oscillations. 
 						bbc.writeR(vv);
 					}
 
-					
+
 				}
 				else
 				{
@@ -2319,8 +2703,8 @@ public class Behavior extends Thread
 				}
 				return;
 			}
-			
-			
+
+
 			if(bbc.modDistance>10)
 			{
 				if(result==-1)
@@ -2468,7 +2852,7 @@ public class Behavior extends Thread
 	}
 
 	///////////////
-	//djemble behavior
+	//djembe behavior
 	//1.  
 	////////////////////////
 
@@ -2854,15 +3238,23 @@ public class Behavior extends Thread
 		setSeparation(false);
 		setAlignment(false);
 		setCohesion(false);
+		
+		humanInterruptedMe=false;
 
+		setPerformComposition(false);
+		
 		setRotate(false);
+
+		avoidBoundaryFlag=true;
 		
 		
+
+
 		this.move2LocWeight=1;
 		this.sacWeights[0]=1;
 		this.sacWeights[1]=1;
 		this.sacWeights[2]=1;
-		
+
 	}
 
 	public void setRotate(boolean b) {
@@ -2873,14 +3265,288 @@ public class Behavior extends Thread
 
 	public void setSmooth(boolean b) {
 		// TODO Auto-generated method stub
-		
+
 		this.smooth=b;
-		
+
 	}
-	
+
 	public void setMove2Loc(boolean b)
 	{
 		this.move2Loc=b;
 	}
+
+
+	long shakeTimer1;
+	public boolean targetCheck;
+	public void emoteJiggle() {
+		// TODO Auto-generated method stub
+
+		long t= System.currentTimeMillis()-shakeTimer;
+		long timerot=100;
+		if(t<timerot*4)
+		{
+			if(t<timerot)
+			{
+				bbc.rotLeft();
+				bbc.rfv.doJiggle();
+				bbc.rfv.doJiggleBigger();
+			}
+			else
+			{
+				if(t<timerot*2)
+				{
+					bbc.rotRight();
+				}
+				else
+				{
+					if(t<timerot*3)
+					{
+						bbc.rotLeft();						
+					}
+					else
+					{
+						if(t< timerot*4 )
+						{
+							bbc.rotRight();
+						}
+						/*
+						else
+						{
+							if(t< timerot*5 )
+							{
+								bbc.rotLeft();
+							}
+							else
+							{
+								if(t< timerot*6 )
+								{
+									bbc.rotRight();
+								}
+								else
+								{
+									if(t< timerot*7 )
+									{
+										bbc.rotLeft();
+									}
+									else
+									{
+										if(t< timerot*8 )
+										{
+											bbc.rotRight();
+										}
+									}
+								}
+							}
+						}
+						 */
+					}
+
+				}
+			}
+
+
+
+
+		}
+		else
+		{
+			bbc.stop();
+			bbc.directControl=false;
+			this.shakeEmotion=false;
+
+		}
+	}
+
+	public void emoteJiggle2(int numShakes)
+	{
+		long t= System.currentTimeMillis()-shakeTimer;
+		long timerot=100;
+		if(t<timerot*4)
+		{
+			if(t<timerot)
+			{
+				bbc.rotLeft();
+			}
+			else
+			{
+				if(t<timerot*2)
+				{
+					bbc.rotRight();
+				}
+				else
+				{
+					if(t<timerot*3)
+					{
+						bbc.rotLeft();						
+					}
+					else
+					{
+						if(t< timerot*4 )
+						{
+							bbc.rotRight();
+						}			
+					}	
+				}
+			}
+		}
+		else
+		{
+			bbc.stop();
+			bbc.directControl=false;
+			this.shakeEmotion=false;
+		}
+	}
+
+	public void doEmoteJiggle() {
+		// TODO Auto-generated method stub
+		this.shakeEmotion=true;
+		this.shakeTimer=System.currentTimeMillis();
+		bbc.directControl=true;
+	}
+
+	boolean isTargetReached(PVector targ)
+	{
+		PVector myPos = new PVector(bbc.myposx,bbc.myposy);
+
+		if(PVector.dist(myPos,targ)<10)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	boolean playAndReport;
+	public void setPlayAndReport(boolean b) {
+		// TODO Auto-generated method stub
+		playAndReport=b;
+	}
+
+
+	boolean playingInMyTurn;
+	private boolean performComposition;
+
+	void useHappiness()
+	{
+		if(bbc.happiness==0)
+		{
+			//bbc.rfv.f
+		}
+	}
+
+	void setHappiness(int i)
+	{
+		bbc.happiness=i;
+		if(bbc.happiness==0)
+		{
+			bbc.rfv.thread.robotTeeth.setState(0);
+			this.emoteFlag=true;
+		}
+		if(bbc.happiness==1)
+		{
+
+			this.emoteFlag=true;
+			bbc.rfv.thread.robotTeeth.setState(1);
+		}
+		if(bbc.happiness==-1)
+		{
+			//this.emoteTimer=System.currentTimeMillis();
+			
+			this.emoteFlag=false;
+			bbc.rfv.thread.robotTeeth.setState(2);
+		}
+	}
+
+	public void determineHappiness(int measureID) {
+		// TODO Auto-generated method stub
+
+
+		//note..only do this for this composition at the beginning... 
+		if(measureID==0)
+		{
+			setHappiness(0);
+			return;
+		}
+
+		//first get previous measure... 
+		//int mID=mActivity.beatTimer.currentCMeasure.ID;
+		int pID=measureID-1;
+		if(pID<0)
+		{
+			pID=bbc.theComposition.measures.size()-1;
+		}
+		boolean[] old = bbc.theComposition.getMeasure(pID).getLine(bbc.ID);
+
+
+
+		if(bbc.happiness==1)
+		{
+			//i was happy..but if i'm not playing...go to happiness 0
+			if(bbc.isSilent(old))
+			{
+				setHappiness(0);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was silent");
+			}
+			else
+			{
+				//i was happy..and i am playing..so stay happy.
+				setHappiness(1);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was playing" + bbc.patternToString(old));
+			}
+			return;
+		}
+		if(bbc.happiness==-1)
+		{
+			//i was not happy..but if i'm not playing...stay unhappy
+			if(bbc.isSilent(old))
+			{
+				setHappiness(-1);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was silent..stay unhappy");
+			}
+			else//i was not happy..and i am playing..so go to  happy.
+			{
+				setHappiness(1);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was playing" + bbc.patternToString(old));
+
+			}
+			return;
+
+		}
+		if(bbc.happiness==0)
+		{
+			// i was ok, but im not playing... go to unhappy
+			if(bbc.isSilent(old))
+			{
+				setHappiness(-1);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was silent..prev ok, go unhappy");
+			}
+			else//i was ok but now playing..go to happy
+			{
+				setHappiness(1);
+				bbc.rfv.thread.message.displayMessage("pid: " + pID + "" + " was playing" + bbc.patternToString(old));
+
+			}
+			return;
+
+		}
+
+	}
+
+	public void setPerformComposition(boolean b) {
+		// TODO Auto-generated method stub
+		
+		performComposition=b;
+		
+		if(performComposition)
+		{
+			bbc.goToStartPosition();
+		}
+		
+		
+	}
+
+
 
 }

@@ -30,7 +30,7 @@ public class RobotFaceView extends SurfaceView implements OnTouchListener,
 SurfaceHolder.Callback, Runnable {
 
 	Paint paint1, paint2, blackpaint, blackpaintText, redPaintHighlight,
-	greenPaint, yellowPaint, goldPaint, coralPaint, blackPaintDebugText;
+	greenPaint, yellowPaint, goldPaint, coralPaint, blackPaintDebugText, bluePaint, redPaint;
 
 	private SurfaceHolder mHolder;
 
@@ -58,6 +58,8 @@ SurfaceHolder.Callback, Runnable {
 	public int initialTouchX,initialTouchY;
 
 	public boolean drawFace=true;
+
+	boolean extraStuff=true;
 
 	public RobotFaceView(Context context) {
 		super(context);
@@ -91,6 +93,8 @@ SurfaceHolder.Callback, Runnable {
 		yellowPaint = new Paint();
 		goldPaint = new Paint();
 		blackPaintDebugText = new Paint();
+		bluePaint = new Paint();
+		redPaint = new Paint();
 
 		coralPaint = new Paint();
 
@@ -107,7 +111,7 @@ SurfaceHolder.Callback, Runnable {
 		blackpaintText.setTextSize(25);
 		blackpaintText.setColor(Color.BLACK);
 		blackpaintText.setAntiAlias(true);
-		
+
 		blackPaintDebugText.setTextSize(50);
 		blackpaintText.setColor(Color.BLACK);
 		blackpaintText.setAntiAlias(true);
@@ -125,6 +129,9 @@ SurfaceHolder.Callback, Runnable {
 		goldPaint.setColor(Color.rgb(255,215,0));
 
 		coralPaint.setColor(Color.rgb(240,220,255));
+
+		bluePaint.setColor(Color.BLUE);
+		redPaint.setColor(Color.RED);
 
 
 		thread = new RobotFaceViewThread(holder, context);
@@ -383,6 +390,8 @@ SurfaceHolder.Callback, Runnable {
 
 		}
 
+
+
 		@Override
 		public void run() {
 			Canvas c;// = mSurfaceHolder.lockCanvas(null);
@@ -404,10 +413,14 @@ SurfaceHolder.Callback, Runnable {
 							//cameraButton.run(c);
 							danceButton.run(c);
 							modeButton.run(c);
-							tempup.run(c);
-							tempdown.run(c);
-							divup.run(c);
-							divdown.run(c);
+
+							if(extraStuff)
+							{
+								tempup.run(c);
+								tempdown.run(c);
+								divup.run(c);
+								divdown.run(c);
+							}
 							message.run(c);
 
 							arena.run(c);
@@ -415,19 +428,31 @@ SurfaceHolder.Callback, Runnable {
 
 							if(bbc!=null)
 							{
-								c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
-								//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
-								//c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
-								c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
-								c.drawText("id: " + bbc.ID , 0, getHeight()-getHeight()/7, blackpaintText);
-								c.drawText("nn: " + bbc.numNeighbors +"," + bbc.myExtendedNeighbors.size(), getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
-								c.drawText("div: " + new DecimalFormat("#.##").format( bbc.mActivity.beatTimer.div) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/7, blackpaintText);
-								c.drawText("mpsc " +  bbc.mActivity.beatTimer.myPlaySessionCount + "," + bbc.mActivity.beatTimer.myGeneralPlaySessionCount, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
-								c.drawText("pm " +  bbc.mActivity.beatTimer.possibleMeasures.size() , getWidth()/2, getHeight()-getHeight()/28, blackpaintText);
 
-								c.drawText("vel: " + new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.x) + ","+ new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.y) , getWidth()/3, getHeight()-getHeight()/14, blackpaintText);
-								c.drawText("lr: " +  bbc.lbyte + ","+  bbc.rbyte , getWidth()/3, getHeight()-getHeight()/7, blackpaintText);
+								if(extraStuff)
+								{
+									//c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
+									//c.drawText("dif:" + new DecimalFormat("#.##").format( bbc.angleAzimuthDiff) , getWidth()/2-getWidth()/8, getHeight()-getHeight()/21, blackpaintText);
+									//c.drawText("az: " + new DecimalFormat("#.##").format( bbc.angleAzimuth) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/21, blackpaintText);
+									//c.drawText("ir0: " + bbc.mActivity.ic.ir0 , 0, getHeight()-getHeight()/14, blackpaintText);
+									c.drawText("id: " + bbc.ID , 0, getHeight()-getHeight()/7, blackpaintText);
+									//c.drawText("nn: " + bbc.numNeighbors +"," + bbc.myExtendedNeighbors.size(), getWidth()-getWidth()/3.25f, getHeight()-getHeight()/14, blackpaintText);
+									c.drawText("div: " + new DecimalFormat("#.##").format( bbc.mActivity.beatTimer.div) , getWidth()-getWidth()/3.25f, getHeight()-getHeight()/7, blackpaintText);
+									c.drawText("cmrk:" +  bbc.compositionMarker+ "," + "cmind:" + bbc.compositionIndex, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
+									if(bbc.theComposition!=null)
+									{
+										if(bbc.theComposition.currentMeasure!=null)
+										{
+											c.drawText("mID " +  bbc.theComposition.currentMeasure.ID , getWidth()/2, getHeight()-getHeight()/28, blackpaintText);
+										}
+									}
 
+									//c.drawText("mpsc " +  bbc.mActivity.beatTimer.myPlaySessionCount + "," + bbc.mActivity.beatTimer.myGeneralPlaySessionCount, getWidth()-getWidth()/3.25f, getHeight()-getHeight()/28, blackpaintText);
+									//c.drawText("pm " +  bbc.mActivity.beatTimer.possibleMeasures.size() , getWidth()/2, getHeight()-getHeight()/28, blackpaintText);
+
+									c.drawText("vel: " + new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.x) + ","+ new DecimalFormat("#.##").format( bbc.myBehavior.desiredVel.y) , getWidth()/3, getHeight()-getHeight()/14, blackpaintText);
+									c.drawText("lr: " +  bbc.lbyte + ","+  bbc.rbyte , getWidth()/3, getHeight()-getHeight()/7, blackpaintText);
+								}
 
 							}
 							if(jiggle)
@@ -452,8 +477,8 @@ SurfaceHolder.Callback, Runnable {
 						{
 							renderDebug(c);
 						}
-						
-						
+
+
 
 					}
 				} finally {
@@ -490,6 +515,9 @@ SurfaceHolder.Callback, Runnable {
 		}
 
 		public void render(Canvas canvas) {
+
+
+			/*
 			if(bbc.avatarMoving)
 			{
 				canvas.drawPaint(greenPaint);
@@ -498,6 +526,28 @@ SurfaceHolder.Callback, Runnable {
 			{
 				canvas.drawPaint(goldPaint);
 			}
+			 */
+
+			if(bbc.usingEmotion)
+			{
+				if(bbc.happiness==0)
+				{
+					canvas.drawPaint(goldPaint);
+				}
+				if(bbc.happiness==1)
+				{
+					canvas.drawPaint(greenPaint);
+				}
+				if(bbc.happiness==-1)
+				{
+					canvas.drawPaint(redPaint);
+				}
+			}
+			else
+			{
+				canvas.drawPaint(goldPaint);
+			}
+
 
 			if (true) {
 				try {
@@ -539,18 +589,18 @@ SurfaceHolder.Callback, Runnable {
 		}
 
 	}
-	
+
 	public void renderDebug(Canvas c)
 	{
 		int ss=0;
-		
+
 		c.drawPaint(paint1);
 		String text="Testing--ID  " +  bbc.ID;
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
-		
+
 		text="integer neighbors " +  bbc.numNeighbors;
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
-		
+
 		text="neighbors sz: " + bbc.myNeighbors.size();
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
 		text="";
@@ -560,8 +610,8 @@ SurfaceHolder.Callback, Runnable {
 			text+="" + b.ID + ",";
 		}
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
-		
-		
+
+
 		text="exten. neigh sz: " + bbc.myExtendedNeighbors.size() ;
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
 		text="";
@@ -572,7 +622,7 @@ SurfaceHolder.Callback, Runnable {
 		}
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
 		c.drawText(bbc.neighborThread.inter, 0, ss+=50, blackPaintDebugText);
-		
+
 		text="other bots--" + bbc.otherBots.size();
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
 		text="";
@@ -582,13 +632,13 @@ SurfaceHolder.Callback, Runnable {
 			text+="" + b.ID + ",";
 		}
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
-		
+
 		text="p= " +  bbc.p;
 		c.drawText(text , 0, ss+=50, blackPaintDebugText);
 		//c.drawText(text , 0, 100, blackPaintDebugText);
-		
+
 		//c.drawText("camang:"  + new DecimalFormat("#.##").format( bbc.camang) , 0, getHeight()-getHeight()/21, blackpaintText);
-		
+
 	}
 
 	class Point {
@@ -612,7 +662,7 @@ SurfaceHolder.Callback, Runnable {
 
 		}
 	}
-	
+
 
 
 	class Eyes {
@@ -751,6 +801,8 @@ SurfaceHolder.Callback, Runnable {
 
 		void render() {
 		}
+
+
 
 		void run(Canvas c) {
 			update();
@@ -1087,12 +1139,17 @@ SurfaceHolder.Callback, Runnable {
 
 		}
 
+		void setState(int i)
+		{
+			this.state=i;
+		}
+
 		void update() {
 
 
 
-
-
+			/*
+			//smile based on how full sequencer is
 			if(bbc.isSilent(bbc.instrumentseq) && !bbc.danceSequencer)
 			{
 				state=2;
@@ -1127,7 +1184,9 @@ SurfaceHolder.Callback, Runnable {
 					state=0;
 				}
 			}
+			 */
 
+			//smile based on if it can see users face and distance/size of face
 			if(bbc.getMapping()==6)
 			{
 
@@ -1158,7 +1217,7 @@ SurfaceHolder.Callback, Runnable {
 			thread.prevFaces=(int) bbc.opcvFD.numFaces;
 
 
-
+			//smile states
 			for (int i = 0; i < t.length; i++) {
 				if (state == 0) {
 					t[i].ytarget = starty;
@@ -1778,6 +1837,9 @@ SurfaceHolder.Callback, Runnable {
 				jiggleTimer=System.currentTimeMillis();
 				jiggle=true;
 
+				int tt=(int) (Math.round(2*Math.random()-1) );
+				bbc.myBehavior.setHappiness(tt);
+
 			} else {
 				// shoudl not be.
 				//this.thread.robotNose.pressed = false;
@@ -1853,29 +1915,31 @@ SurfaceHolder.Callback, Runnable {
 			 */
 
 
-
-			if(thread.tempdown.inButton(x, y))
+			if(extraStuff)
 			{
+				if(thread.tempdown.inButton(x, y))
+				{
 
-				bbc.tempoDown();
-				thread.message.displayMessage("tempo: " + bbc.getTempo());
-			}
-			if(thread.tempup.inButton(x, y))
-			{
-				bbc.tempoUp();
-				thread.message.displayMessage("tempo: " + bbc.getTempo());
-			}
+					bbc.tempoDown();
+					thread.message.displayMessage("tempo: " + bbc.getTempo());
+				}
+				if(thread.tempup.inButton(x, y))
+				{
+					bbc.tempoUp();
+					thread.message.displayMessage("tempo: " + bbc.getTempo());
+				}
 
-			if(thread.divup.inButton(x, y))
-			{
-				bbc.divUpFloat();
-				thread.message.displayMessage("div: " + bbc.getDiv());
-			}
+				if(thread.divup.inButton(x, y))
+				{
+					bbc.divUpFloat();
+					thread.message.displayMessage("div: " + bbc.getDiv());
+				}
 
-			if(thread.divdown.inButton(x, y))
-			{
-				bbc.divDownFloat();
-				thread.message.displayMessage("div: " + bbc.getDiv());
+				if(thread.divdown.inButton(x, y))
+				{
+					bbc.divDownFloat();
+					thread.message.displayMessage("div: " + bbc.getDiv());
+				}
 			}
 
 
@@ -1941,10 +2005,10 @@ SurfaceHolder.Callback, Runnable {
 	{
 
 	}
-	
-	
-	
-	
+
+
+
+
 
 
 }

@@ -962,15 +962,207 @@ class Kuku extends Song
 	}
 }
 
-class Orff
+class Orff extends Song
 {
+	
+	//p60
+	// rhythmrs for ostinato accompaniments
+	
+	
+ 
 	
 	Orff()
 	{
+		initializeP60();
+	}
+	public void initializeP60() {
+		// TODO Auto-generated method stub
+		int[][] p60_1 = new int[8][this.SEQUENCERLENGTH];
+		
+		// finger snapping 1
+		//clapping 2
+		//knee slapping 3
+		// stamping 4
+		// 
+		
+		
+		 
+		//p60[]
+		Measure m1 = new Measure();
+		m1.notes[0]=2;
+		m1.notes[24]=2;
+		measures.add(m1);
+		
+		Measure m2 = new Measure();
+		m2.notes[0]=2;
+		m2.notes[12]=2;
+		m2.notes[24]=2;
+		m2.notes[36]=2;
+		measures.add(m2);
+		
+		Measure m3 = new Measure();
+		m3.notes[0]=2;
+		m3.notes[6]=2;
+		m3.notes[12]=2;
+		m3.notes[18]=2;
+		m3.notes[24]=2;
+		m3.notes[30]=2;
+		m3.notes[36]=2;
+		m3.notes[42]=2;
+		measures.add(m3);
+		
+		Measure m4 = new Measure();
+		m4.notes[0]=2;
+		m4.notes[6]=2;
+		m4.notes[12]=2;
+		//m4.notes[18]=2;
+		m4.notes[24]=2;
+		m4.notes[30]=2;
+		m4.notes[36]=2;
+		//m4.notes[42]=2;
+		measures.add(m4);
+		
+		//5
+		Measure tm = new Measure();
+		tm.notes[0]=2;
+		//tm.notes[6]=2;
+		tm.notes[12]=2;
+		tm.notes[18]=2;
+		tm.notes[24]=2;
+		tm.notes[30]=2;
+		tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//6
+		tm = new Measure();
+		tm.notes[0]=2;
+		//tm.notes[6]=2;
+		//tm.notes[12]=2;
+		tm.notes[18]=2;
+		tm.notes[24]=2;
+		//tm.notes[30]=2;
+		//tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//7
+		tm = new Measure();
+		tm.notes[0]=2;
+		//tm.notes[6]=2;
+		tm.notes[12]=2;
+		//tm.notes[18]=2;
+		tm.notes[24]=2;
+		//tm.notes[30]=2;
+		//tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//8
+		tm = new Measure();
+		tm.notes[0]=2;
+		//tm.notes[6]=2;
+		tm.notes[12]=2;
+		//tm.notes[18]=2;
+		//tm.notes[24]=2;
+		tm.notes[30]=2;
+		tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//9
+		tm = new Measure();
+		tm.notes[0]=2;
+		tm.notes[6]=2;
+		//tm.notes[12]=2;
+		tm.notes[18]=2;
+		tm.notes[24]=2;
+		tm.notes[30]=2;
+		//tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//10
+		tm = new Measure();
+		tm.notes[0]=2;
+		tm.notes[6]=2;
+		//tm.notes[12]=2;
+		tm.notes[18]=2;
+		//tm.notes[24]=2;
+		tm.notes[30]=2;
+		//tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		
+		
+		//////////////////////////
+		
+		////
+		tm = new Measure();
+		tm.notes[0]=4;
+		//tm.notes[6]=2;
+		tm.notes[12]=2;
+		//tm.notes[18]=2;
+		tm.notes[24]=4;
+		//tm.notes[30]=2;
+		tm.notes[36]=2;
+		//tm.notes[42]=2;
+		measures.add(tm);
+		
+		//11
+		tm = new Measure();
+		tm.notes[0]=4;
+		tm.notes[6]=2;
+		tm.notes[12]=4;
+		tm.notes[18]=2;
+		tm.notes[24]=4;
+		tm.notes[30]=2;
+		tm.notes[36]=4;
+		tm.notes[42]=2;
+		measures.add(tm);
+		
+		//13
+		tm = new Measure();
+		tm.notes[0]=4;
+		tm.notes[6]=2;
+		tm.notes[12]=2;
+		//tm.notes[18]=2;
+		tm.notes[24]=4;
+		tm.notes[30]=2;
+		tm.notes[36]=2;
+		//tm.notes[42]=2;
+		measures.add(tm);
+		
+		//14
+		tm = new Measure();
+		tm.notes[0]=4;
+		tm.notes[6]=2;
+		tm.notes[12]=2;
+		tm.notes[18]=2;
+		tm.notes[24]=4;
+		tm.notes[30]=2;
+		tm.notes[36]=2;
+		//tm.notes[42]=2;
+		measures.add(tm);
+		
+		//15
+		tm = new Measure();
+		tm.notes[0]=2;
+		tm.notes[6]=2;
+		tm.notes[12]=2;
+		tm.notes[18]=2;
+		tm.notes[24]=2;
+		tm.notes[30]=2;
+		tm.notes[36]=2;
+		tm.notes[42]=2;
+		measures.add(tm);
 		
 	}
 	
 	
 }
+
+
 
 

@@ -132,6 +132,7 @@ public class ClientCode implements OnClickListener{
 							syncTimer=System.currentTimeMillis();
 
 							syncFlag=true;
+							mActivity.beatTimer.syncMute=true;
 						}
 
 
@@ -139,8 +140,12 @@ public class ClientCode implements OnClickListener{
 
 					if(System.currentTimeMillis()-syncTimer>waitTime && syncFlag)
 					{
+						mActivity.beatTimer.syncMute=false;
 						bbc.resetIndex();
 						syncFlag=false;
+
+
+
 					}
 
 					if(messageFlag)
@@ -256,6 +261,26 @@ public class ClientCode implements OnClickListener{
 						}						
 					}
 
+					if(line.contains("usingEmotion"))
+					{
+						bbc.usingEmotion=!bbc.usingEmotion;
+					}
+					if(line.contains("resetComposition"))
+					{
+						doStop();
+						bbc.myBehavior.setSeparation(true);
+						bbc.compositionIndex=0;
+						bbc.compositionMarker=0;
+						for(int i=0;i<bbc.theComposition.measures.size();i++)
+						{
+							CMeasure m = bbc.theComposition.getMeasure(i);
+							m.clearMeasure();
+						}
+						bbc.setMapping(299);
+						bbc.goToStartPosition();
+						
+					}
+
 					if(line.contains("setAvatar"))
 					{
 						String test [] = line.split(",");
@@ -298,9 +323,9 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						myID= Integer.parseInt(test[1]);
 						bbc.ID=myID;
-						
+
 						bbc.CN();
-						
+
 
 						////check other bots
 						for(int i=0;i<bbc.otherBots.size();i++)
@@ -316,7 +341,7 @@ public class ClientCode implements OnClickListener{
 
 						//bbc.setMyNote(bbc.getMSDegree(bbc.ID)+72   );
 						bbc.setMyNote(bbc.getFightSongNote(bbc.ID));
-						
+
 						bbc.neighborThread.sortBy("ID");
 
 						///
@@ -329,7 +354,7 @@ public class ClientCode implements OnClickListener{
 
 
 					}
-					
+
 					if(line.contains("debugView"))
 					{
 						bbc.rfv.drawFace=!bbc.rfv.drawFace;
@@ -499,6 +524,10 @@ public class ClientCode implements OnClickListener{
 					{
 						bbc.useSong=!bbc.useSong;
 					}
+					if(line.contains("useCSong"))
+					{
+						bbc.useCSong=!bbc.useCSong;
+					}
 
 					if(line.contains("directControl"))
 					{
@@ -582,7 +611,7 @@ public class ClientCode implements OnClickListener{
 						String test [] = line.split(",");
 						Log.d("client","formation " + test[1] );
 
-						int d=80;
+						int d=170;
 						if(test.length>=3)
 						{
 							d=(int) Float.parseFloat(test[2]);
@@ -1139,6 +1168,22 @@ public class ClientCode implements OnClickListener{
 
 
 							}
+							if(code==1001)//resetComposition
+							{
+								 
+								doStop();
+								bbc.myBehavior.setSeparation(true);
+								bbc.compositionIndex=0;
+								bbc.compositionMarker=0;
+								for(int i=0;i<bbc.theComposition.measures.size();i++)
+								{
+									CMeasure m = bbc.theComposition.getMeasure(i);
+									m.clearMeasure();
+								}
+								bbc.setMapping(299);
+								bbc.goToStartPosition();
+								
+							}
 							if(code==998) // move with mouse continuously
 							{
 
@@ -1371,34 +1416,461 @@ public class ClientCode implements OnClickListener{
 									}
 								});
 							}
+
+							//hit from grid
+							if(code==903)
+							{
+
+
+								if(test.length==4)
+								{
+									int d = Integer.parseInt(test[2]);
+									if(d==bbc.ID)
+									{
+										bbc.userPlay();
+										//bbc.myBehavior.determineHappiness();
+										if(bbc.usingEmotion)
+										{
+											bbc.myBehavior.setHappiness(1);//im happy because i was played.
+										}
+										int ind = Integer.parseInt(test[3]);
+										bbc.instrumentseq[ind]=true;
+										bbc.sfxrseq[ind]=true;
+
+										if(bbc.compositionMode)
+										{
+											//write into the composition this time
+											CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+											Integer testInt = new Integer(d);//the id
+											if(!m.notes[ind].contains(testInt))
+											{
+												m.notes[ind].add(testInt);//the id
+											}
+
+											//bbc.lookAtHuman();
+											bbc.myBehavior.doEmoteJiggle();
+											//bbc.goToStartPosition();
+
+											//the human played but it wasn't his turn. interruption. what
+											if(bbc.compositionMarker%2==1)
+											{
+
+												bbc.hiseq[ind]=true;
+												bbc.myBehavior.extraHumanTime=5*1000;
+												bbc.myBehavior.humanInterruptedMeTimer=System.currentTimeMillis();
+											}
+										}
+
+
+									}
+
+
+								}
+							}
+							//remove from grid
+							if(code==9033)
+							{
+								if(test.length==4)
+								{
+									int d = Integer.parseInt(test[2]);
+									if(d==bbc.ID)
+									{
+										int ind = Integer.parseInt(test[3]);
+										bbc.instrumentseq[ind]=true;
+										bbc.sfxrseq[ind]=true;
+
+										if(bbc.compositionMode)
+										{
+											//write into the composition this time
+											CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+											Integer testInt = new Integer(d);//the id
+											if(m.notes[ind].contains(testInt))
+											{
+												m.notes[ind].remove(testInt);//the id
+											}
+
+											//bbc.lookAtHuman();
+											bbc.myBehavior.doEmoteJiggle();
+											//bbc.goToStartPosition();
+
+											//the human played but it wasn't his turn. interruption. what
+											if(bbc.compositionMarker%2==1)
+											{
+
+												bbc.hiseqneg[ind]=true;
+												bbc.myBehavior.extraHumanTime=5*1000;
+												bbc.myBehavior.humanInterruptedMeTimer=System.currentTimeMillis();
+												bbc.myBehavior.humanInterruptedMe=true;
+												
+											}
+										}
+
+										if(bbc.usingEmotion)
+										{
+											//bbc.myBehavior.determineHappiness();//must check to see if i'm still happy now
+										}
+									}
+
+								}
+							}
+
+							//remove note
+							if(code==8033)
+							{
+
+								if(test.length==3)
+								{
+									int d = Integer.parseInt(test[2]);
+									if(d==bbc.ID)
+									{
+										int cc = bbc.currentIndex;
+										bbc.instrumentseq[cc]=false;
+										bbc.sfxrseq[cc]=false;
+										if(bbc.compositionMode)
+										{
+											//write into the composition this time
+											CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+											//m.notes[bbc.ID].add(new Integer(bbc.currentIndex));
+											Integer testInt = new Integer(bbc.ID);//the id
+
+											if(m.notes[cc].contains(testInt))//the id
+											{
+												m.notes[cc].remove(testInt);//the id
+											}
+
+
+											//bbc.lookAtHuman();
+											//bbc.myBehavior.doEmoteJiggle();
+											//bbc.goToStartPosition();
+
+											//the human played but it wasn't his turn. interruption. what
+											if(bbc.compositionMarker%2==1)
+											{
+												//bbc.fillNow(bbc.hiseq);
+												bbc.fillNow(bbc.hiseqneg);
+												bbc.myBehavior.extraHumanTime=5*1000;
+												bbc.myBehavior.humanInterruptedMeTimer=System.currentTimeMillis();
+												bbc.myBehavior.humanInterruptedMe=true;
+											}
+										}
+										//bbc.myBehavior.determineHappiness();//must check to see if i'm still happy now
+
+									}
+								}
+							}
+							////hitnow
 							if(code==803)
 							{
+
 								if(test.length==2)
 								{
 									bbc.userPlay();
 									if(bbc.recordSequence)
 									{
 										bbc.fillNow(bbc.instrumentseq);
-										bbc.fillNow(bbc.sfxrseq);
+										bbc.fillNow(bbc.sfxrseq);									
+
 									}
 								}
 								else
 								{
+									//carillon... 
 									if(test.length==3)
 									{
 										int d = Integer.parseInt(test[2]);
+										//int index = 
 										if(d==bbc.ID)
 										{
 											bbc.userPlay();
-											
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.setHappiness(1);
+											}
 											if(bbc.recordSequence)
 											{
 												bbc.fillNow(bbc.instrumentseq);
 												bbc.fillNow(bbc.sfxrseq);
 											}
+
+											if(bbc.compositionMode)
+											{
+
+												bbc.fillNow(bbc.instrumentseq);
+												bbc.fillNow(bbc.sfxrseq);
+
+
+												//write into the composition this time
+												CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+												//m.notes[bbc.ID].add(new Integer(bbc.currentIndex));
+												m.notes[bbc.currentIndex].add(new Integer(bbc.ID));
+
+												//bbc.lookAtHuman();
+												if(bbc.usingEmotion)
+												{
+													bbc.myBehavior.doEmoteJiggle();
+												}
+												//bbc.goToStartPosition();
+
+												//the human played but it wasn't his turn. interruption. what
+												if(bbc.compositionMarker%2==1)
+												{
+													bbc.fillNow(bbc.hiseq);
+													bbc.myBehavior.extraHumanTime=5*1000;
+													bbc.myBehavior.humanInterruptedMeTimer=System.currentTimeMillis();
+													bbc.myBehavior.humanInterruptedMe=true;
+													
+												}
+											}
+
+											//bbc.myBehavior.determineHappiness();
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.setHappiness(1);//i was played so i'm happy
+											}
+										}
+									}
+									////index 4 carillon
+									if(test.length==4)
+									{
+										int d = Integer.parseInt(test[2]);
+										int index = Integer.parseInt(test[3]);
+										if(d==bbc.ID)
+										{
+											bbc.userPlay();
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.setHappiness(1);
+											}
+											if(bbc.recordSequence)
+											{
+												//bbc.fillNow(bbc.instrumentseq);
+												//bbc.fillNow(bbc.sfxrseq);
+												bbc.instrumentseq[index]=true;
+												bbc.sfxrseq[index]=true;
+											}
+
+											if(bbc.compositionMode)
+											{
+
+												//bbc.fillNow(bbc.instrumentseq);
+												//bbc.fillNow(bbc.sfxrseq);
+
+												bbc.instrumentseq[index]=true;
+												bbc.sfxrseq[index]=true;
+
+
+												//write into the composition this time
+												CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+												//m.notes[bbc.ID].add(new Integer(bbc.currentIndex));
+												m.notes[index].add(new Integer(bbc.ID));
+
+												//bbc.lookAtHuman();
+												if(bbc.usingEmotion)
+												{
+													bbc.myBehavior.doEmoteJiggle();
+												}
+												//bbc.goToStartPosition();
+
+												//the human played but it wasn't his turn. interruption. what
+												if(bbc.compositionMarker%2==1)
+												{
+													//bbc.fillNow(bbc.hiseq);
+													bbc.hiseq[index]=true;
+													bbc.myBehavior.extraHumanTime=5*1000;
+													bbc.myBehavior.humanInterruptedMeTimer=System.currentTimeMillis();
+													bbc.myBehavior.humanInterruptedMe=true;
+													
+												}
+											}
+
+											//bbc.myBehavior.determineHappiness();
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.setHappiness(1);//i was played so i'm happy
+											}
 										}
 									}
 								}
+							}
+
+							if(code==805)
+							{
+								//playCMeasure
+								///assume that the sync operation was also called
+
+								int measureID = (int) Float.parseFloat(test[2]);
+								bbc.playCMeasure( measureID);
+								bbc.playMeasureFlag=true;
+							}
+
+							if(code == 806)
+							{
+								//playComposition
+								bbc.playComposition();
+								bbc.playCompositionFlag=true;
+								///assume that the sync operation was also called
+
+								//bbc.myBehavior.setOrbitInLine(true);
+								bbc.myBehavior.setPerformComposition(true);//shoudl be in go to start
+
+								bbc.setMapping(300);
+								bbc.compositionIndex=0;
+								bbc.theComposition.currentMeasure=bbc.theComposition.getMeasure(bbc.compositionIndex);
+
+							}
+							if(code==807)//changing turn  
+							{
+								//bbc.myBehavior.determineHappiness();//determine happiness at this moment right before playing
+								//if it was previously humans turn or robots, i should know if i was playing
+
+								//regardless of turn..human interrupted me is false
+								bbc.myBehavior.humanInterruptedMe=false;
+								
+								//clear the human interruption sequence
+								bbc.clearRhythm(bbc.hiseq);
+								bbc.clearRhythm(bbc.hiseqneg);
+								
+								
+								int measureID = (int) Float.parseFloat(test[2]);
+								bbc.compositionIndex=measureID;
+								bbc.compositionMarker=measureID;
+
+								bbc.theComposition.currentMeasure=bbc.theComposition.getMeasure(bbc.compositionMarker);
+								bbc.mActivity.beatTimer.currentCMeasure=bbc.theComposition.currentMeasure;
+
+								doStop();							
+								bbc.myBehavior.setSeparation(true);
+								//human's turn
+								if(measureID%2==0)
+								{
+									bbc.myBehavior.avoidBoundaryFlag=true;//already take care of by doStop
+									bbc.directControl=false;//as a precaution
+									bbc.goToStartPosition();
+									bbc.setMapping(299);
+									bbc.myBehavior.setSeparation(true);
+									//bbc.doRhythmMove=false;//already in gotostart
+
+									bbc.myBehavior.extraHumanTime=0;
+
+									//clear the human interruption sequence
+									bbc.clearRhythm(bbc.hiseq);
+									bbc.clearRhythm(bbc.hiseqneg);
+									bbc.myBehavior.humanInterruptedMe=false;
+
+									handler.post(new Runnable() {
+										@Override
+										public void run() {
+											Toast.makeText(mActivity.getApplicationContext(), "human's turn " + bbc.compositionIndex  , Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+								else//robot's turn
+								{							
+									bbc.myBehavior.avoidBoundaryFlag=true;
+									//only do this if you haven't done anything before on this measure
+									if(!bbc.alreadyPlayed[measureID%bbc.alreadyPlayed.length])
+									{
+
+										bbc.myBehavior.setSeparation(true);
+										bbc.directControl=false;//as a precaution
+										bbc.myBehavior.targetCheck=false;				
+										bbc.initializeRobotPosition();									
+										//bbc.myBehavior.setRotate(false);
+										//bbc.myBehavior.setWanderVector(true);
+										//bbc.setDanceSequencer(true);
+										//bbc.doRhythmMove=true;									
+										bbc.setMapping(301);
+										//bbc.setMapping(a)
+
+
+
+
+										handler.post(new Runnable() {
+											@Override
+											public void run() {
+												Toast.makeText(mActivity.getApplicationContext(), "robo turn. measure: " + bbc.compositionIndex , Toast.LENGTH_LONG).show();
+											}
+										});
+
+									}
+									else
+									{
+
+										handler.post(new Runnable() {
+											@Override
+											public void run() {
+												Toast.makeText(mActivity.getApplicationContext(), "already played but robots' turn "  , Toast.LENGTH_LONG).show();
+											}
+										});
+
+									}
+
+
+								}
+
+								if(bbc.usingEmotion)
+								{
+									bbc.myBehavior.determineHappiness(measureID);
+								}
+
+							}
+							if(code==888)
+							{
+								//human's turn
+								bbc.directControl=false;//as a precaution
+								bbc.goToStartPosition();
+								bbc.setMapping(299);
+							}
+
+							if(code==804)
+							{
+								Log.d("clientCode","received from controller a CMeasure");
+
+								int measureID = (int) Float.parseFloat(test[2]);
+								int botID = (int) Float.parseFloat(test[3]);
+								String s = test[4];
+								char[] a= s.toCharArray();
+
+								if(measureID<bbc.theComposition.measures.size())
+								{
+
+								}
+								else
+								{
+									Log.e("clientcode"," wrong number of measures received to contained--" + measureID + " vs " + bbc.theComposition.measures.size());
+								}
+								CMeasure m = bbc.theComposition.getMeasure(measureID);
+
+								//m.clearMeasure();
+								for(int i = 0;i<m.SEQUENCERLENGTH;i++)
+								{
+									if(i<a.length)
+									{
+										if(a[i]=='0')
+										{
+
+										}
+										else
+										{
+											Integer t = new Integer(bbc.theComposition.base+botID);
+											if(!m.notes[i].contains(t))
+											{
+												m.notes[i].add(t);
+											}
+										}
+									}
+
+								}
+
+
+
+
+
 							}
 							if(code==802)
 							{
@@ -1444,6 +1916,36 @@ public class ClientCode implements OnClickListener{
 									}
 
 									bbc.setRhythm(bbc.receivedSequence);
+
+									if(bbc.compositionMode)
+									{
+										//write into the composition this time
+										CMeasure m = bbc.theComposition.getMeasure(bbc.compositionMarker);
+
+										//m.notes[bbc.ID].add(new Integer(bbc.currentIndex));
+
+										for(int i=0;i<bbc.receivedSequence.length;i++)
+										{
+											Integer testInt= new Integer(bbc.ID);//the id
+											if(bbc.receivedSequence[i])
+											{
+												if(!m.notes[i].contains(testInt))
+												{
+													m.notes[i].add(testInt);
+												}
+											}
+											else
+											{
+												if(m.notes[i].contains(testInt))
+												{
+													m.notes[i].remove(testInt);
+												}
+											}
+
+										}
+
+
+									}
 
 
 									handler.post(new Runnable() {
@@ -1501,6 +2003,31 @@ public class ClientCode implements OnClickListener{
 								});
 
 							}
+							///////////////codes for the composition scenario
+							if(code==11235)
+							{
+								int measureID=Integer.parseInt(test[2]);
+								if(measureID%2==0)
+								{
+									//this is the human's turn
+
+								}
+								else
+								{
+									//this is the robot's turn, but the human interrupted??
+								}
+							}
+							//sethappiness
+							if(code==76767)
+							{
+								if(bbc.usingEmotion)
+								{
+									int hap=Integer.parseInt(test[2]);
+									bbc.myBehavior.setHappiness(hap);
+								}
+							}
+
+
 
 						}
 
@@ -1945,6 +2472,11 @@ public class ClientCode implements OnClickListener{
 		}
 	}
 
+	public void sendMessage3(String s)
+	{
+		out2.println(s);
+	}
+
 	public void doStuff()
 	{
 		Log.d("ClientCode", "attempting to connect");
@@ -1988,14 +2520,24 @@ public class ClientCode implements OnClickListener{
 		bbc.myBehavior.setEvadeAvatar(false);
 		bbc.myBehavior.setOrbitAvatar(false);
 
-		bbc.myBehavior.setSeparation(false);
+		bbc.myBehavior.setSeparation(true);//warning
 		bbc.myBehavior.setAlignment(false);
 		bbc.myBehavior.setCohesion(false);
+		
+		bbc.myBehavior.humanInterruptedMe=false;
 
 
 		bbc.directControl=false;
 
+		bbc.myBehavior.setPerformComposition(false);
+		
 		bbc.myBehavior.setRotate(false);
+
+		bbc.myBehavior.targetCheck=false;
+
+		bbc.myBehavior.avoidBoundaryFlag=true;
+		
+		
 
 
 		Log.d("LINE","stop");
