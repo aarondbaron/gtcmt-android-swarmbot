@@ -4,9 +4,12 @@ import java.util.Vector;
 
 public class Performance implements Runnable{
 	
-	Vector scenes;
+	Vector<Scene> scenes;
+	
+	Song song;
 	
 	int sceneCounter;
+	Scene currentScene;
 	
 	String performanceType;
 	
@@ -27,6 +30,15 @@ public class Performance implements Runnable{
 		scenes.add(s);
 	}
 	
+	public Scene getScene(int i)
+	{
+		return scenes.get(i%scenes.size());
+	}
+	public void nextScene()
+	{
+		this.sceneCounter++;
+		currentScene=getScene(sceneCounter);
+	}
 	
 	
 	

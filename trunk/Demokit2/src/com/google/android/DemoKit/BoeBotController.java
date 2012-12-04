@@ -1,6 +1,7 @@
 package com.google.android.DemoKit;
 
 
+ 
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -51,7 +52,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	private RectView view1;
 	private Paint paint;
 
-	public boolean[] fseq,bseq,rseq,lseq, sfxrseq, instrumentseq, movementseq;
+	public boolean[] fseq,bseq,rseq,lseq, sfxrseq, instrumentseq, movementseq, hiseq, hiseqneg;
 	//SurfaceView sv;
 	Thread svthread;
 
@@ -189,6 +190,13 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 	boolean p;
 	boolean cn=false;
+	
+	//CMeasure currentCMeasure;
+	Composition theComposition;
+	
+	int controllerID;
+	
+	public boolean usingEmotion=true;
 
 	public boolean isnComEnable() {
 		return nComEnable;
@@ -225,6 +233,9 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		avatarseq = new boolean[SEQUENCERLENGTH];
 
 		receivedSequence = new boolean[SEQUENCERLENGTH];
+		
+		hiseq = new boolean[SEQUENCERLENGTH];
+		hiseqneg = new boolean[SEQUENCERLENGTH];
 
 
 
@@ -338,6 +349,22 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 		myposx=640/2;
 		myposy=480/2;
 
+		
+		
+		theComposition = new Composition();
+		for(int i=0;i<8;i++)
+		{
+			CMeasure mm = new CMeasure();
+			mm.ID=i;
+			theComposition.addMeasure(mm);
+			
+		}
+		theComposition.currentMeasure=theComposition.getMeasure(0);
+		
+		humanPos = new PVector(640/2,480+60);
+		
+		
+		alreadyPlayed = new boolean[8];
 
 	}
 
@@ -478,6 +505,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public boolean swapOnce;
 	public boolean findOnce;
 	public boolean useSong=true;
+	public boolean useCSong=true;
 	public int myNote=72;
 	public int[] MSDeg;
 	public boolean avatarMoving;
@@ -933,6 +961,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	public void userPlay()
 	{
 		this.userPlayed=true;
+		this.timeFromUserPlayed=System.currentTimeMillis();
 		new Thread(
 				new Runnable() {
 					public void run() {
@@ -947,6 +976,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 							////////////////////
 							mActivity.aTest.soundType(7);
 							mActivity.aTest.replay();
+							
+							if(!useCSong)
+							{
+								mActivity.aTest.setNote(myNote);
+							}
+							else
+							{
+								mActivity.aTest.setNote(mActivity.beatTimer.currentMeasure.notes[currentIndex]);
+								
+							}
 
 							if(!useSong)
 							{
@@ -1300,6 +1339,45 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 
 
 	}
+	
+	
+	
+	boolean[] andArrays(boolean[] b1, boolean b2[])
+	{
+		if(b1.length!=b2.length)
+		{
+			return new boolean[this.SEQUENCERLENGTH];
+		}
+		else
+		{
+			boolean[] t = new boolean[this.SEQUENCERLENGTH];
+			
+			for(int i=0;i<t.length;i++)
+			{
+				t[i]=b1[i] && b2[i];
+			}
+			
+			return t;
+		}
+	}
+	boolean[] orArrays(boolean[] b1, boolean b2[])
+	{
+		if(b1.length!=b2.length)
+		{
+			return new boolean[this.SEQUENCERLENGTH];
+		}
+		else
+		{
+			boolean[] t = new boolean[this.SEQUENCERLENGTH];
+			
+			for(int i=0;i<t.length;i++)
+			{
+				t[i]=b1[i]||b2[i];
+			}
+			
+			return t;
+		}
+	}
 
 	void setRhythm(boolean[] b)
 	{
@@ -1308,6 +1386,16 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			sfxrseq[i]=b[i];
 			instrumentseq[i]=b[i];
 
+		}
+	}
+	
+	void reverseRhythm(boolean[] b)
+	{
+		for(int i = 0; i < b.length / 2; i++)
+		{
+			boolean temp = b[i];
+		    b[i] = b[b.length - i - 1];
+		    b[b.length - i - 1] = temp;
 		}
 	}
 
@@ -1329,6 +1417,18 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 			b[i]=!b[i];
 		}
 	}
+	/*
+	boolean[] invertRhythm(boolean b[])
+	{
+		boolean[] res = new boolean[b.length];
+		for (int i=0; i<b.length;i++)
+		{
+			res[i]=!b[i];
+		}
+		
+		return res;
+	}
+	*/
 
 	void clearRhythm(boolean b[]) 
 	{
@@ -3324,6 +3424,233 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	{
 		 mActivity.client.sendMessage2(this.notesToString(m.notes));		
 	}
+	
+	
+	
+	
+	//using CMeasure
+	////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	boolean compositionMode= true;
+	//start position will always be a circle looking towards the human, when it's the human's turn
+	int happiness=0;
+	boolean [] didIPlay;
+	void goToStartPosition()
+	{
+		myBehavior.robotTurnTimer=System.currentTimeMillis();//why here? doens't ned to be
+		this.doRhythmMove=false;
+		this.directControl=false;
+		myBehavior.formationType="circle";
+		myBehavior.setFormation(true);
+		myBehavior.distFormation=170;
+		
+		myBehavior.setPlayAndReport(false); ///if you end early..must make sure to ste this false
+		
+		//must make sure not stuck in rotate
+		myBehavior.setRotate(false);
+		
+		myBehavior.targetCheck=true;
+		myBehavior.humanInterruptedMe=false;
+		
+		robotTurnInitFlag2=false;
+	}
+	
+	//this is for the robot to take its turn.. first . look towards the center	
+	boolean robotTurnInitFlag2=false;
+	void initializeRobotPosition()
+	{
+		
+		myBehavior.robotTurnTimer=System.currentTimeMillis(); //this needs to be here
+		
+		this.directControl=false;//direct control is only for emote
+		//this.lookAtPosition(new PVector(640/2,480/2));
+		myBehavior.robotTurnInitTimer1=System.currentTimeMillis();//look to the center to start
+		myBehavior.setPlayAndReport(true);
+		myBehavior.targetCheck=false;	
+		
+		myBehavior.humanInterruptedMe=false;
+		
+		robotTurnInitFlag2=false;
+		
+		
+	}
+	
+	
+	void initializeCompositionPosition()
+	{
+		goToStartPosition();
+		
+	}
+	
+	
+	
+	/*
+	void askForTurn()
+	{
+		if(happiness<1)
+		{
+			if(this.usingEmotion)
+			{
+				myBehavior.doEmoteJiggle();
+			}
+		}
+	}
+	*/
+	
+	PVector humanPos ;
+	void lookAtHuman()
+	{
+		
+		
+		
+		lookAtPosition(humanPos);
+		
+		
+		
+		
+	}
+	
+	void lookAtPosition(PVector pos)
+	{
+		targetx=(int) pos.x;
+		targety=(int) pos.y;	
+		
+		myBehavior.setRotate(true);
+		moveToLoc(true);
+		
+		//targetx= (int) (myposx+ 100.0*Math.cos(ang));
+		//targety= (int) (myposy+ 100.0*Math.sin(ang));
+		
+
+	}
+	
+	void getAttention()
+	{
+		
+	}
+	
+	boolean amIPlaying()
+	{
+		return true;
+	}
+	
+	
+	/*
+	 * things to do...make robot look towards human (it does do this....but when should it..
+	 * acknowledge receipt of message....(shake emotion is working---but should make it so its greater agitation)
+	 * robots must record their patterns and then broadcast it to the main controller
+	 * robots must play their pattern
+	 */
+	
+	/*
+	 * 
+	 * human ALWAYS goes first...makes a measure... can have robots play it back
+	 * robots that are used have happiness measure.  
+	 * human then cedes control to robots
+	 * robots will always use last created human measure(s).  
+	 * when robots are performing.. they will always use dance mode..
+	 * when going back to start state...the will move normally....
+	 * 
+	 * when a robot gets to play...the robot will smile and its "happiness measure" is high
+	 * if a robot has not been played over the course of the song, it will show a sad face..and sad color
+	 * robots then take their turn..using only either angle neigbhor or speed, they alter what the human played
+	 * how does robot move?  orbit/move close to one another...
+	 *   
+	 * condition 1.. human does NOT get to interact/change the robots as they make their part of the song.
+	 * in condition 1, robot will look at what human play, and then pick the same notes to play, doing a circular back and forth motion /orbit ..ony based on angle..
+	 * 
+	 * condition 2.. human does get to itneract with robots as they make their song...interrupting
+	 * in condition 2, if the human interrupts, the human will not do any motion behavior..only by playing..... playing a robot indicates that this robot will join the activity
+	 * the timer will be reset...  the robots normally only choose based on the last measure of what human played.  at any time, the human may play the robots to cause another robot to be brought into the fray.
+	 * bringing a robot into the fray..measn that robot does not have anything..but must be given what everyone else has
+	 * 
+	 */
+	void takeTurn()
+	{
+		int choice = (int)Math.random()*5;
+		
+		switch(choice)
+		{	
+		
+		case 0:  // /move together and use neigbhor mapping
+			
+			break;
+		case 1:
+			//move tgoether and use angle mapping
+			break;
+		case 2:
+			// use what they played in the previous measure, vary it by neigbhor
+			
+			break;
+			
+		case 3:
+			// use what they played in the previous measure, vary it by angle
+			
+			break;
+			
+		case 4:
+			// use what they played in the previous measure, vary it by something and shift in pitch
+			
+			break;
+			
+		case 5:
+			// use what they played in the previous measure, vary it by something and shift in pitch
+			
+			break;
+			
+		case 6:
+			// play a single melody from reivous measure, orbit, and then shift based on angle..
+			
+			break;
+			
+			
+		default: ;
+			break;
+		
+		}
+	}
+
+	public void playCMeasure(int measureID) {
+		// TODO Auto-generated method stub
+		this.compositionIndex=measureID;
+		
+		this.theComposition.currentMeasure=theComposition.getMeasure(measureID);
+		this.setRhythm(theComposition.currentMeasure.getLine(this.ID));
+		
+		
+		
+	}
+	
+	int compositionIndex=0;
+	public int compositionMarker=0;
+	public void playComposition()
+	{
+		compositionIndex=0;
+		this.theComposition.currentMeasure=theComposition.getMeasure(compositionIndex);
+		this.setMapping(300);
+		
+	}
+	
+	boolean[] alreadyPlayed;
+	public boolean playMeasureFlag;
+	public boolean playCompositionFlag;
+	public long timeFromUserPlayed;
+
+	
+	/*
+	 * 
+	 * color
+	 * allow for interruption--handele what to do-- need to have a special sequence for the human in interruptin case
+	 *  so that it will always put whatever the human dictated.
+	 * dont' play if not used previously..
+	 * play composition entirely
+	 * highlight robot sequencer that wants to be used...
+	 * better musical choice
+	 * fix composition so that its not continually adding in but settles on one particular pattern
+	 * consider starting with the reverse of the melody..
+	 */
+	
 	
 	
 
