@@ -26,7 +26,7 @@ import android.view.SubMenu;
 import android.view.WindowManager;
 
 
- 
+
 
 import com.android.future.usb.UsbAccessory;
 import com.android.future.usb.UsbManager;
@@ -52,12 +52,17 @@ public class DemokitMobileControlActivity extends Activity {
 	long startTime;
 
 	boolean doTrackMenu;
-	
+
 	boolean useSFXR;
 	int changeSound;
-	
+
 	boolean useSong;
 
+	int measureCounter=0;
+
+	long mTimer;
+	
+	boolean initialStart=false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -148,6 +153,7 @@ public class DemokitMobileControlActivity extends Activity {
 
 
 		startTime=System.currentTimeMillis();
+		mTimer=startTime;
 
 
 	}
@@ -217,11 +223,11 @@ public class DemokitMobileControlActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 			// do something on back.
-			
+
 			if(this.drawView.thread.numberPick.show)
 			{
 				this.drawView.thread.numberPick.show=false;
-			    this.drawView.mode = prevMode;
+				this.drawView.mode = prevMode;
 				return true;
 			}
 
@@ -229,10 +235,15 @@ public class DemokitMobileControlActivity extends Activity {
 			{
 				this.drawView.thread.showSequencer=false;
 			}
-			else
+
+
+			if(!reallyQuit)
 			{
-				finish();
+				//finish();
+				this.reallyQuit=true;
+				this.openOptionsMenu();
 			}
+
 			return true;
 		}
 
@@ -245,7 +256,7 @@ public class DemokitMobileControlActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		this.makeArenaMenu(menu);
-		 
+
 		return true;
 	}
 
@@ -259,6 +270,9 @@ public class DemokitMobileControlActivity extends Activity {
 			//showControls();
 			this.drawView.thread.arena.cursor.active=!this.drawView.thread.arena.cursor.active;
 		} else if (item.getTitle() == "Quit") {
+
+			writeCompositionToFile();
+
 			finish();
 			System.exit(0);
 		}else if (item.getTitle() == "HitMode") {
@@ -281,13 +295,13 @@ public class DemokitMobileControlActivity extends Activity {
 			this.client.sendMessage("controller,"+ 756 + "," + t );
 		}else if (item.getTitle() == "ChangeSound") {
 			changeSound++;
-			 
+
 			if(changeSound>10)
 			{
 				changeSound=0;
 			}
 			this.client.sendMessage("controller,"+ 7555 + "," + changeSound );
-			
+
 		}else if (item.getTitle() == "StopAll") {
 			//mActivity.client.sendMessage("controller,"+ 999 + "," + xx + "," + yy) ;
 			drawView.mode="StopAll";
@@ -363,7 +377,7 @@ public class DemokitMobileControlActivity extends Activity {
 			this.drawView.mode="AvatarMove";
 		}else if (item.getTitle() == "circle") {
 			this.drawView.mode="formation";
-			this.client.sendMessage("controller,"+ 997 + ",circle," + 80);
+			this.client.sendMessage("controller,"+ 997 + ",circle," + 60);//smaller circle
 
 		}else if (item.getTitle() == "square") {
 			this.drawView.mode="formation";
@@ -394,13 +408,13 @@ public class DemokitMobileControlActivity extends Activity {
 		}else if (item.getTitle() == "noMapping") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
 		}else if (item.getTitle() == "chooseNumber") {
-			
+
 			this.drawView.thread.numberPick.show=true;
 			Log.d("bringing up the nuberpick" ,"" + this.drawView.thread.numberPick.show );
-			
+
 			prevMode=drawView.mode;
 			drawView.mode="chooseNumber";
-			
+
 			//this.client.sendMessage("controller,"+ 800 + "," + Mapping.NONE.getMap());
 		}else if (item.getTitle() == "angle") {
 			this.client.sendMessage("controller,"+ 800 + "," + Mapping.ANGLE.getMap());
@@ -438,6 +452,20 @@ public class DemokitMobileControlActivity extends Activity {
 			this.drawView.thread.arenaSongmaker=true;
 			//prevMode=this.drawView.mode;
 			this.drawView.mode="";
+			this.drawView.thread.songMaker.displayMeasure(this.measureCounter);			
+			//send message to get inot start position
+			//this.client.sendMessage("controller,"+ ControllerCode.INITIALZESTART.getCode() + "," +  measureCounter);
+			
+			if(!this.initialStart)
+			{
+				measureCounter=0;
+				this.client.sendMessage("controller,"+ ControllerCode.CHANGEMEASURE.getCode() + "," +  measureCounter);
+				this.mTimer=System.currentTimeMillis();
+				this.initialStart=true;//purpose of initial start is to set up the experiment at the begininning
+
+			}
+			
+
 		}else if(item.getTitle() == "ToArena")		{
 			this.drawView.thread.arenaSongmaker=false;
 			//this.drawView.mode=prevMode;
@@ -471,6 +499,77 @@ public class DemokitMobileControlActivity extends Activity {
 
 
 
+		}else if(item.getTitle() == "resetComposition")		{
+			measureCounter=0;						
+			//bbc.compositionIndex=0;
+			//bbc.compositionMarker=0;						
+			for(int i=0;i<sc.myComposition.measures.size();i++)
+			{
+				CMeasure m = sc.myComposition.getMeasure(i);
+				m.clearMeasure();
+			}
+			drawView.thread.songMaker.displayMeasure(measureCounter);
+			this.mTimer=System.currentTimeMillis();
+			
+			this.client.sendMessage("controller,"+ 1001);
+
+
+
+		}else if(item.getTitle() == "-->")		{
+			//CMeasure s= this.sc.myComposition.getNextMeasure();
+
+			//this.drawView.thread.sequencer.nextMeasure();
+
+			this.drawView.thread.songMaker.nextMeasure();
+			measureCounter++;
+
+			long ttt = System.currentTimeMillis()-mTimer;
+			mTimer=System.currentTimeMillis();
+			this.writeToFile("time for measure "  + (measureCounter-1) + " : " + ttt);
+
+			if(measureCounter>=this.drawView.bbc.myComposition.measures.size())
+			{
+				measureCounter=0;
+			}
+
+			this.client.sendMessage("controller,"+ ControllerCode.CHANGEMEASURE.getCode() + "," +  measureCounter);
+
+
+			//this.drawView.thread.songMaker.displayMeasure(this.measureCounter);
+
+		}else if(item.getTitle() == "<--")		{
+			//CMeasure s= this.sc.myComposition.getPreviousMeasure();
+
+			//this will by default include displaying it
+			this.drawView.thread.songMaker.previousMeasure();
+
+			//this.drawView.thread.songMaker.displayMeasure(0);
+
+			measureCounter--;
+			if(measureCounter<0)
+			{
+				measureCounter=this.drawView.bbc.myComposition.measures.size()-1;
+			}
+			//this.drawView.thread.songMaker.displayMeasure(this.measureCounter);
+
+			this.client.sendMessage("controller,"+ ControllerCode.CHANGEMEASURE.getCode() + "," +  measureCounter);
+
+
+
+		}else if(item.getTitle() == "+")		{
+			CMeasure s= this.sc.myComposition.newMeasure();
+			this.drawView.thread.songMaker.displayMeasure(this.drawView.bbc.myComposition.measures.size()-1);
+		}else if(item.getTitle() == "-")		{
+			this.sc.myComposition.deleteMeasure();
+			this.drawView.thread.songMaker.previousMeasure();
+
+			measureCounter--;
+			if(measureCounter<0)
+			{
+				measureCounter=this.drawView.bbc.myComposition.measures.size()-1;
+			}
+
+
 		}else if(item.getTitle() == "RandomEuclid")		{
 
 			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
@@ -488,20 +587,20 @@ public class DemokitMobileControlActivity extends Activity {
 
 			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
 			int ind =this.drawView.selectedI; 
-			
+
 			int ae2 = (int) (Math.random()* gridVals[ind].length);
 			int ae = (int)( Math.random() *10);
 
 			this.drawView.bbc.embellish2(gridVals[ind], ae2, 4);
 			this.drawView.bbc.embellish(gridVals[ind], ae, 0);
-			
+
 			//this.drawView.bbc.embellish(gridVals[ind], number);
 			//this.drawView.bbc.fillEuclid((int) (Math.random()*gridVals[ind].length/4 +1), gridVals[ind]);
 
 		}else if(item.getTitle() == "EmbellishAll")		{
 
 			boolean[][] gridVals = this.drawView.thread.songMaker.g.gridVals;
-			
+
 			for (int i=0;i<gridVals.length;i++)
 			{
 				int ae2 = (int) (Math.random()* gridVals[i].length);
@@ -509,9 +608,9 @@ public class DemokitMobileControlActivity extends Activity {
 
 				this.drawView.bbc.embellish2(gridVals[i], ae2, 4);
 				this.drawView.bbc.embellish(gridVals[i], ae, 0);
-				
+
 			}
-			 
+
 		}else if(item.getTitle() == "Fill")		{
 
 			if(this.drawView.thread.arenaSongmaker)
@@ -526,6 +625,31 @@ public class DemokitMobileControlActivity extends Activity {
 					}
 				}
 			}
+
+		}else if(item.getTitle() == "BroadcastCMeasure")		{
+
+			HandleBroadcastThread h = new HandleBroadcastThread(this);
+
+			h.start();
+
+		}else if(item.getTitle() == "LoopMeasure")		{
+
+			//this.client.sendMessage("controller,"+ 1000);
+			//this.client.sendMessage("controller,"+ ControllerCode.PLAYMEASURE.getCode() + "," + this.drawView.thread.songMaker.comp.currentMeasure.ID);
+			this.drawView.bbc.loopMeasure=!this.drawView.bbc.loopMeasure;
+
+		}else if(item.getTitle() == "PlayMeasure")		{
+
+			//this.client.sendMessage("controller,"+ 1000);
+			this.client.sendMessage("controller,"+ ControllerCode.PLAYMEASURE.getCode() + "," + this.drawView.thread.songMaker.comp.currentMeasure.ID);
+
+		}else if(item.getTitle() == "PlayComposition")		{
+
+			//this.client.sendMessage("controller,"+ 1000);
+			this.client.sendMessage("controller,"+ ControllerCode.PLAYCOMPOSITION.getCode() );
+
+
+
 
 		}else if(item.getTitle() == "BroadcastMeasure")	{
 
@@ -597,6 +721,38 @@ public class DemokitMobileControlActivity extends Activity {
 
 
 
+	private void writeCompositionToFile() {
+		// TODO Auto-generated method stub
+
+		Composition c = this.sc.myComposition;
+
+		for(int i=0;i<c.measures.size();i++)
+		{
+
+			CMeasure cc = c.getMeasure(i);
+			this.writeToFile("Measure: " + cc.ID);
+			boolean[][] ff= cc.toGrid();
+			for(int j = 0; j < ff.length;j++)
+			{
+				String s = sc.patternToString(ff[j]);
+				this.writeToFile(s);
+			}
+
+
+			/*
+			for(int j = 0; j < sc.allBots.size();j++)
+			{
+				boolean[] b =cc.getLine(j);
+				String s = sc.patternToString(b);
+
+				this.writeToFile(s);
+
+			}
+			 */
+		}
+
+	}
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
@@ -610,24 +766,48 @@ public class DemokitMobileControlActivity extends Activity {
 		}
 		if(this.drawView.thread.arenaSongmaker)
 		{
+
 			makeSongMakerMenu( menu);
 		}
 		else
 		{
 			makeArenaMenu(menu);
 		}
+
+		if(reallyQuit)
+		{
+			makeQuitMenu(menu);
+			reallyQuit=false;
+		}
 		return true;
 
 	}
+	boolean reallyQuit;
 
 	public void makeSongMakerMenu(Menu menu)
 	{
 
 		menu.clear();
+		//menu.add("<--");
+		if(this.measureCounter!=7)
+		{
+			menu.add("-->");
+		}
 
-		menu.add("ToArena");
-		menu.add("BroadcastMeasure");
-		menu.add("ClearAll");
+		/*
+		menu.add("+");
+		menu.add("-");
+		 */
+
+		//menu.add("PlayMeasure");
+		if(this.measureCounter==7)
+		{
+			menu.add("PlayComposition");
+		}
+		menu.add("LoopMeasure");
+		menu.add("ClearAll");	
+
+
 		menu.add("RandomEuclid");
 		menu.add("EmbellishAll");
 		menu.add("StopAll");		
@@ -638,7 +818,11 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("ChangeSound");
 		menu.add("UseSong");
 		menu.add("HitMode");
-		menu.add("Problem?");		
+		menu.add("ToArena");
+		menu.add("BroadcastMeasure");
+		menu.add("BroadcastCMeasure");
+		menu.add("resetComposition");
+		menu.add("Problem?");				
 		menu.add("Quit");
 
 	}
@@ -653,7 +837,7 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Fill");
 		menu.add("Embellish");
 		menu.add("Double");
-		menu.add("Half");		
+		//menu.add("Half");		
 
 
 	}
@@ -742,6 +926,26 @@ public class DemokitMobileControlActivity extends Activity {
 		menu.add("Problem?");		
 		menu.add("Quit");
 
+	}
+
+
+	void makeInteractionMenu1(Menu menu)
+	{
+		menu.clear();
+
+		menu.add("done with my turn");
+		menu.add("play song");
+	}
+
+	void makeInteractionMenu2(Menu menu)
+	{
+
+	}
+
+	void makeQuitMenu(Menu menu)
+	{
+		menu.clear();
+		menu.add("Quit");
 	}
 
 

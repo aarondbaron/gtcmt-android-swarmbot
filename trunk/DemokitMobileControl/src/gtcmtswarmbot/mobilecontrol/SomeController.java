@@ -1,5 +1,7 @@
 package gtcmtswarmbot.mobilecontrol;
 
+ 
+
 import java.util.List;
 import java.util.Vector;
 
@@ -40,6 +42,9 @@ public class SomeController {
 	
 	List<List<String>> registry;
 	
+	Composition myComposition;
+	boolean[] alreadyPlayed;
+	
 	SomeController(DemokitMobileControlActivity demokitMobileControlActivity)
 	{
 		
@@ -68,6 +73,31 @@ public class SomeController {
 		MSDeg[6]=11;
 		MSDeg[7]=12;
 		
+		myComposition = new Composition();
+		
+		/*
+		CMeasure m = new CMeasure();		
+		m.notes[0].add(new Integer(72+7));
+		m.notes[0+4].add(new Integer(72+9));
+		m.notes[0+8].add(new Integer(72+7));
+		m.notes[0+12].add(new Integer(72+5));
+		m.notes[0+16].add(new Integer(72+4));
+		m.notes[0+20].add(new Integer(72+2));
+		m.notes[0+24].add(new Integer(72));
+		m.notes[0+36].add(new Integer(72+4));
+		m.notes[0+44].add(new Integer(72+2));
+		myComposition.addMeasure(m);
+		*/
+		
+		for(int i=0;i<8;i++)
+		{
+			CMeasure mm = new CMeasure();
+			mm.ID=i;
+			myComposition.addMeasure(mm);
+			
+		}
+		
+		alreadyPlayed = new boolean[8];
 		
 		
 		registry = new Vector<List<String>>();
@@ -563,6 +593,36 @@ public class SomeController {
 	{
 		return mActivity.beatTimer.globalTimeInterval;
 	}
+	
+	/////////////////////////////////////////composition stuff//////////////////
+	void playComposition()
+	{
+		
+	}
+	
+	void askForTurn()
+	{
+		//pick a robot
+		//make it jiggle move and look at human...blink and smile and play
+		//
+	}
+	
+	void suggestForHuman()
+	{
+		
+	}
+	
+	void takeTurn()
+	{
+		
+	}
+	
+	void relinquishTurn()
+	{
+		
+	}
+	
+	boolean loopMeasure=true;
 	
 	
 }

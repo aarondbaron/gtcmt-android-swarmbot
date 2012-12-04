@@ -1,5 +1,7 @@
 package gtcmtswarmbot.mobilecontrol;
 
+import java.util.Vector;
+ 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,6 +15,8 @@ public class Sequencer {
 
 	Paint p,p2,p3;
 	int sz=60;
+	
+	Composition comp;
 
 	Sequencer(DrawView v)
 	{
@@ -36,6 +40,8 @@ public class Sequencer {
 		p3.setColor(Color.YELLOW);
 		p3.setAntiAlias(true);
 		//p3.setStyle(Paint.Style.STROKE);
+		
+		this.comp=v.bbc.myComposition;
 	}
 
 	void run(Canvas c)
@@ -131,6 +137,30 @@ public class Sequencer {
 				seq[i]=!seq[i];
 			}
 		}
+	}
+	
+	void displayMeasure(int k)
+	{
+		
+		CMeasure m = this.comp.getMeasure(k);
+		
+		for(int i =0 ; i< m.SEQUENCERLENGTH;i++)
+		{
+			Vector v = m.notes[i];
+			for(int j = 0; j < v.size();j++)
+			{
+				
+			}
+			
+			
+		}
+	}
+
+	public void nextMeasure() {
+		// TODO Auto-generated method stub
+		
+		//this.comp.
+		
 	}
 
 }
