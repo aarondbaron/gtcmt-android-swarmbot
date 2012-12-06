@@ -196,7 +196,7 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 	
 	int controllerID;
 	
-	public boolean usingEmotion=true;
+	public boolean usingEmotion=false;
 
 	public boolean isnComEnable() {
 		return nComEnable;
@@ -971,8 +971,11 @@ public class BoeBotController implements OnClickListener, SensorEventListener
 							
 							
 							////////////////////
-							rfv.doJiggle();
-							rfv.doJiggleBigger();
+							if(usingEmotion)
+							{
+								rfv.doJiggle();
+								rfv.doJiggleBigger();
+							}
 							////////////////////
 							mActivity.aTest.soundType(7);
 							mActivity.aTest.replay();
