@@ -2607,8 +2607,11 @@ public class BeatTimer extends Thread{
 								bbc.playInstrument();
 							}
 						}
-						bbc.rfv.doJiggle();
-						bbc.rfv.doJiggleBigger();
+						if(bbc.usingEmotion)
+						{
+							bbc.rfv.doJiggle();
+							bbc.rfv.doJiggleBigger();
+						}
 					}
 
 					/*

@@ -1449,7 +1449,10 @@ public class ClientCode implements OnClickListener{
 											}
 
 											//bbc.lookAtHuman();
-											bbc.myBehavior.doEmoteJiggle();
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.doEmoteJiggle();
+											}
 											//bbc.goToStartPosition();
 
 											//the human played but it wasn't his turn. interruption. what
@@ -1492,7 +1495,10 @@ public class ClientCode implements OnClickListener{
 											}
 
 											//bbc.lookAtHuman();
-											bbc.myBehavior.doEmoteJiggle();
+											if(bbc.usingEmotion)
+											{
+												bbc.myBehavior.doEmoteJiggle();
+											}
 											//bbc.goToStartPosition();
 
 											//the human played but it wasn't his turn. interruption. what

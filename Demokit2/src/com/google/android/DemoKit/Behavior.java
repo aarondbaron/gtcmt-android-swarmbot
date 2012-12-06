@@ -654,7 +654,8 @@ public class Behavior extends Thread
 
 
 		//the human interrupted
-		if(bbc.myBehavior.humanInterruptedMe)
+		//in this case..kindof grouping the emotion with the responsiveness to the user..but whatever.
+		if(bbc.myBehavior.humanInterruptedMe&&bbc.usingEmotion)
 		{
 			//look at the human for 2 seconds
 			if(System.currentTimeMillis()-humanInterruptedMeTimer <2000)
@@ -3287,7 +3288,7 @@ public class Behavior extends Thread
 		{
 			if(t<timerot)
 			{
-				bbc.rotLeft();
+				bbc.rotLeft();				
 				bbc.rfv.doJiggle();
 				bbc.rfv.doJiggleBigger();
 			}
